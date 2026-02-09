@@ -1,12 +1,12 @@
 # trade-erp
 
-基于 `webapp-template` 迁移的外销 ERP 管理后台（MVP）。
+基于 `webapp-template` 迁移的外销 ERP 管理后台（一期预需求落地版）。
 
 ## 目录结构
 
-- `web/`：Ant Design 管理后台（本次重点）
-- `server/`：Go Kratos + Ent 后端骨架（从模板迁移）
-- `docs/`：需求映射与实施说明
+- `web/`：Ant Design 管理后台（当前实现重点）
+- `server/`：Go Kratos + Ent 后端骨架
+- `docs/`：需求映射与阶段清单
 
 ## 快速开始
 
@@ -35,40 +35,13 @@ make init
 make run
 ```
 
-## 已实现模块（MVP）
+## 一期预需求实现
 
-- 客户/供应商
-- 产品
-- 报价单（可选）
-- 外销
-- 采购（采购合同）
-- 入库通知/检验/入库
-- 库存
-- 出运明细
-- 出库
-- 结汇（支持按付款周期自动计算应收日期）
-- 水单 → 招领 → 认领确认
-- 打印模板中心（报价单、PI、采购合同、商业发票、装箱单、送货单）
-
-## 状态箱机制
-
-支持以下状态箱及流转：
-
-- 草稿箱
-- 待批箱
-- 已批箱
-- 招领箱
-- 确认箱
-- 免批
-
-## 数据与后端说明
-
-当前为前端可运行 MVP，页面使用内置 mock 数据（便于先确认流程与模板）。
-后续可直接对接 `server/` API 与数据库模型。
+详见：`/Users/simon/projects/trade-erp/docs/erp-phase1-requirements.md`
 
 ## 数据库迁移约束
 
-`server` 已采用 Ent + Atlas 工作流，遵循以下规范：
+`server` 已采用 Ent + Atlas 工作流：
 
 - 禁止手写 SQL
 - 使用 `make data` 生成迁移

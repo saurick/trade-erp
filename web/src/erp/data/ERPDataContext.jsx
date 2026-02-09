@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useMemo, useState } from 'react'
+import { moduleMap } from '../config/moduleDefinitions'
 import { createAutoCode } from '../utils/finance'
+import { applyInventoryDelta } from '../utils/inventory'
 import { createInitialModuleData } from './seedFactory'
 
 const ERPDataContext = createContext(null)
@@ -7,10 +9,33 @@ const ERPDataContext = createContext(null)
 export const ERPDataProvider = ({ children }) => {
   const [moduleRecords, setModuleRecords] = useState(createInitialModuleData)
 
-  const addRecord = (moduleItem, values) => {
+  const getModuleRecords = (moduleKey) => moduleRecords[moduleKey] || []
+
+  const buildCode = (moduleItem, values, currentList) => {
+    if (typeof moduleItem.codeBuilder === 'function') {
+      return moduleItem.codeBuilder(values, {
+        currentSize: currentList.length,
+        createAutoCode,
+      })
+    }
+
+    return createAutoCode(moduleItem.codePrefix, currentList.length)
+  }
+
+  const applyModuleUpdate = (moduleKey, updater) => {
     setModuleRecords((prev) => {
-      const currentList = prev[moduleItem.key] || []
-      const code = values.code || createAutoCode(moduleItem.codePrefix, currentList.length)
+      const currentList = prev[moduleKey] || []
+      const nextList = updater(currentList)
+      return {
+        ...prev,
+        [moduleKey]: nextList,
+      }
+    })
+  }
+
+  const addRecord = (moduleItem, values, options = {}) => {
+    applyModuleUpdate(moduleItem.key, (currentList) => {
+      const code = values.code || buildCode(moduleItem, values, currentList)
       const record = {
         id: `${moduleItem.key}-${Date.now()}`,
         code,
@@ -18,17 +43,23 @@ export const ERPDataProvider = ({ children }) => {
         ...values,
       }
 
-      return {
-        ...prev,
-        [moduleItem.key]: [record, ...currentList],
-      }
+      return [record, ...currentList]
     })
+
+    if (options.inventoryDelta) {
+      applyModuleUpdate('inventory', (inventoryRecords) => {
+        const { records } = applyInventoryDelta({
+          records: inventoryRecords,
+          ...options.inventoryDelta,
+        })
+        return records
+      })
+    }
   }
 
   const updateRecord = (moduleItem, recordId, values) => {
-    setModuleRecords((prev) => {
-      const currentList = prev[moduleItem.key] || []
-      const nextList = currentList.map((record) =>
+    applyModuleUpdate(moduleItem.key, (currentList) =>
+      currentList.map((record) =>
         record.id === recordId
           ? {
               ...record,
@@ -36,39 +67,74 @@ export const ERPDataProvider = ({ children }) => {
             }
           : record
       )
-
-      return {
-        ...prev,
-        [moduleItem.key]: nextList,
-      }
-    })
+    )
   }
 
   const moveStatus = (moduleItem, recordId, nextStatus) => {
-    setModuleRecords((prev) => {
-      const currentList = prev[moduleItem.key] || []
-      const nextList = currentList.map((record) =>
-        record.id === recordId
-          ? {
-              ...record,
-              box: nextStatus,
-            }
-          : record
-      )
+    updateRecord(moduleItem, recordId, { box: nextStatus })
+  }
 
-      return {
-        ...prev,
-        [moduleItem.key]: nextList,
-      }
-    })
+  const createLinkedRecord = (targetKey, sourceRecord, mapFn, options = {}) => {
+    const targetModule = moduleMap[targetKey]
+    if (!targetModule) {
+      return
+    }
+
+    const helpers = {
+      getModuleRecords,
+    }
+
+    let values = mapFn ? mapFn(sourceRecord, helpers) : {}
+    if (typeof targetModule.beforeSave === 'function') {
+      values = targetModule.beforeSave(values, helpers)
+    }
+    addRecord(targetModule, values, options)
+  }
+
+  const receiveInbound = (record) => {
+    if (!record) {
+      return
+    }
+
+    if (!record.entryNo) {
+      applyModuleUpdate('inbound', (currentList) =>
+        currentList.map((item) => {
+          if (item.id !== record.id) {
+            return item
+          }
+          const entryNo = createAutoCode('RKD', currentList.length)
+          return {
+            ...item,
+            entryNo,
+            inboundApplied: true,
+          }
+        })
+      )
+    }
+
+    if (!record.inboundApplied && record.productName && record.warehouseName && record.location && record.quantity) {
+      applyModuleUpdate('inventory', (inventoryRecords) => {
+        const { records } = applyInventoryDelta({
+          records: inventoryRecords,
+          productName: record.productName,
+          warehouseName: record.warehouseName,
+          location: record.location,
+          deltaQty: Number(record.quantity),
+        })
+        return records
+      })
+    }
   }
 
   const value = useMemo(
     () => ({
       moduleRecords,
+      getModuleRecords,
       addRecord,
       updateRecord,
       moveStatus,
+      createLinkedRecord,
+      receiveInbound,
     }),
     [moduleRecords]
   )
