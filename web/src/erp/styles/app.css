@@ -1,0 +1,98 @@
+:root {
+  --erp-bg-start: #f4fbf5;
+  --erp-bg-end: #e8f5ec;
+  --erp-sider-bg: #f9fffa;
+  --erp-header-bg: #ffffffcc;
+  --erp-border: #d8e7db;
+  --erp-text: #0f172a;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--erp-text);
+  background:
+    radial-gradient(circle at 0% 0%, #e7f7ea 0%, transparent 35%),
+    radial-gradient(circle at 100% 100%, #dff2e5 0%, transparent 30%),
+    linear-gradient(135deg, var(--erp-bg-start), var(--erp-bg-end));
+}
+
+.erp-app-shell {
+  min-height: 100vh;
+  background: transparent;
+}
+
+.erp-sider {
+  border-right: 1px solid var(--erp-border);
+  background: var(--erp-sider-bg) !important;
+}
+
+.erp-sider-brand {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: #135c25;
+  border-bottom: 1px dashed var(--erp-border);
+}
+
+.erp-menu {
+  background: transparent;
+  border-inline-end: none !important;
+  padding: 12px 10px;
+}
+
+.erp-menu .ant-menu-item,
+.erp-menu .ant-menu-item-group-title {
+  border-radius: 8px;
+}
+
+.erp-header {
+  height: 64px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--erp-header-bg) !important;
+  border-bottom: 1px solid var(--erp-border);
+  backdrop-filter: blur(8px);
+  padding: 0 20px !important;
+}
+
+.erp-content {
+  padding: 16px;
+}
+
+.erp-page-card {
+  border: 1px solid #e5f1e8;
+  box-shadow: 0 8px 24px rgb(34 99 52 / 7%);
+  animation: card-enter 0.45s ease-out;
+}
+
+@keyframes card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 992px) {
+  .erp-header {
+    padding: 0 12px !important;
+  }
+
+  .erp-content {
+    padding: 12px;
+  }
+}

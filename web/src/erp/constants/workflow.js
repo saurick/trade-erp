@@ -1,0 +1,26 @@
+export const BOX_STATUS = {
+  DRAFT: '草稿箱',
+  PENDING: '待批箱',
+  APPROVED: '已批箱',
+  CLAIM: '招领箱',
+  CONFIRMED: '确认箱',
+  AUTO: '免批',
+}
+
+export const BOX_TRANSITIONS = {
+  [BOX_STATUS.DRAFT]: [BOX_STATUS.PENDING, BOX_STATUS.AUTO],
+  [BOX_STATUS.PENDING]: [BOX_STATUS.APPROVED, BOX_STATUS.DRAFT],
+  [BOX_STATUS.APPROVED]: [],
+  [BOX_STATUS.CLAIM]: [BOX_STATUS.CONFIRMED],
+  [BOX_STATUS.CONFIRMED]: [],
+  [BOX_STATUS.AUTO]: [],
+}
+
+export const BOX_COLORS = {
+  [BOX_STATUS.DRAFT]: 'default',
+  [BOX_STATUS.PENDING]: 'processing',
+  [BOX_STATUS.APPROVED]: 'success',
+  [BOX_STATUS.CLAIM]: 'gold',
+  [BOX_STATUS.CONFIRMED]: 'cyan',
+  [BOX_STATUS.AUTO]: 'purple',
+}
