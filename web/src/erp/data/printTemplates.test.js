@@ -24,8 +24,7 @@ describe('printTemplates', () => {
     const pdfHeader = Uint8Array.from([0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e, 0x33]).buffer
     const html = buildTemplateHTMLFromResponse('pi', pdfHeader, 'application/pdf')
     expect(html).toContain('proforma-template')
-    expect(html).toContain('PROFORMA INVOICE')
-    expect(html).toContain('/templates/billing-info-logo.png')
+    expect(html).toContain('/templates/proforma-invoice-bg-cropped.png')
   })
 
   it('purchase 使用固定版式模板', () => {

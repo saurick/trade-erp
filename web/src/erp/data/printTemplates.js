@@ -1846,161 +1846,56 @@ const buildProformaInvoiceTemplateHTML = (record = {}) => {
     <section class="proforma-template">
       <article class="proforma-paper">
         <div class="proforma-sheet" role="img" aria-label="外销形式发票模板">
-          <header class="proforma-header">
-            <div class="proforma-header-left">
-              ${buildEditableNode('headerCompanyName', 'proforma-header-company')}
-              ${buildEditableNode('headerAddressLine1', 'proforma-header-address')}
-              ${buildEditableNode('headerAddressLine2', 'proforma-header-address')}
-              ${buildEditableNode('headerPhone', 'proforma-header-phone')}
-            </div>
-            <div class="proforma-header-right">
-              <img class="proforma-logo" src="/templates/billing-info-logo.png" alt="KS MAGNETICS" draggable="false" />
-              ${buildEditableNode('headerWebsite', 'proforma-header-website')}
-            </div>
-          </header>
+          <img class="proforma-bg" src="/templates/proforma-invoice-bg-cropped.png" alt="外销形式发票固定底图" draggable="false" />
 
-          <div class="proforma-divider"></div>
-          <div class="proforma-title-wrap">
-            ${buildEditableNode('title', 'proforma-title')}
-          </div>
+          ${buildEditableNode('headerCompanyName', 'proforma-field proforma-header-company')}
+          ${buildEditableNode('headerAddressLine1', 'proforma-field proforma-header-address-1')}
+          ${buildEditableNode('headerAddressLine2', 'proforma-field proforma-header-address-2')}
+          ${buildEditableNode('headerPhone', 'proforma-field proforma-header-phone')}
+          ${buildEditableNode('headerWebsite', 'proforma-field proforma-header-website')}
 
-          <section class="proforma-meta">
-            <div class="proforma-buyer">
-              ${buildEditableNode('buyerCompanyName', 'proforma-buyer-company')}
-              ${buildEditableNode('buyerAddressTel', 'proforma-buyer-address', true)}
-            </div>
-            <table class="proforma-meta-table">
-              <tbody>
-                <tr>
-                  <th>Invoice No.:</th>
-                  <td>${buildEditableNode('invoiceNo')}</td>
-                </tr>
-                <tr>
-                  <th>Order No.:</th>
-                  <td>${buildEditableNode('orderNo')}</td>
-                </tr>
-                <tr>
-                  <th>Date:</th>
-                  <td>${buildEditableNode('date')}</td>
-                </tr>
-                <tr>
-                  <th>Email:</th>
-                  <td>${buildEditableNode('email')}</td>
-                </tr>
-              </tbody>
-            </table>
-          </section>
+          ${buildEditableNode('title', 'proforma-field proforma-title')}
+          ${buildEditableNode('buyerCompanyName', 'proforma-field proforma-buyer-company')}
+          ${buildEditableNode('buyerAddressTel', 'proforma-field proforma-buyer-address', true)}
 
-          <table class="proforma-items-table">
-            <colgroup>
-              <col style="width:7.587%" />
-              <col style="width:10.199%" />
-              <col style="width:38.557%" />
-              <col style="width:13.308%" />
-              <col style="width:11.94%" />
-              <col style="width:18.408%" />
-            </colgroup>
-            <thead>
-              <tr>
-                <th>Item</th>
-                <th>Ref. No.</th>
-                <th>Goods Description</th>
-                <th>Quantity</th>
-                <th>Net Price</th>
-                <th>Net Value</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>${buildEditableNode('item1No', 'proforma-cell-center')}</td>
-                <td>${buildEditableNode('item1Ref', 'proforma-cell-center')}</td>
-                <td>${buildEditableNode('item1Desc', 'proforma-cell-left', true)}</td>
-                <td>${buildEditableNode('item1Qty', 'proforma-cell-center')}</td>
-                <td>${buildEditableNode('item1NetPrice', 'proforma-cell-right')}</td>
-                <td>${buildEditableNode('item1NetValue', 'proforma-cell-right')}</td>
-              </tr>
-              <tr>
-                <td>${buildEditableNode('item2No', 'proforma-cell-center')}</td>
-                <td>${buildEditableNode('item2Ref', 'proforma-cell-center')}</td>
-                <td>${buildEditableNode('item2Desc', 'proforma-cell-left', true)}</td>
-                <td>${buildEditableNode('item2Qty', 'proforma-cell-center')}</td>
-                <td>${buildEditableNode('item2NetPrice', 'proforma-cell-right')}</td>
-                <td>${buildEditableNode('item2NetValue', 'proforma-cell-right')}</td>
-              </tr>
-              <tr class="proforma-total-title-row">
-                <td colspan="5"><strong>Total Net Value:</strong></td>
-                <td class="proforma-total-value-cell" rowspan="2">${buildEditableNode('totalNetValue', 'proforma-cell-right proforma-cell-strong')}</td>
-              </tr>
-              <tr class="proforma-total-words-row">
-                <td colspan="5">${buildEditableNode('amountInWords', 'proforma-amount-words')}</td>
-              </tr>
-            </tbody>
-          </table>
+          ${buildEditableNode('invoiceNo', 'proforma-field proforma-invoice-no')}
+          ${buildEditableNode('orderNo', 'proforma-field proforma-order-no')}
+          ${buildEditableNode('date', 'proforma-field proforma-date')}
+          ${buildEditableNode('email', 'proforma-field proforma-email')}
 
-          <table class="proforma-terms-table">
-            <tbody>
-              <tr>
-                <th>Incoterms:</th>
-                <td>${buildEditableNode('incoterms')}</td>
-                <th>Delivery Method:</th>
-                <td>${buildEditableNode('deliveryMethod')}</td>
-              </tr>
-              <tr>
-                <th>Lead-time:</th>
-                <td>${buildEditableNode('leadTime')}</td>
-                <th>Payment Terms:</th>
-                <td>${buildEditableNode('paymentTerms', '', true)}</td>
-              </tr>
-              <tr>
-                <th>Notes:</th>
-                <td colspan="3">${buildEditableNode('notes', '', true)}</td>
-              </tr>
-            </tbody>
-          </table>
+          ${buildEditableNode('item1No', 'proforma-field proforma-item1-no proforma-center')}
+          ${buildEditableNode('item1Ref', 'proforma-field proforma-item1-ref proforma-center')}
+          ${buildEditableNode('item1Desc', 'proforma-field proforma-item1-desc proforma-center', true)}
+          ${buildEditableNode('item1Qty', 'proforma-field proforma-item1-qty proforma-center')}
+          ${buildEditableNode('item1NetPrice', 'proforma-field proforma-item1-price proforma-center')}
+          ${buildEditableNode('item1NetValue', 'proforma-field proforma-item1-value proforma-center')}
 
-          <section class="proforma-signature-zone">
-            <div class="proforma-seller-signature">
-              ${buildEditableNode('sellerCompanyEn', 'proforma-seller-company-en')}
-              ${buildEditableNode('sellerCompanyCn', 'proforma-seller-company-cn')}
-              ${buildEditableNode('sellerSigner', 'proforma-seller-signer')}
-              <div class="proforma-seller-sign-line"></div>
-              <div class="proforma-seller-sign-note">Authorized Signature(s)</div>
-            </div>
-            <div class="proforma-signature-labels">
-              ${buildEditableNode('authorizedBuyer', 'proforma-signature-label')}
-              ${buildEditableNode('authorizedSeller', 'proforma-signature-label')}
-            </div>
-          </section>
+          ${buildEditableNode('item2No', 'proforma-field proforma-item2-no proforma-center')}
+          ${buildEditableNode('item2Ref', 'proforma-field proforma-item2-ref proforma-center')}
+          ${buildEditableNode('item2Desc', 'proforma-field proforma-item2-desc proforma-center', true)}
+          ${buildEditableNode('item2Qty', 'proforma-field proforma-item2-qty proforma-center')}
+          ${buildEditableNode('item2NetPrice', 'proforma-field proforma-item2-price proforma-center')}
+          ${buildEditableNode('item2NetValue', 'proforma-field proforma-item2-value proforma-center')}
 
-          <table class="proforma-bank-table">
-            <tbody>
-              <tr>
-                <th>BANK NAME:</th>
-                <th>BENEFICIARY NAME:</th>
-                <td>${buildEditableNode('beneficiaryName')}</td>
-              </tr>
-              <tr>
-                <td>${buildEditableNode('bankName')}</td>
-                <th>ADDRESS:</th>
-                <td>${buildEditableNode('beneficiaryAddress')}</td>
-              </tr>
-              <tr>
-                <th>BANK ADDRESS:</th>
-                <th>A/C NO. USD:</th>
-                <td>${buildEditableNode('accountUsd')}</td>
-              </tr>
-              <tr>
-                <td>${buildEditableNode('bankAddress1')}</td>
-                <th>A/C NO. EURO:</th>
-                <td>${buildEditableNode('accountEuro')}</td>
-              </tr>
-              <tr>
-                <td>${buildEditableNode('bankAddress2')}</td>
-                <th>SWIFT CODE:</th>
-                <td>${buildEditableNode('swiftCode')}</td>
-              </tr>
-            </tbody>
-          </table>
+          ${buildEditableNode('totalNetValue', 'proforma-field proforma-total-value proforma-center proforma-strong')}
+          ${buildEditableNode('amountInWords', 'proforma-field proforma-amount-words proforma-strong', true)}
+          ${buildEditableNode('incoterms', 'proforma-field proforma-incoterms')}
+          ${buildEditableNode('deliveryMethod', 'proforma-field proforma-delivery')}
+          ${buildEditableNode('leadTime', 'proforma-field proforma-leadtime')}
+          ${buildEditableNode('paymentTerms', 'proforma-field proforma-payment', true)}
+          ${buildEditableNode('notes', 'proforma-field proforma-notes', true)}
+
+          ${buildEditableNode('authorizedBuyer', 'proforma-field proforma-auth-buyer proforma-strong')}
+          ${buildEditableNode('authorizedSeller', 'proforma-field proforma-auth-seller proforma-strong')}
+
+          ${buildEditableNode('bankName', 'proforma-field proforma-bank-name', true)}
+          ${buildEditableNode('bankAddress1', 'proforma-field proforma-bank-address-1', true)}
+          ${buildEditableNode('bankAddress2', 'proforma-field proforma-bank-address-2', true)}
+          ${buildEditableNode('beneficiaryName', 'proforma-field proforma-beneficiary-name')}
+          ${buildEditableNode('beneficiaryAddress', 'proforma-field proforma-beneficiary-address')}
+          ${buildEditableNode('accountUsd', 'proforma-field proforma-account-usd')}
+          ${buildEditableNode('accountEuro', 'proforma-field proforma-account-euro')}
+          ${buildEditableNode('swiftCode', 'proforma-field proforma-swift')}
         </div>
       </article>
     </section>
@@ -2346,26 +2241,43 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
         background: #d9d9d9;
       }
       .template-wrap .proforma-paper {
-        width: 842px;
-        min-height: 760px;
-        background: #fff;
+        width: 741px;
+        min-height: 800px;
+        background: #f6f6f6;
         box-shadow: 0 2px 14px rgba(0, 0, 0, 0.2);
-        padding: 10px 12px;
+        padding: 0;
         font-family: Arial, Helvetica, sans-serif;
         color: #111;
       }
       .template-wrap .proforma-sheet {
+        position: relative;
+        width: 741px;
+        height: 800px;
         border: 0;
         min-height: 100%;
+      }
+      .template-wrap .proforma-bg {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 741px;
+        height: 800px;
+        user-select: none;
+        -webkit-user-drag: none;
+        pointer-events: none;
+      }
+      .template-wrap .proforma-field {
+        position: absolute;
       }
       .template-wrap .proforma-editable {
         outline: 1px dashed transparent;
         border-radius: 2px;
-        min-height: 14px;
+        min-height: 12px;
         line-height: 1.2;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        font-size: 7px;
       }
       .template-wrap .proforma-editable[data-multiline="true"] {
         white-space: pre-wrap;
@@ -2376,227 +2288,178 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
         outline-color: #1f7a3f;
         background: rgba(31, 122, 63, 0.08);
       }
-      .template-wrap .proforma-header {
-        display: flex;
-        justify-content: space-between;
-        gap: 12px;
-        padding: 8px 10px 2px;
+      .template-wrap .proforma-center {
+        text-align: center;
       }
-      .template-wrap .proforma-header-left {
-        flex: 1;
+      .template-wrap .proforma-strong {
+        font-weight: 700;
       }
       .template-wrap .proforma-header-company {
-        font-size: 14px;
+        left: 4px;
+        top: 5px;
+        width: 325px;
+        font-size: 7px;
         font-weight: 700;
-        letter-spacing: 0.1px;
       }
-      .template-wrap .proforma-header-address {
-        margin-top: 2px;
-        font-size: 9px;
+      .template-wrap .proforma-header-address-1 {
+        left: 4px;
+        top: 19px;
+        width: 200px;
+      }
+      .template-wrap .proforma-header-address-2 {
+        left: 4px;
+        top: 32px;
+        width: 200px;
       }
       .template-wrap .proforma-header-phone {
-        margin-top: 2px;
-        font-size: 9px;
-      }
-      .template-wrap .proforma-header-right {
-        width: 252px;
-        text-align: center;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-      }
-      .template-wrap .proforma-logo {
-        width: 252px;
-        max-width: 100%;
-        margin-top: 2px;
-        user-select: none;
-        -webkit-user-drag: none;
+        left: 4px;
+        top: 45px;
+        width: 210px;
       }
       .template-wrap .proforma-header-website {
-        margin-top: 3px;
-        font-size: 9px;
+        left: 594px;
+        top: 45px;
+        width: 125px;
         text-align: right;
-        width: 100%;
-      }
-      .template-wrap .proforma-divider {
-        border-top: 2px solid #000;
-      }
-      .template-wrap .proforma-title-wrap {
-        padding: 8px 0 0;
-        text-align: center;
+        font-size: 6.8px;
       }
       .template-wrap .proforma-title {
-        font-size: 17px;
+        left: 266px;
+        top: 79px;
+        width: 210px;
+        text-align: center;
+        font-size: 7px;
         font-weight: 700;
-        letter-spacing: 0.2px;
-      }
-      .template-wrap .proforma-meta {
-        display: flex;
-        justify-content: space-between;
-        gap: 10px;
-        padding: 8px 10px 8px;
       }
       .template-wrap .proforma-buyer {
-        flex: 1;
-        min-height: 86px;
+        left: 4px;
+        top: 102px;
+        width: 260px;
+        min-height: 40px;
       }
       .template-wrap .proforma-buyer-company {
-        font-size: 12px;
+        left: 4px;
+        top: 102px;
+        width: 200px;
+        font-size: 7px;
         font-weight: 700;
       }
       .template-wrap .proforma-buyer-address {
-        margin-top: 2px;
-        font-size: 8px;
+        left: 4px;
+        top: 116px;
+        width: 200px;
       }
-      .template-wrap .proforma-meta-table {
-        width: 43%;
-        border-collapse: collapse;
-        table-layout: fixed;
+      .template-wrap .proforma-invoice-no {
+        left: 495px;
+        top: 102px;
+        width: 116px;
       }
-      .template-wrap .proforma-meta-table th,
-      .template-wrap .proforma-meta-table td {
-        border: 0;
-        padding: 1px 3px;
-        vertical-align: top;
+      .template-wrap .proforma-order-no {
+        left: 495px;
+        top: 116px;
+        width: 116px;
       }
-      .template-wrap .proforma-meta-table th {
-        width: 34%;
-        text-align: left;
-        white-space: nowrap;
-        font-size: 8px;
-        font-weight: 700;
+      .template-wrap .proforma-date {
+        left: 495px;
+        top: 130px;
+        width: 116px;
       }
-      .template-wrap .proforma-meta-table td {
-        font-size: 8px;
+      .template-wrap .proforma-email {
+        left: 495px;
+        top: 143px;
+        width: 155px;
       }
-      .template-wrap .proforma-items-table {
-        width: 100%;
-        border-collapse: collapse;
-        table-layout: fixed;
-        border-top: 1px solid #000;
+      .template-wrap .proforma-item1-no {
+        left: 31px;
+        top: 250px;
+        width: 24px;
       }
-      .template-wrap .proforma-items-table th,
-      .template-wrap .proforma-items-table td {
-        border: 1px solid #000;
-        padding: 3px 4px;
-        font-size: 8.5px;
-        vertical-align: middle;
+      .template-wrap .proforma-item1-ref {
+        left: 84px;
+        top: 250px;
+        width: 45px;
       }
-      .template-wrap .proforma-items-table th {
-        text-align: center;
-        font-weight: 700;
+      .template-wrap .proforma-item1-desc {
+        left: 173px;
+        top: 238px;
+        width: 226px;
+        line-height: 1.45;
       }
-      .template-wrap .proforma-cell-left {
-        text-align: left;
+      .template-wrap .proforma-item1-qty {
+        left: 447px;
+        top: 250px;
+        width: 18px;
       }
-      .template-wrap .proforma-cell-center {
-        text-align: center;
+      .template-wrap .proforma-item1-price {
+        left: 542px;
+        top: 250px;
+        width: 42px;
       }
-      .template-wrap .proforma-cell-right {
-        text-align: right;
+      .template-wrap .proforma-item1-value {
+        left: 665px;
+        top: 250px;
+        width: 47px;
       }
-      .template-wrap .proforma-cell-strong {
-        font-weight: 700;
+      .template-wrap .proforma-item2-no {
+        left: 31px;
+        top: 307px;
+        width: 24px;
       }
-      .template-wrap .proforma-total-title-row td {
-        font-size: 8.8px;
+      .template-wrap .proforma-item2-ref {
+        left: 84px;
+        top: 307px;
+        width: 45px;
       }
-      .template-wrap .proforma-total-words-row td {
-        min-height: 26px;
-        font-size: 8.8px;
-        font-weight: 700;
+      .template-wrap .proforma-item2-desc {
+        left: 170px;
+        top: 292px;
+        width: 232px;
+        line-height: 1.45;
       }
-      .template-wrap .proforma-total-value-cell {
-        vertical-align: middle !important;
+      .template-wrap .proforma-item2-qty {
+        left: 447px;
+        top: 307px;
+        width: 18px;
+      }
+      .template-wrap .proforma-item2-price {
+        left: 542px;
+        top: 307px;
+        width: 42px;
+      }
+      .template-wrap .proforma-item2-value {
+        left: 665px;
+        top: 307px;
+        width: 47px;
+      }
+      .template-wrap .proforma-total-value {
+        left: 658px;
+        top: 366px;
+        width: 58px;
       }
       .template-wrap .proforma-amount-words {
+        left: 30px;
+        top: 353px;
+        width: 365px;
         white-space: normal;
+        line-height: 1.45;
       }
-      .template-wrap .proforma-terms-table {
-        width: 100%;
-        border-collapse: collapse;
-        table-layout: fixed;
-      }
-      .template-wrap .proforma-terms-table th,
-      .template-wrap .proforma-terms-table td {
-        border: 1px solid #000;
-        padding: 3px 4px;
-        vertical-align: middle;
-        font-size: 8.5px;
-      }
-      .template-wrap .proforma-terms-table th {
-        width: 18%;
-        text-align: left;
-        font-weight: 700;
-      }
-      .template-wrap .proforma-terms-table td {
-        width: 32%;
-      }
-      .template-wrap .proforma-signature-zone {
-        border-left: 1px solid #000;
-        border-right: 1px solid #000;
-        padding: 8px 10px 6px;
-      }
-      .template-wrap .proforma-seller-signature {
-        width: 48%;
-        margin: 0 auto;
-        text-align: center;
-        color: #52638f;
-      }
-      .template-wrap .proforma-seller-company-en {
-        font-size: 9px;
-        font-weight: 700;
-      }
-      .template-wrap .proforma-seller-company-cn {
-        margin-top: 2px;
-        font-size: 11px;
-        font-family: "SimSun", "Songti SC", "Noto Serif CJK SC", serif;
-      }
-      .template-wrap .proforma-seller-signer {
-        margin-top: 8px;
-        font-size: 16px;
-        font-family: "Brush Script MT", "Segoe Script", cursive;
-      }
-      .template-wrap .proforma-seller-sign-line {
-        margin-top: 3px;
-        border-top: 1px dotted #52638f;
-      }
-      .template-wrap .proforma-seller-sign-note {
-        margin-top: 2px;
-        font-size: 7px;
-        font-style: italic;
-      }
-      .template-wrap .proforma-signature-labels {
-        display: flex;
-        justify-content: space-between;
-        gap: 16px;
-        margin-top: 6px;
-      }
-      .template-wrap .proforma-signature-label {
-        flex: 1;
-        font-size: 9px;
-        font-weight: 700;
-      }
-      .template-wrap .proforma-bank-table {
-        width: 100%;
-        border-collapse: collapse;
-        table-layout: fixed;
-        border-top: 1px solid #000;
-      }
-      .template-wrap .proforma-bank-table th,
-      .template-wrap .proforma-bank-table td {
-        padding: 2px 5px;
-        text-align: left;
-        vertical-align: top;
-        border: 0;
-      }
-      .template-wrap .proforma-bank-table th {
-        font-size: 8px;
-        font-weight: 700;
-      }
-      .template-wrap .proforma-bank-table td {
-        font-size: 8px;
-      }
+      .template-wrap .proforma-incoterms { left: 127px; top: 438px; width: 220px; }
+      .template-wrap .proforma-delivery { left: 496px; top: 438px; width: 120px; }
+      .template-wrap .proforma-leadtime { left: 127px; top: 470px; width: 120px; }
+      .template-wrap .proforma-payment { left: 496px; top: 470px; width: 212px; white-space: normal; line-height: 1.45; }
+      .template-wrap .proforma-notes { left: 127px; top: 502px; width: 581px; }
+
+      .template-wrap .proforma-auth-buyer { left: 29px; top: 645px; width: 200px; }
+      .template-wrap .proforma-auth-seller { left: 353px; top: 645px; width: 200px; }
+
+      .template-wrap .proforma-bank-name { left: 29px; top: 672px; width: 248px; line-height: 1.45; }
+      .template-wrap .proforma-bank-address-1 { left: 29px; top: 701px; width: 248px; line-height: 1.45; }
+      .template-wrap .proforma-bank-address-2 { left: 29px; top: 733px; width: 248px; line-height: 1.45; }
+      .template-wrap .proforma-beneficiary-name { left: 398px; top: 672px; width: 312px; }
+      .template-wrap .proforma-beneficiary-address { left: 398px; top: 701px; width: 312px; }
+      .template-wrap .proforma-account-usd { left: 398px; top: 715px; width: 158px; }
+      .template-wrap .proforma-account-euro { left: 398px; top: 729px; width: 158px; }
+      .template-wrap .proforma-swift { left: 398px; top: 744px; width: 158px; }
       .template-wrap .purchase-contract-template {
         display: flex;
         justify-content: center;
@@ -2738,10 +2601,10 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
           background: #fff !important;
         }
         .template-wrap .proforma-paper {
-          width: 210mm !important;
+          width: 185mm !important;
           min-height: 297mm !important;
           box-shadow: none !important;
-          padding: 3mm !important;
+          padding: 0 !important;
         }
         .template-wrap .purchase-contract-template {
           padding: 0 !important;
@@ -2757,30 +2620,17 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
           transform-origin: left top;
           transform: scale(0.899);
         }
-        .template-wrap .proforma-header-company { font-size: 8.4pt !important; }
-        .template-wrap .proforma-header-address { font-size: 6.5pt !important; }
-        .template-wrap .proforma-header-phone { font-size: 6.3pt !important; }
-        .template-wrap .proforma-header-website { font-size: 6.4pt !important; }
-        .template-wrap .proforma-title { font-size: 7.1pt !important; }
-        .template-wrap .proforma-buyer-company { font-size: 6.4pt !important; }
-        .template-wrap .proforma-buyer-address { font-size: 5.8pt !important; }
-        .template-wrap .proforma-meta-table th,
-        .template-wrap .proforma-meta-table td,
-        .template-wrap .proforma-items-table th,
-        .template-wrap .proforma-items-table td,
-        .template-wrap .proforma-total-title-row td,
-        .template-wrap .proforma-total-words-row td,
-        .template-wrap .proforma-terms-table th,
-        .template-wrap .proforma-terms-table td,
-        .template-wrap .proforma-signature-label,
-        .template-wrap .proforma-bank-table th,
-        .template-wrap .proforma-bank-table td {
+        .template-wrap .proforma-sheet {
+          width: 185mm !important;
+          height: 198.78mm !important;
+        }
+        .template-wrap .proforma-bg {
+          width: 185mm !important;
+          height: 198.78mm !important;
+        }
+        .template-wrap .proforma-editable {
           font-size: 5.8pt !important;
         }
-        .template-wrap .proforma-seller-company-en { font-size: 5.4pt !important; }
-        .template-wrap .proforma-seller-company-cn { font-size: 6pt !important; }
-        .template-wrap .proforma-seller-signer { font-size: 8.6pt !important; }
-        .template-wrap .proforma-seller-sign-note { font-size: 4.6pt !important; }
       }
     </style>
   </head>
