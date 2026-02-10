@@ -42,8 +42,6 @@ cd /Users/simon/projects/trade-erp/server
 make data
 make migrate_apply
 make db_schema_check
-# 全量校验（包含 M1/可选表）：
-go run ./cmd/dbschemacheck -conf ./configs/dev/config.yaml -full
 ```
 
 - 默认从 `configs/dev/config.yaml` 自动解析数据库连接并执行迁移。
