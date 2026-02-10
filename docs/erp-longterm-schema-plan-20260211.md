@@ -85,6 +85,8 @@
 make data
 make migrate_apply
 make db_schema_check
+# 需要全量校验（M0 + M1 + 可选表）时：
+go run ./cmd/dbschemacheck -conf ./configs/dev/config.yaml -full
 ```
 
 ## 六、完整逻辑仍需补齐的点

@@ -22,6 +22,7 @@ type bootstrapConfig struct {
 
 func main() {
 	confPath := flag.String("conf", "./configs/dev/config.yaml", "config yaml path")
+	fullCheck := flag.Bool("full", false, "whether check all ERP tables (include M1/optional tables)")
 	flag.Parse()
 
 	dsn, dbName := loadDSN(*confPath)
@@ -475,6 +476,29 @@ func main() {
 		},
 	}
 
+	if !*fullCheck {
+		optionalOrM1Tables := []string{
+			"erp_quotations",
+			"erp_quotation_items",
+			"erp_export_sales",
+			"erp_export_sale_items",
+			"erp_purchase_contracts",
+			"erp_purchase_contract_items",
+			"erp_inbound_notices",
+			"erp_inbound_notice_items",
+			"erp_shipment_details",
+			"erp_shipment_detail_items",
+			"erp_outbound_orders",
+			"erp_outbound_order_items",
+			"erp_doc_links",
+			"erp_sequences",
+			"erp_attachments",
+		}
+		for _, table := range optionalOrM1Tables {
+			delete(required, table)
+		}
+	}
+
 	for table, cols := range required {
 		for _, col := range cols {
 			ok, err := columnExists(db, dbName, table, col)
@@ -487,7 +511,11 @@ func main() {
 		}
 	}
 
-	fmt.Println("schema check passed")
+	if *fullCheck {
+		fmt.Println("schema check passed (mode=full)")
+		return
+	}
+	fmt.Println("schema check passed (mode=m0)")
 }
 
 func loadDSN(confPath string) (string, string) {
