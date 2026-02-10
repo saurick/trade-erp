@@ -77,6 +77,20 @@ func (_u *AdminUserUpdate) AddLevel(v int8) *AdminUserUpdate {
 	return _u
 }
 
+// SetMenuPermissions sets the "menu_permissions" field.
+func (_u *AdminUserUpdate) SetMenuPermissions(v string) *AdminUserUpdate {
+	_u.mutation.SetMenuPermissions(v)
+	return _u
+}
+
+// SetNillableMenuPermissions sets the "menu_permissions" field if the given value is not nil.
+func (_u *AdminUserUpdate) SetNillableMenuPermissions(v *string) *AdminUserUpdate {
+	if v != nil {
+		_u.SetMenuPermissions(*v)
+	}
+	return _u
+}
+
 // SetParentID sets the "parent_id" field.
 func (_u *AdminUserUpdate) SetParentID(v int) *AdminUserUpdate {
 	_u.mutation.ResetParentID()
@@ -197,6 +211,11 @@ func (_u *AdminUserUpdate) check() error {
 			return &ValidationError{Name: "password_hash", err: fmt.Errorf(`ent: validator failed for field "AdminUser.password_hash": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.MenuPermissions(); ok {
+		if err := adminuser.MenuPermissionsValidator(v); err != nil {
+			return &ValidationError{Name: "menu_permissions", err: fmt.Errorf(`ent: validator failed for field "AdminUser.menu_permissions": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -223,6 +242,9 @@ func (_u *AdminUserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if value, ok := _u.mutation.AddedLevel(); ok {
 		_spec.AddField(adminuser.FieldLevel, field.TypeInt8, value)
+	}
+	if value, ok := _u.mutation.MenuPermissions(); ok {
+		_spec.SetField(adminuser.FieldMenuPermissions, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.ParentID(); ok {
 		_spec.SetField(adminuser.FieldParentID, field.TypeInt, value)
@@ -311,6 +333,20 @@ func (_u *AdminUserUpdateOne) SetNillableLevel(v *int8) *AdminUserUpdateOne {
 // AddLevel adds value to the "level" field.
 func (_u *AdminUserUpdateOne) AddLevel(v int8) *AdminUserUpdateOne {
 	_u.mutation.AddLevel(v)
+	return _u
+}
+
+// SetMenuPermissions sets the "menu_permissions" field.
+func (_u *AdminUserUpdateOne) SetMenuPermissions(v string) *AdminUserUpdateOne {
+	_u.mutation.SetMenuPermissions(v)
+	return _u
+}
+
+// SetNillableMenuPermissions sets the "menu_permissions" field if the given value is not nil.
+func (_u *AdminUserUpdateOne) SetNillableMenuPermissions(v *string) *AdminUserUpdateOne {
+	if v != nil {
+		_u.SetMenuPermissions(*v)
+	}
 	return _u
 }
 
@@ -447,6 +483,11 @@ func (_u *AdminUserUpdateOne) check() error {
 			return &ValidationError{Name: "password_hash", err: fmt.Errorf(`ent: validator failed for field "AdminUser.password_hash": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.MenuPermissions(); ok {
+		if err := adminuser.MenuPermissionsValidator(v); err != nil {
+			return &ValidationError{Name: "menu_permissions", err: fmt.Errorf(`ent: validator failed for field "AdminUser.menu_permissions": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -490,6 +531,9 @@ func (_u *AdminUserUpdateOne) sqlSave(ctx context.Context) (_node *AdminUser, er
 	}
 	if value, ok := _u.mutation.AddedLevel(); ok {
 		_spec.AddField(adminuser.FieldLevel, field.TypeInt8, value)
+	}
+	if value, ok := _u.mutation.MenuPermissions(); ok {
+		_spec.SetField(adminuser.FieldMenuPermissions, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.ParentID(); ok {
 		_spec.SetField(adminuser.FieldParentID, field.TypeInt, value)

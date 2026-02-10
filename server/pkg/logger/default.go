@@ -4,6 +4,8 @@ import (
 	"context"
 	"os"
 
+	"server/pkg/requestid"
+
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/tracing"
 )
@@ -17,6 +19,9 @@ func NewDefaultLogger(id, name, version string, debug bool) log.Logger {
 		"service.id", id,
 		"service.name", name,
 		"service.version", version,
+		"request_id", requestid.Valuer(),
+		"trace_id", tracing.TraceID(),
+		"span_id", tracing.SpanID(),
 		"trace.id", tracing.TraceID(),
 		"span.id", tracing.SpanID(),
 		"task.id", TaskID(),

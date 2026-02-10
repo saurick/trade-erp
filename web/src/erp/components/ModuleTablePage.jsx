@@ -10,14 +10,17 @@ import {
   Input,
   InputNumber,
   Modal,
+  Popconfirm,
   Row,
   Select,
   Space,
   Table,
   Typography,
+  Upload,
   message,
 } from 'antd'
-import { DownOutlined, EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons'
+import { DeleteOutlined, DownOutlined, EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons'
+import { AUTH_SCOPE, getToken } from '@/common/auth/auth'
 import { BOX_STATUS } from '../constants/workflow'
 import { getNextStatuses } from '../utils/workflow'
 import { useERPData } from '../data/ERPDataContext'
@@ -27,6 +30,67 @@ import { summarizeItems } from '../utils/items'
 import { openPrintWindow } from '../data/printTemplates'
 
 const { Paragraph, Text, Title } = Typography
+
+const uploadAttachment = async (file, category = 'attachments') => {
+  const token = getToken(AUTH_SCOPE.ADMIN)
+  if (!token) {
+    throw new Error('请先登录管理员账号')
+  }
+  const formData = new FormData()
+  formData.append('file', file)
+
+  const resp = await fetch(`/files/upload?category=${encodeURIComponent(category)}`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  })
+  const payload = await resp.json().catch(() => ({}))
+  if (!resp.ok || Number(payload?.code) !== 0) {
+    throw new Error(payload?.message || '附件上传失败')
+  }
+  return payload?.data?.url || ''
+}
+
+const UploadFieldInput = ({ value, onChange, multiple = false, category = 'attachments' }) => {
+  const textValue = typeof value === 'string' ? value : ''
+
+  const handleUpload = async ({ file, onSuccess, onError }) => {
+    try {
+      const fileURL = await uploadAttachment(file, category)
+      const mergedValue = multiple
+        ? [textValue, fileURL].filter(Boolean).join('\n')
+        : fileURL
+      onChange?.(mergedValue)
+      message.success('附件上传成功')
+      onSuccess?.({}, file)
+    } catch (err) {
+      message.error(err?.message || '附件上传失败')
+      onError?.(err)
+    }
+  }
+
+  return (
+    <Space direction="vertical" style={{ width: '100%' }} size={8}>
+      <Input.TextArea
+        value={textValue}
+        rows={3}
+        maxLength={1000}
+        showCount
+        placeholder="可手动输入或上传文件后自动写入 URL"
+        onChange={(event) => onChange?.(event.target.value)}
+      />
+      <Upload
+        accept=".xls,.xlsx,.pdf,.png,.jpg,.jpeg,.webp,.doc,.docx"
+        showUploadList={false}
+        customRequest={handleUpload}
+      >
+        <Button size="small">上传附件</Button>
+      </Upload>
+    </Space>
+  )
+}
 
 const renderField = (field, options = {}) => {
   if (field.type === 'items') {
@@ -47,6 +111,15 @@ const renderField = (field, options = {}) => {
 
   if (field.type === 'textarea') {
     return <Input.TextArea rows={3} maxLength={300} showCount />
+  }
+
+  if (field.type === 'upload') {
+    return (
+      <UploadFieldInput
+        multiple={Boolean(field.multiple)}
+        category={field.uploadCategory || 'attachments'}
+      />
+    )
   }
 
   if (field.type === 'date-picker') {
@@ -76,9 +149,11 @@ const normalizeValues = (values) => {
 
 const ModuleTablePage = ({ moduleItem }) => {
   const {
+    loading,
     moduleRecords,
     addRecord,
     updateRecord,
+    deleteRecord,
     moveStatus,
     createLinkedRecord,
     receiveInbound,
@@ -130,10 +205,10 @@ const ModuleTablePage = ({ moduleItem }) => {
     }
 
     if (editingRecord) {
-      updateRecord(moduleItem, editingRecord.id, payload)
+      await updateRecord(moduleItem, editingRecord.id, payload)
       message.success('记录已更新')
     } else {
-      addRecord(moduleItem, payload)
+      await addRecord(moduleItem, payload)
       message.success('记录已新增')
     }
 
@@ -174,17 +249,27 @@ const ModuleTablePage = ({ moduleItem }) => {
           label: status,
         }))
 
-        const handleStatusClick = ({ key }) => {
-          moveStatus(moduleItem, record.id, key)
-          message.success(`已流转到 ${key}`)
+        const handleStatusClick = async ({ key }) => {
+          try {
+            await moveStatus(moduleItem, record.id, key)
+            message.success(`已流转到 ${key}`)
+          } catch (err) {
+            message.error(err?.message || '状态流转失败')
+          }
+        }
+
+        const runSafe = (runner, args = []) => {
+          Promise.resolve(runner(...args)).catch((err) => {
+            message.error(err?.message || '操作失败')
+          })
         }
 
         const actionHelpers = {
-          addRecord,
-          updateRecord,
-          moveStatus,
-          createLinkedRecord,
-          receiveInbound,
+          addRecord: (...args) => runSafe(addRecord, args),
+          updateRecord: (...args) => runSafe(updateRecord, args),
+          moveStatus: (...args) => runSafe(moveStatus, args),
+          createLinkedRecord: (...args) => runSafe(createLinkedRecord, args),
+          receiveInbound: (...args) => runSafe(receiveInbound, args),
           getModuleRecords,
           notify: message,
           openPrintWindow,
@@ -209,18 +294,39 @@ const ModuleTablePage = ({ moduleItem }) => {
                 key={action.key}
                 size="small"
                 type={action.type === 'primary' ? 'primary' : 'default'}
-                onClick={() => action.onRun(record, actionHelpers, moduleItem)}
+                onClick={() => {
+                  Promise.resolve(action.onRun(record, actionHelpers, moduleItem)).catch((err) => {
+                    message.error(err?.message || '操作失败')
+                  })
+                }}
               >
                 {action.label}
               </Button>
             ))}
+            <Popconfirm
+              title="确认删除该记录？"
+              okText="删除"
+              cancelText="取消"
+              onConfirm={async () => {
+                try {
+                  await deleteRecord(moduleItem, record.id)
+                  message.success('记录已删除')
+                } catch (err) {
+                  message.error(err?.message || '删除失败')
+                }
+              }}
+            >
+              <Button danger size="small" icon={<DeleteOutlined />}>
+                删除
+              </Button>
+            </Popconfirm>
           </Space>
         )
       },
     })
 
     return baseColumns
-  }, [moduleItem, moveStatus])
+  }, [moduleItem, addRecord, updateRecord, deleteRecord, moveStatus, createLinkedRecord, receiveInbound, getModuleRecords])
 
   return (
     <Space direction="vertical" size={16} style={{ width: '100%' }}>
@@ -269,6 +375,7 @@ const ModuleTablePage = ({ moduleItem }) => {
         <Table
           rowKey="id"
           size="middle"
+          loading={loading}
           pagination={{ pageSize: 8 }}
           locale={{ emptyText: <Empty description="暂无数据" /> }}
           columns={columnDefs}

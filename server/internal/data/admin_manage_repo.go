@@ -4,6 +4,7 @@ package data
 import (
 	"context"
 	"database/sql"
+	"strings"
 
 	"server/internal/biz"
 	"server/internal/data/model/ent"
@@ -35,6 +36,7 @@ func (r *adminManageRepo) toBizAdmin(a *ent.AdminUser) *biz.AdminAccount {
 		ID:              a.ID,
 		Username:        a.Username,
 		Level:           biz.AdminLevel(a.Level),
+		MenuPermissions: decodeMenuPermissions(a.MenuPermissions),
 		ParentID:        a.ParentID,
 		Disabled:        a.Disabled,
 		LastLoginAt:     a.LastLoginAt,
@@ -178,6 +180,7 @@ func (r *adminManageRepo) CreateAdmin(ctx context.Context, in *biz.AdminCreate) 
 		SetUsername(in.Username).
 		SetPasswordHash(in.PasswordHash).
 		SetLevel(int8(in.Level)).
+		SetMenuPermissions(encodeMenuPermissions(in.MenuPermissions)).
 		SetDisabled(false)
 
 	if in.ParentID != nil {
@@ -194,6 +197,20 @@ func (r *adminManageRepo) CreateAdmin(ctx context.Context, in *biz.AdminCreate) 
 		return nil, err
 	}
 	return r.toBizAdmin(row), nil
+}
+
+func (r *adminManageRepo) UpdateAdminMenuPermissions(ctx context.Context, id int, menuPermissions []string) error {
+	if id <= 0 {
+		return biz.ErrBadParam
+	}
+	encoded := encodeMenuPermissions(menuPermissions)
+	if _, err := r.data.mysql.AdminUser.UpdateOneID(id).SetMenuPermissions(encoded).Save(ctx); err != nil {
+		if ent.IsNotFound(err) {
+			return biz.ErrAdminNotFound
+		}
+		return err
+	}
+	return nil
 }
 
 func (r *adminManageRepo) UpdateAdminHierarchy(ctx context.Context, id int, level biz.AdminLevel, parentID *int) error {
@@ -282,4 +299,17 @@ func (r *adminManageRepo) isUsernameUsedByUser(ctx context.Context, username str
 		Query().
 		Where(user.Username(username)).
 		Exist(ctx)
+}
+
+func decodeMenuPermissions(raw string) []string {
+	raw = strings.TrimSpace(raw)
+	if raw == "" {
+		return []string{}
+	}
+	return biz.NormalizeAdminMenuPermissions(strings.Split(raw, ","))
+}
+
+func encodeMenuPermissions(values []string) string {
+	normalized := biz.NormalizeAdminMenuPermissions(values)
+	return strings.Join(normalized, ",")
 }

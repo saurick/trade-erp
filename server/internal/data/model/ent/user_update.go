@@ -56,26 +56,6 @@ func (_u *UserUpdate) SetNillablePasswordHash(v *string) *UserUpdate {
 	return _u
 }
 
-// SetInviteCode sets the "invite_code" field.
-func (_u *UserUpdate) SetInviteCode(v string) *UserUpdate {
-	_u.mutation.SetInviteCode(v)
-	return _u
-}
-
-// SetNillableInviteCode sets the "invite_code" field if the given value is not nil.
-func (_u *UserUpdate) SetNillableInviteCode(v *string) *UserUpdate {
-	if v != nil {
-		_u.SetInviteCode(*v)
-	}
-	return _u
-}
-
-// ClearInviteCode clears the value of the "invite_code" field.
-func (_u *UserUpdate) ClearInviteCode() *UserUpdate {
-	_u.mutation.ClearInviteCode()
-	return _u
-}
-
 // SetRole sets the "role" field.
 func (_u *UserUpdate) SetRole(v int8) *UserUpdate {
 	_u.mutation.ResetRole()
@@ -258,11 +238,6 @@ func (_u *UserUpdate) check() error {
 			return &ValidationError{Name: "password_hash", err: fmt.Errorf(`ent: validator failed for field "User.password_hash": %w`, err)}
 		}
 	}
-	if v, ok := _u.mutation.InviteCode(); ok {
-		if err := user.InviteCodeValidator(v); err != nil {
-			return &ValidationError{Name: "invite_code", err: fmt.Errorf(`ent: validator failed for field "User.invite_code": %w`, err)}
-		}
-	}
 	return nil
 }
 
@@ -283,12 +258,6 @@ func (_u *UserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if value, ok := _u.mutation.PasswordHash(); ok {
 		_spec.SetField(user.FieldPasswordHash, field.TypeString, value)
-	}
-	if value, ok := _u.mutation.InviteCode(); ok {
-		_spec.SetField(user.FieldInviteCode, field.TypeString, value)
-	}
-	if _u.mutation.InviteCodeCleared() {
-		_spec.ClearField(user.FieldInviteCode, field.TypeString)
 	}
 	if value, ok := _u.mutation.Role(); ok {
 		_spec.SetField(user.FieldRole, field.TypeInt8, value)
@@ -374,26 +343,6 @@ func (_u *UserUpdateOne) SetNillablePasswordHash(v *string) *UserUpdateOne {
 	if v != nil {
 		_u.SetPasswordHash(*v)
 	}
-	return _u
-}
-
-// SetInviteCode sets the "invite_code" field.
-func (_u *UserUpdateOne) SetInviteCode(v string) *UserUpdateOne {
-	_u.mutation.SetInviteCode(v)
-	return _u
-}
-
-// SetNillableInviteCode sets the "invite_code" field if the given value is not nil.
-func (_u *UserUpdateOne) SetNillableInviteCode(v *string) *UserUpdateOne {
-	if v != nil {
-		_u.SetInviteCode(*v)
-	}
-	return _u
-}
-
-// ClearInviteCode clears the value of the "invite_code" field.
-func (_u *UserUpdateOne) ClearInviteCode() *UserUpdateOne {
-	_u.mutation.ClearInviteCode()
 	return _u
 }
 
@@ -592,11 +541,6 @@ func (_u *UserUpdateOne) check() error {
 			return &ValidationError{Name: "password_hash", err: fmt.Errorf(`ent: validator failed for field "User.password_hash": %w`, err)}
 		}
 	}
-	if v, ok := _u.mutation.InviteCode(); ok {
-		if err := user.InviteCodeValidator(v); err != nil {
-			return &ValidationError{Name: "invite_code", err: fmt.Errorf(`ent: validator failed for field "User.invite_code": %w`, err)}
-		}
-	}
 	return nil
 }
 
@@ -634,12 +578,6 @@ func (_u *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) {
 	}
 	if value, ok := _u.mutation.PasswordHash(); ok {
 		_spec.SetField(user.FieldPasswordHash, field.TypeString, value)
-	}
-	if value, ok := _u.mutation.InviteCode(); ok {
-		_spec.SetField(user.FieldInviteCode, field.TypeString, value)
-	}
-	if _u.mutation.InviteCodeCleared() {
-		_spec.ClearField(user.FieldInviteCode, field.TypeString)
 	}
 	if value, ok := _u.mutation.Role(); ok {
 		_spec.SetField(user.FieldRole, field.TypeInt8, value)

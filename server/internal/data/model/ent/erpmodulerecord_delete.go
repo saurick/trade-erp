@@ -4,7 +4,7 @@ package ent
 
 import (
 	"context"
-	"server/internal/data/model/ent/invitecode"
+	"server/internal/data/model/ent/erpmodulerecord"
 	"server/internal/data/model/ent/predicate"
 
 	"entgo.io/ent/dialect/sql"
@@ -12,26 +12,26 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// InviteCodeDelete is the builder for deleting a InviteCode entity.
-type InviteCodeDelete struct {
+// ERPModuleRecordDelete is the builder for deleting a ERPModuleRecord entity.
+type ERPModuleRecordDelete struct {
 	config
 	hooks    []Hook
-	mutation *InviteCodeMutation
+	mutation *ERPModuleRecordMutation
 }
 
-// Where appends a list predicates to the InviteCodeDelete builder.
-func (_d *InviteCodeDelete) Where(ps ...predicate.InviteCode) *InviteCodeDelete {
+// Where appends a list predicates to the ERPModuleRecordDelete builder.
+func (_d *ERPModuleRecordDelete) Where(ps ...predicate.ERPModuleRecord) *ERPModuleRecordDelete {
 	_d.mutation.Where(ps...)
 	return _d
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (_d *InviteCodeDelete) Exec(ctx context.Context) (int, error) {
+func (_d *ERPModuleRecordDelete) Exec(ctx context.Context) (int, error) {
 	return withHooks(ctx, _d.sqlExec, _d.mutation, _d.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (_d *InviteCodeDelete) ExecX(ctx context.Context) int {
+func (_d *ERPModuleRecordDelete) ExecX(ctx context.Context) int {
 	n, err := _d.Exec(ctx)
 	if err != nil {
 		panic(err)
@@ -39,8 +39,8 @@ func (_d *InviteCodeDelete) ExecX(ctx context.Context) int {
 	return n
 }
 
-func (_d *InviteCodeDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := sqlgraph.NewDeleteSpec(invitecode.Table, sqlgraph.NewFieldSpec(invitecode.FieldID, field.TypeInt))
+func (_d *ERPModuleRecordDelete) sqlExec(ctx context.Context) (int, error) {
+	_spec := sqlgraph.NewDeleteSpec(erpmodulerecord.Table, sqlgraph.NewFieldSpec(erpmodulerecord.FieldID, field.TypeInt))
 	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -56,32 +56,32 @@ func (_d *InviteCodeDelete) sqlExec(ctx context.Context) (int, error) {
 	return affected, err
 }
 
-// InviteCodeDeleteOne is the builder for deleting a single InviteCode entity.
-type InviteCodeDeleteOne struct {
-	_d *InviteCodeDelete
+// ERPModuleRecordDeleteOne is the builder for deleting a single ERPModuleRecord entity.
+type ERPModuleRecordDeleteOne struct {
+	_d *ERPModuleRecordDelete
 }
 
-// Where appends a list predicates to the InviteCodeDelete builder.
-func (_d *InviteCodeDeleteOne) Where(ps ...predicate.InviteCode) *InviteCodeDeleteOne {
+// Where appends a list predicates to the ERPModuleRecordDelete builder.
+func (_d *ERPModuleRecordDeleteOne) Where(ps ...predicate.ERPModuleRecord) *ERPModuleRecordDeleteOne {
 	_d._d.mutation.Where(ps...)
 	return _d
 }
 
 // Exec executes the deletion query.
-func (_d *InviteCodeDeleteOne) Exec(ctx context.Context) error {
+func (_d *ERPModuleRecordDeleteOne) Exec(ctx context.Context) error {
 	n, err := _d._d.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
 	case n == 0:
-		return &NotFoundError{invitecode.Label}
+		return &NotFoundError{erpmodulerecord.Label}
 	default:
 		return nil
 	}
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (_d *InviteCodeDeleteOne) ExecX(ctx context.Context) {
+func (_d *ERPModuleRecordDeleteOne) ExecX(ctx context.Context) {
 	if err := _d.Exec(ctx); err != nil {
 		panic(err)
 	}

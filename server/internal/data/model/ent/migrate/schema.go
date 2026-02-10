@@ -14,6 +14,7 @@ var (
 		{Name: "username", Type: field.TypeString, Size: 64},
 		{Name: "password_hash", Type: field.TypeString},
 		{Name: "level", Type: field.TypeInt8, Default: 2},
+		{Name: "menu_permissions", Type: field.TypeString, Size: 4096, Default: ""},
 		{Name: "parent_id", Type: field.TypeInt, Nullable: true},
 		{Name: "disabled", Type: field.TypeBool, Default: false},
 		{Name: "last_login_at", Type: field.TypeTime, Nullable: true},
@@ -39,31 +40,37 @@ var (
 			{
 				Name:    "adminuser_parent_id",
 				Unique:  false,
-				Columns: []*schema.Column{AdminUsersColumns[4]},
+				Columns: []*schema.Column{AdminUsersColumns[5]},
 			},
 		},
 	}
-	// InviteCodesColumns holds the columns for the "invite_codes" table.
-	InviteCodesColumns = []*schema.Column{
+	// ErpModuleRecordsColumns holds the columns for the "erp_module_records" table.
+	ErpModuleRecordsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "code", Type: field.TypeString, Size: 32},
-		{Name: "max_uses", Type: field.TypeInt, Default: 1},
-		{Name: "used_count", Type: field.TypeInt, Default: 0},
-		{Name: "expires_at", Type: field.TypeTime, Nullable: true},
-		{Name: "disabled", Type: field.TypeBool, Default: false},
+		{Name: "module_key", Type: field.TypeString, Size: 64},
+		{Name: "code", Type: field.TypeString, Nullable: true, Size: 128},
+		{Name: "box", Type: field.TypeString, Nullable: true, Size: 32},
+		{Name: "payload", Type: field.TypeString, Size: 2147483647, Default: "{}"},
+		{Name: "created_by_admin_id", Type: field.TypeInt, Nullable: true},
+		{Name: "updated_by_admin_id", Type: field.TypeInt, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 	}
-	// InviteCodesTable holds the schema information for the "invite_codes" table.
-	InviteCodesTable = &schema.Table{
-		Name:       "invite_codes",
-		Columns:    InviteCodesColumns,
-		PrimaryKey: []*schema.Column{InviteCodesColumns[0]},
+	// ErpModuleRecordsTable holds the schema information for the "erp_module_records" table.
+	ErpModuleRecordsTable = &schema.Table{
+		Name:       "erp_module_records",
+		Columns:    ErpModuleRecordsColumns,
+		PrimaryKey: []*schema.Column{ErpModuleRecordsColumns[0]},
 		Indexes: []*schema.Index{
 			{
-				Name:    "invitecode_code",
-				Unique:  true,
-				Columns: []*schema.Column{InviteCodesColumns[1]},
+				Name:    "erpmodulerecord_module_key",
+				Unique:  false,
+				Columns: []*schema.Column{ErpModuleRecordsColumns[1]},
+			},
+			{
+				Name:    "erpmodulerecord_module_key_code",
+				Unique:  false,
+				Columns: []*schema.Column{ErpModuleRecordsColumns[1], ErpModuleRecordsColumns[2]},
 			},
 		},
 	}
@@ -72,7 +79,6 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "username", Type: field.TypeString, Size: 32},
 		{Name: "password_hash", Type: field.TypeString},
-		{Name: "invite_code", Type: field.TypeString, Nullable: true, Size: 32},
 		{Name: "role", Type: field.TypeInt8, Default: 0},
 		{Name: "admin_id", Type: field.TypeInt, Nullable: true},
 		{Name: "disabled", Type: field.TypeBool, Default: false},
@@ -94,21 +100,16 @@ var (
 				Columns: []*schema.Column{UsersColumns[1]},
 			},
 			{
-				Name:    "user_invite_code",
-				Unique:  false,
-				Columns: []*schema.Column{UsersColumns[3]},
-			},
-			{
 				Name:    "user_admin_id",
 				Unique:  false,
-				Columns: []*schema.Column{UsersColumns[5]},
+				Columns: []*schema.Column{UsersColumns[4]},
 			},
 		},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		AdminUsersTable,
-		InviteCodesTable,
+		ErpModuleRecordsTable,
 		UsersTable,
 	}
 )

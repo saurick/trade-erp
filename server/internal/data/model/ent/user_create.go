@@ -32,20 +32,6 @@ func (_c *UserCreate) SetPasswordHash(v string) *UserCreate {
 	return _c
 }
 
-// SetInviteCode sets the "invite_code" field.
-func (_c *UserCreate) SetInviteCode(v string) *UserCreate {
-	_c.mutation.SetInviteCode(v)
-	return _c
-}
-
-// SetNillableInviteCode sets the "invite_code" field if the given value is not nil.
-func (_c *UserCreate) SetNillableInviteCode(v *string) *UserCreate {
-	if v != nil {
-		_c.SetInviteCode(*v)
-	}
-	return _c
-}
-
 // SetRole sets the "role" field.
 func (_c *UserCreate) SetRole(v int8) *UserCreate {
 	_c.mutation.SetRole(v)
@@ -233,11 +219,6 @@ func (_c *UserCreate) check() error {
 			return &ValidationError{Name: "password_hash", err: fmt.Errorf(`ent: validator failed for field "User.password_hash": %w`, err)}
 		}
 	}
-	if v, ok := _c.mutation.InviteCode(); ok {
-		if err := user.InviteCodeValidator(v); err != nil {
-			return &ValidationError{Name: "invite_code", err: fmt.Errorf(`ent: validator failed for field "User.invite_code": %w`, err)}
-		}
-	}
 	if _, ok := _c.mutation.Role(); !ok {
 		return &ValidationError{Name: "role", err: errors.New(`ent: missing required field "User.role"`)}
 	}
@@ -286,10 +267,6 @@ func (_c *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.PasswordHash(); ok {
 		_spec.SetField(user.FieldPasswordHash, field.TypeString, value)
 		_node.PasswordHash = value
-	}
-	if value, ok := _c.mutation.InviteCode(); ok {
-		_spec.SetField(user.FieldInviteCode, field.TypeString, value)
-		_node.InviteCode = &value
 	}
 	if value, ok := _c.mutation.Role(); ok {
 		_spec.SetField(user.FieldRole, field.TypeInt8, value)

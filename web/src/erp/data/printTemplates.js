@@ -1,54 +1,5 @@
-import { calcItemsTotal } from '../utils/items'
-
-const companyInfo = {
-  name: '杭州科森磁材有限公司',
-  nameEn: 'HANGZHOU KESEN MAGNETICS CO., LTD.',
-  taxNo: '91330109MA7N1W9P5Y',
-  address: '浙江省杭州市萧山区北干街道永久路288号912室',
-  addressEn: '288 YONGJIU ROAD, HANGZHOU, ZHEJIANG 311202, CHINA',
-  phone: '0571-86790529',
-  phoneEn: '+86 571 8679 0529',
-  bankName: '中国农业银行杭州金城路支行',
-  bankAccount: '19085201040039051',
-  website: 'WWW.KSMAGNETIC.COM',
-}
-
-const calcRowAmount = (row) => {
-  const qty = Number(row.qty || row.quantity || 0)
-  const price = Number(row.unitPrice || 0)
-  return qty * price
-}
-
-const normalizeRows = (items = []) => {
-  return items.map((item, index) => ({
-    no: index + 1,
-    name: item.productName || item.productModel || item.cnDesc || item.enDesc || '',
-    qty: item.quantity || 0,
-    unitPrice: item.unitPrice || 0,
-    amount: item.totalPrice || calcRowAmount(item),
-    packDetail: item.packDetail || '',
-    netWeight: item.netWeight || '',
-    grossWeight: item.grossWeight || '',
-    volume: item.volume || '',
-  }))
-}
-
-const buildTemplate = (title, record, extraMeta = [], rows = []) => {
-  return {
-    title,
-    documentNo: record?.code || record?.invoiceNo || '-',
-    date: record?.quotedDate || record?.signDate || record?.shipDate || record?.warehouseShipDate || '-',
-    customer: record?.customerName || record?.supplierName || '-',
-    meta: [
-      { label: '公司名称', value: companyInfo.name },
-      { label: '税号', value: companyInfo.taxNo },
-      { label: '地址', value: companyInfo.address },
-      { label: '电话', value: companyInfo.phone },
-      ...extraMeta,
-    ],
-    rows,
-  }
-}
+import * as XLSX from 'xlsx'
+import { AUTH_SCOPE, getToken } from '@/common/auth/auth'
 
 export const templateList = [
   { key: 'quotation', title: '报价单' },
@@ -58,190 +9,466 @@ export const templateList = [
   { key: 'packing', title: '装箱单 Packing List' },
   { key: 'delivery', title: '送货单' },
   { key: 'production', title: '生产加工申请单' },
+  { key: 'billingInfo', title: '开票信息' },
 ]
 
-export const buildTemplateData = (templateKey, record) => {
-  const rows = normalizeRows(record?.items || [])
+const DEFAULT_TEMPLATE_ASSET_MAP = {
+  quotation: '/templates/export-invoice-template.xls',
+  pi: '/templates/export-invoice-template.xls',
+  purchase: '/templates/purchase-contract-template.xls',
+  invoice: '/templates/export-invoice-template.xls',
+  packing: '/templates/export-invoice-template.xls',
+  delivery: '/templates/export-invoice-template.xls',
+  production: '/templates/export-invoice-template.xls',
+  billingInfo: '/templates/billing-info-template.html',
+}
 
-  switch (templateKey) {
-    case 'quotation':
-      return buildTemplate('报价单', record, [
-        { label: '联系人', value: record?.contactName || '-' },
-        { label: '联系方式', value: record?.contactTel || '-' },
-        { label: '邮箱', value: record?.contactEmail || '-' },
-        { label: '币种', value: record?.currency || '-' },
-        { label: '运输条款', value: record?.priceTerm || '-' },
-        { label: '付款方式', value: record?.payMode || '-' },
-        { label: '有效期(天)', value: record?.validPeriod || '-' },
-      ], rows)
-    case 'pi':
-      return buildTemplate('形式发票 PI', record, [
-        { label: '预收款比例', value: record?.prepayRatio ? `${record.prepayRatio}%` : '-' },
-        { label: '运输条款', value: record?.priceTerm || '-' },
-        { label: '付款方式', value: record?.paymentMethod || record?.payMode || '-' },
-      ], rows)
-    case 'purchase':
-      return buildTemplate('采购合同', record, [
-        { label: '供应商', value: record?.supplierName || '-' },
-        { label: '交货日期', value: record?.deliveryDate || '-' },
-        { label: '交货地点', value: record?.deliveryAddress || '-' },
-      ], rows)
-    case 'invoice':
-      return buildTemplate('商业发票 Commercial Invoice', record, [
-        { label: 'SHIP TO', value: record?.shipToAddress || '-' },
-        { label: '运抵国', value: record?.arriveCountry || '-' },
-        { label: '唛头', value: record?.marking || '-' },
-      ], rows)
-    case 'packing':
-      return buildTemplate('装箱单 Packing List', record, [
-        { label: '总件数', value: record?.totalPackages || '-' },
-        { label: '木箱尺寸', value: record?.woodCaseSize || '-' },
-      ], rows)
-    case 'delivery':
-      return buildTemplate('送货单', record, [
-        { label: '仓库', value: record?.warehouseName || '杭州一号仓' },
-        { label: '货位', value: record?.location || '-' },
-      ], rows)
-    case 'production':
-      return buildTemplate('生产加工申请单', record, [
-        { label: '合同编号', value: record?.code || '-' },
-        { label: '订单号', value: record?.orderNo || '-' },
-        { label: '备货期限', value: record?.deliveryDate || '-' },
-      ], rows)
-    default:
-      return buildTemplate('模板', record, [], rows)
+const EXCEL_XLS_MAGIC = [0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1]
+const EXCEL_XLSX_MAGIC = [0x50, 0x4b, 0x03, 0x04]
+const PDF_MAGIC = [0x25, 0x50, 0x44, 0x46]
+
+const escapeHTML = (raw) =>
+  String(raw ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;')
+
+const flattenRecord = (record = {}) => {
+  const out = {}
+  Object.entries(record || {}).forEach(([key, value]) => {
+    if (value == null) {
+      out[key] = ''
+      return
+    }
+    if (typeof value === 'object') {
+      out[key] = JSON.stringify(value, null, 2)
+      return
+    }
+    out[key] = String(value)
+  })
+  return out
+}
+
+const matchMagic = (arrayBuffer, expectedMagic) => {
+  if (!(arrayBuffer instanceof ArrayBuffer) || arrayBuffer.byteLength < expectedMagic.length) {
+    return false
+  }
+  const bytes = new Uint8Array(arrayBuffer, 0, expectedMagic.length)
+  return expectedMagic.every((value, index) => bytes[index] === value)
+}
+
+const isExcelArrayBuffer = (arrayBuffer) =>
+  matchMagic(arrayBuffer, EXCEL_XLS_MAGIC) || matchMagic(arrayBuffer, EXCEL_XLSX_MAGIC)
+
+const isPDFArrayBuffer = (arrayBuffer) => matchMagic(arrayBuffer, PDF_MAGIC)
+
+const arrayBufferToText = (arrayBuffer) => {
+  try {
+    return new TextDecoder('utf-8').decode(new Uint8Array(arrayBuffer))
+  } catch (err) {
+    return ''
   }
 }
 
-export const printCss = `
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  font-family: 'Noto Sans SC', 'PingFang SC', sans-serif;
-  color: #1f2937;
+const looksLikeHTML = (text) => {
+  if (!text) {
+    return false
+  }
+  const start = text.trimStart().slice(0, 256).toLowerCase()
+  return start.startsWith('<!doctype html') || start.startsWith('<html') || start.includes('<table')
 }
-.print-sheet {
-  width: 210mm;
-  min-height: 297mm;
-  margin: 0 auto;
-  padding: 12mm;
+
+const looksLikeAppShellHTML = (text) => {
+  const html = text.toLowerCase()
+  return (
+    html.includes('id="root"') ||
+    html.includes("id='root'") ||
+    html.includes('<script type="module"') ||
+    html.includes('vite') ||
+    html.includes('react')
+  )
 }
-.print-title {
-  text-align: center;
-  margin: 0;
-  font-size: 24px;
+
+const stripHTMLDocument = (html) => {
+  const withoutScripts = html.replace(/<script[\s\S]*?<\/script>/gi, '')
+  const bodyMatch = withoutScripts.match(/<body[^>]*>([\s\S]*)<\/body>/i)
+  return bodyMatch ? bodyMatch[1] : withoutScripts
 }
-.print-meta {
-  display: flex;
-  justify-content: space-between;
-  margin: 12px 0;
-  font-size: 13px;
-  gap: 12px;
-  flex-wrap: wrap;
+
+const withEditableCells = (rawHTML) => {
+  const markEditable = (html, tag) =>
+    html.replace(
+      new RegExp(`<${tag}(?![^>]*contenteditable)`, 'gi'),
+      `<${tag} contenteditable="true" spellcheck="false"`
+    )
+  return markEditable(markEditable(rawHTML, 'td'), 'th')
 }
-.print-meta-item {
-  min-width: 45%;
+
+const buildEditableSheetHTML = (arrayBuffer) => {
+  try {
+    const workbook = XLSX.read(arrayBuffer, {
+      type: 'array',
+      cellStyles: true,
+      cellDates: true,
+      cellNF: true,
+    })
+    const firstSheetName = workbook.SheetNames?.[0]
+    if (!firstSheetName) {
+      throw new Error('模板文件没有可用工作表')
+    }
+
+    const worksheet = workbook.Sheets[firstSheetName]
+    const sheetHTML = XLSX.utils.sheet_to_html(worksheet, {
+      id: 'erp-template-sheet',
+    })
+    return withEditableCells(sheetHTML)
+  } catch (err) {
+    const message = String(err?.message || '')
+    if (message.includes('could not find <table>')) {
+      throw new Error('模板内容不是有效的 Excel 工作表，请上传原始 xls/xlsx 模板文件')
+    }
+    throw err
+  }
 }
-.print-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 8px;
+
+const buildTemplateHTMLFromResponse = (templateKey, arrayBuffer, contentType = '') => {
+  if (isExcelArrayBuffer(arrayBuffer)) {
+    return buildEditableSheetHTML(arrayBuffer)
+  }
+
+  const asText = arrayBufferToText(arrayBuffer)
+  if (looksLikeHTML(asText) || contentType.includes('text/html')) {
+    if (looksLikeAppShellHTML(asText)) {
+      throw new Error('返回了应用壳 HTML，未获取到真实模板文件')
+    }
+    return withEditableCells(stripHTMLDocument(asText))
+  }
+
+  if (isPDFArrayBuffer(arrayBuffer)) {
+    if (templateKey === 'billingInfo') {
+      return withEditableCells(DEFAULT_BILLING_INFO_TEMPLATE_HTML)
+    }
+    throw new Error('当前模板是 PDF，无法直接编辑；请上传 xls/xlsx 模板')
+  }
+
+  throw new Error('模板文件格式不支持，请使用 xls/xlsx/html')
 }
-.print-table th,
-.print-table td {
-  border: 1px solid #4b5563;
-  padding: 6px;
-  font-size: 12px;
-  text-align: left;
+
+const fetchBinaryWithMeta = async (url, options = {}) => {
+  const resp = await fetch(url, options)
+  const arrayBuffer = await resp.arrayBuffer()
+  return {
+    ok: resp.ok,
+    status: resp.status,
+    arrayBuffer,
+    contentType: String(resp.headers.get('content-type') || '').toLowerCase(),
+  }
 }
-.print-footer {
-  margin-top: 12px;
-  font-size: 12px;
-  color: #475569;
+
+const fetchTemplateHTML = async (templateKey) => {
+  const authToken = getToken(AUTH_SCOPE.ADMIN)
+  const serverHeaders = authToken ? { Authorization: `Bearer ${authToken}` } : {}
+
+  try {
+    const serverResp = await fetchBinaryWithMeta(`/templates/file/${templateKey}`, {
+      headers: serverHeaders,
+    })
+    if (serverResp.ok) {
+      const serverHTML = buildTemplateHTMLFromResponse(
+        templateKey,
+        serverResp.arrayBuffer,
+        serverResp.contentType
+      )
+      return { source: 'server', templateHTML: serverHTML }
+    }
+  } catch (err) {
+    // 服务端不可达或内容非法时自动回退默认模板。
+  }
+
+  const fallbackAsset = DEFAULT_TEMPLATE_ASSET_MAP[templateKey] || DEFAULT_TEMPLATE_ASSET_MAP.invoice
+  const fallbackResp = await fetchBinaryWithMeta(fallbackAsset)
+  if (!fallbackResp.ok) {
+    throw new Error(`模板加载失败：${templateKey}`)
+  }
+  const fallbackHTML = buildTemplateHTMLFromResponse(
+    templateKey,
+    fallbackResp.arrayBuffer,
+    fallbackResp.contentType
+  )
+  return { source: 'default', templateHTML: fallbackHTML }
 }
+
+const DEFAULT_BILLING_INFO_TEMPLATE_HTML = `
+  <table style="border-collapse: collapse; width: 100%; max-width: 980px; margin: 16px auto; font-size: 14px;">
+    <thead>
+      <tr>
+        <th colspan="2" style="border: 1px solid #222; padding: 10px; font-size: 20px;">杭州科森磁材开票信息</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="border: 1px solid #222; padding: 10px; width: 28%;">单位名称</td>
+        <td style="border: 1px solid #222; padding: 10px;">杭州科森磁材有限公司</td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #222; padding: 10px;">税号</td>
+        <td style="border: 1px solid #222; padding: 10px;">91330109MA7N1W9P5Y</td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #222; padding: 10px;">地址、电话</td>
+        <td style="border: 1px solid #222; padding: 10px;">浙江省杭州市萧山区北干街道永久路288号912室 0571-86790529</td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #222; padding: 10px;">开户行及账号</td>
+        <td style="border: 1px solid #222; padding: 10px;">中国农业银行杭州金城路支行 19085201040039051</td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #222; padding: 10px;">备注</td>
+        <td style="border: 1px solid #222; padding: 10px;">所有字段均可直接编辑后打印。</td>
+      </tr>
+    </tbody>
+  </table>
 `
 
-const renderSheet = (template) => {
-  const metaHtml = template.meta
-    .map((item) => `<div class="print-meta-item">${item.label}：${item.value || '-'}</div>`)
-    .join('')
-
-  const rowsHtml = template.rows
+const buildRecordPanelHTML = (record) => {
+  const fields = flattenRecord(record)
+  const rows = Object.entries(fields)
     .map(
-      (row) => `
-      <tr>
-        <td>${row.no}</td>
-        <td>${row.name}</td>
-        <td>${row.qty}</td>
-        <td>${row.unitPrice}</td>
-        <td>${row.amount}</td>
-        <td>${row.packDetail}</td>
-        <td>${row.netWeight}</td>
-        <td>${row.grossWeight}</td>
-        <td>${row.volume}</td>
-      </tr>
-    `
+      ([key, value]) => `
+        <tr>
+          <td class="field-key">${escapeHTML(key)}</td>
+          <td class="field-value" contenteditable="true">${escapeHTML(value)}</td>
+        </tr>
+      `
     )
     .join('')
 
-  const totalAmount = calcItemsTotal(template.rows || [], 'qty', 'unitPrice')
-
   return `
-  <section class="print-sheet">
-    <h1 class="print-title">${template.title}</h1>
-    <div class="print-meta">
-      <div class="print-meta-item">单号：${template.documentNo}</div>
-      <div class="print-meta-item">日期：${template.date}</div>
-      <div class="print-meta-item">客户/对象：${template.customer}</div>
-      <div class="print-meta-item">网站：${companyInfo.website}</div>
-    </div>
-    <div class="print-meta">${metaHtml}</div>
-    <table class="print-table">
-      <thead>
-        <tr>
-          <th>序号</th>
-          <th>品名/型号</th>
-          <th>数量</th>
-          <th>单价</th>
-          <th>金额</th>
-          <th>包装</th>
-          <th>净重</th>
-          <th>毛重</th>
-          <th>体积</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${rowsHtml}
-      </tbody>
-    </table>
-    <p class="print-footer">合计金额：${totalAmount}</p>
-  </section>
-`
+    <section class="record-panel">
+      <h3>当前记录字段（可编辑）</h3>
+      <p>提示：模板区每个单元格都可直接编辑，字段区用于复制参考值。</p>
+      <table class="record-table">
+        <thead>
+          <tr>
+            <th>字段</th>
+            <th>值</th>
+          </tr>
+        </thead>
+        <tbody>${rows || '<tr><td colspan="2">暂无记录字段</td></tr>'}</tbody>
+      </table>
+    </section>
+  `
 }
 
-export const openPrintWindow = (templateKey, record) => {
-  const template = buildTemplateData(templateKey, record || {})
-  const printWindow = window.open('', '_blank', 'width=1024,height=768')
-  if (!printWindow) {
-    return
+const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>${escapeHTML(title)}</title>
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        padding: 0;
+        background: #f5f7fa;
+      }
+      .toolbar {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 14px;
+        border-bottom: 1px solid #d9d9d9;
+        background: #fff;
+      }
+      .toolbar button {
+        height: 32px;
+        padding: 0 14px;
+        border: 1px solid #1f7a3f;
+        background: #1f7a3f;
+        color: #fff;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+      .toolbar .ghost {
+        border: 1px solid #8c8c8c;
+        background: #fff;
+        color: #262626;
+      }
+      .source-tag {
+        display: inline-block;
+        margin-left: 8px;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 12px;
+        background: #e6f4ea;
+        color: #1f7a3f;
+      }
+      .content {
+        padding: 14px;
+        display: grid;
+        grid-template-columns: 360px 1fr;
+        gap: 12px;
+      }
+      .record-panel {
+        font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+        background: #fff;
+        border: 1px solid #d9d9d9;
+        border-radius: 8px;
+        padding: 12px;
+        overflow: auto;
+        max-height: calc(100vh - 100px);
+      }
+      .record-panel h3 {
+        margin: 0;
+        font-size: 16px;
+      }
+      .record-panel p {
+        margin: 8px 0 10px;
+        color: #595959;
+        font-size: 12px;
+      }
+      .record-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .record-table th,
+      .record-table td {
+        border: 1px solid #d9d9d9;
+        padding: 6px;
+        vertical-align: top;
+        font-size: 12px;
+      }
+      .field-key {
+        width: 36%;
+        background: #fafafa;
+        color: #434343;
+      }
+      .field-value {
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+      .template-wrap {
+        background: #fff;
+        border: 1px solid #d9d9d9;
+        border-radius: 8px;
+        padding: 0;
+        overflow: auto;
+        max-height: calc(100vh - 100px);
+      }
+      .template-wrap td[contenteditable="true"],
+      .template-wrap th[contenteditable="true"] {
+        outline: 1px dashed transparent;
+      }
+      .template-wrap td[contenteditable="true"]:focus,
+      .template-wrap th[contenteditable="true"]:focus {
+        outline-color: #1f7a3f;
+        background: #f6ffed;
+      }
+      @media print {
+        @page {
+          margin: 0;
+        }
+        body { background: #fff; }
+        .toolbar, .record-panel { display: none; }
+        .content {
+          display: block;
+          padding: 0;
+        }
+        .template-wrap {
+          border: 0;
+          border-radius: 0;
+          padding: 0;
+          max-height: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="toolbar">
+      <div>
+        <strong>${escapeHTML(title)}</strong>
+        <span class="source-tag">${source === 'server' ? '使用上传模板' : '使用默认模板'}</span>
+      </div>
+      <div>
+        <button class="ghost" id="toggle-grid-btn">切换字段区</button>
+        <button id="print-btn">打印</button>
+      </div>
+    </header>
+    <main class="content">
+      ${recordPanelHTML}
+      <section class="template-wrap">
+        ${templateHTML}
+      </section>
+    </main>
+    <script>
+      (function () {
+        var printBtn = document.getElementById('print-btn');
+        var toggleGridBtn = document.getElementById('toggle-grid-btn');
+        var panel = document.querySelector('.record-panel');
+        if (printBtn) {
+          printBtn.addEventListener('click', function () {
+            window.print();
+          });
+        }
+        if (toggleGridBtn && panel) {
+          toggleGridBtn.addEventListener('click', function () {
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+          });
+        }
+      })();
+    </script>
+  </body>
+</html>
+`
+
+export const openPrintWindow = async (templateKey, record = {}) => {
+  const templateMeta = templateList.find((item) => item.key === templateKey)
+  const title = templateMeta?.title || '打印模板'
+  const { source, templateHTML } = await fetchTemplateHTML(templateKey)
+  const recordPanelHTML = buildRecordPanelHTML(record)
+
+  const popup = window.open('', '_blank', 'width=1440,height=900')
+  if (!popup) {
+    throw new Error('浏览器拦截了弹窗，请允许弹窗后重试')
   }
 
-  const html = `
-    <html>
-      <head>
-        <title>${template.title}</title>
-        <style>${printCss}</style>
-      </head>
-      <body>
-        ${renderSheet(template)}
-      </body>
-    </html>
-  `
+  popup.document.open()
+  popup.document.write(
+    buildWindowHTML({
+      title,
+      templateHTML,
+      recordPanelHTML,
+      source,
+    })
+  )
+  popup.document.close()
+  popup.focus()
+}
 
-  printWindow.document.open()
-  printWindow.document.write(html)
-  printWindow.document.close()
-  printWindow.focus()
-  printWindow.print()
-  printWindow.close()
+export const uploadTemplateFile = async (templateKey, file) => {
+  const authToken = getToken(AUTH_SCOPE.ADMIN)
+  if (!authToken) {
+    throw new Error('请先登录管理员账号')
+  }
+  const formData = new FormData()
+  formData.append('file', file)
+
+  const resp = await fetch(`/templates/upload/${templateKey}`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${authToken}`,
+    },
+    body: formData,
+  })
+  const payload = await resp.json().catch(() => ({}))
+  if (!resp.ok || Number(payload?.code) !== 0) {
+    throw new Error(payload?.message || '模板上传失败')
+  }
+  return payload?.data || {}
 }

@@ -21,8 +21,6 @@ type User struct {
 	Username string `json:"username,omitempty"`
 	// PasswordHash holds the value of the "password_hash" field.
 	PasswordHash string `json:"-"`
-	// InviteCode holds the value of the "invite_code" field.
-	InviteCode *string `json:"invite_code,omitempty"`
 	// 0=user, 1=admin
 	Role int8 `json:"role,omitempty"`
 	// 所属管理员ID
@@ -51,7 +49,7 @@ func (*User) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case user.FieldID, user.FieldRole, user.FieldAdminID, user.FieldPoints:
 			values[i] = new(sql.NullInt64)
-		case user.FieldUsername, user.FieldPasswordHash, user.FieldInviteCode:
+		case user.FieldUsername, user.FieldPasswordHash:
 			values[i] = new(sql.NullString)
 		case user.FieldLastLoginAt, user.FieldExpiresAt, user.FieldCreatedAt, user.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -87,13 +85,6 @@ func (_m *User) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field password_hash", values[i])
 			} else if value.Valid {
 				_m.PasswordHash = value.String
-			}
-		case user.FieldInviteCode:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field invite_code", values[i])
-			} else if value.Valid {
-				_m.InviteCode = new(string)
-				*_m.InviteCode = value.String
 			}
 		case user.FieldRole:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -186,11 +177,6 @@ func (_m *User) String() string {
 	builder.WriteString(_m.Username)
 	builder.WriteString(", ")
 	builder.WriteString("password_hash=<sensitive>")
-	builder.WriteString(", ")
-	if v := _m.InviteCode; v != nil {
-		builder.WriteString("invite_code=")
-		builder.WriteString(*v)
-	}
 	builder.WriteString(", ")
 	builder.WriteString("role=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Role))

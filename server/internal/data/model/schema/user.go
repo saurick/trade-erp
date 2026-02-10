@@ -21,10 +21,6 @@ func (User) Fields() []ent.Field {
 		field.String("password_hash").
 			NotEmpty().
 			Sensitive(),
-		field.String("invite_code").
-			Optional().
-			Nillable().
-			MaxLen(32),
 		field.Int8("role").
 			Default(0).
 			Comment("0=user, 1=admin"),
@@ -56,7 +52,6 @@ func (User) Fields() []ent.Field {
 func (User) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Fields("username").Unique(),
-		index.Fields("invite_code"),
 		index.Fields("admin_id"),
 	}
 }

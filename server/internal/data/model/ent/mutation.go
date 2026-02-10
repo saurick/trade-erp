@@ -7,7 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"server/internal/data/model/ent/adminuser"
-	"server/internal/data/model/ent/invitecode"
+	"server/internal/data/model/ent/erpmodulerecord"
 	"server/internal/data/model/ent/predicate"
 	"server/internal/data/model/ent/user"
 	"sync"
@@ -26,31 +26,32 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeAdminUser  = "AdminUser"
-	TypeInviteCode = "InviteCode"
-	TypeUser       = "User"
+	TypeAdminUser       = "AdminUser"
+	TypeERPModuleRecord = "ERPModuleRecord"
+	TypeUser            = "User"
 )
 
 // AdminUserMutation represents an operation that mutates the AdminUser nodes in the graph.
 type AdminUserMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *int
-	username      *string
-	password_hash *string
-	level         *int8
-	addlevel      *int8
-	parent_id     *int
-	addparent_id  *int
-	disabled      *bool
-	last_login_at *time.Time
-	created_at    *time.Time
-	updated_at    *time.Time
-	clearedFields map[string]struct{}
-	done          bool
-	oldValue      func(context.Context) (*AdminUser, error)
-	predicates    []predicate.AdminUser
+	op               Op
+	typ              string
+	id               *int
+	username         *string
+	password_hash    *string
+	level            *int8
+	addlevel         *int8
+	menu_permissions *string
+	parent_id        *int
+	addparent_id     *int
+	disabled         *bool
+	last_login_at    *time.Time
+	created_at       *time.Time
+	updated_at       *time.Time
+	clearedFields    map[string]struct{}
+	done             bool
+	oldValue         func(context.Context) (*AdminUser, error)
+	predicates       []predicate.AdminUser
 }
 
 var _ ent.Mutation = (*AdminUserMutation)(nil)
@@ -277,6 +278,42 @@ func (m *AdminUserMutation) AddedLevel() (r int8, exists bool) {
 func (m *AdminUserMutation) ResetLevel() {
 	m.level = nil
 	m.addlevel = nil
+}
+
+// SetMenuPermissions sets the "menu_permissions" field.
+func (m *AdminUserMutation) SetMenuPermissions(s string) {
+	m.menu_permissions = &s
+}
+
+// MenuPermissions returns the value of the "menu_permissions" field in the mutation.
+func (m *AdminUserMutation) MenuPermissions() (r string, exists bool) {
+	v := m.menu_permissions
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMenuPermissions returns the old "menu_permissions" field's value of the AdminUser entity.
+// If the AdminUser object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AdminUserMutation) OldMenuPermissions(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMenuPermissions is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMenuPermissions requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMenuPermissions: %w", err)
+	}
+	return oldValue.MenuPermissions, nil
+}
+
+// ResetMenuPermissions resets all changes to the "menu_permissions" field.
+func (m *AdminUserMutation) ResetMenuPermissions() {
+	m.menu_permissions = nil
 }
 
 // SetParentID sets the "parent_id" field.
@@ -540,7 +577,7 @@ func (m *AdminUserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *AdminUserMutation) Fields() []string {
-	fields := make([]string, 0, 8)
+	fields := make([]string, 0, 9)
 	if m.username != nil {
 		fields = append(fields, adminuser.FieldUsername)
 	}
@@ -549,6 +586,9 @@ func (m *AdminUserMutation) Fields() []string {
 	}
 	if m.level != nil {
 		fields = append(fields, adminuser.FieldLevel)
+	}
+	if m.menu_permissions != nil {
+		fields = append(fields, adminuser.FieldMenuPermissions)
 	}
 	if m.parent_id != nil {
 		fields = append(fields, adminuser.FieldParentID)
@@ -579,6 +619,8 @@ func (m *AdminUserMutation) Field(name string) (ent.Value, bool) {
 		return m.PasswordHash()
 	case adminuser.FieldLevel:
 		return m.Level()
+	case adminuser.FieldMenuPermissions:
+		return m.MenuPermissions()
 	case adminuser.FieldParentID:
 		return m.ParentID()
 	case adminuser.FieldDisabled:
@@ -604,6 +646,8 @@ func (m *AdminUserMutation) OldField(ctx context.Context, name string) (ent.Valu
 		return m.OldPasswordHash(ctx)
 	case adminuser.FieldLevel:
 		return m.OldLevel(ctx)
+	case adminuser.FieldMenuPermissions:
+		return m.OldMenuPermissions(ctx)
 	case adminuser.FieldParentID:
 		return m.OldParentID(ctx)
 	case adminuser.FieldDisabled:
@@ -643,6 +687,13 @@ func (m *AdminUserMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetLevel(v)
+		return nil
+	case adminuser.FieldMenuPermissions:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMenuPermissions(v)
 		return nil
 	case adminuser.FieldParentID:
 		v, ok := value.(int)
@@ -779,6 +830,9 @@ func (m *AdminUserMutation) ResetField(name string) error {
 	case adminuser.FieldLevel:
 		m.ResetLevel()
 		return nil
+	case adminuser.FieldMenuPermissions:
+		m.ResetMenuPermissions()
+		return nil
 	case adminuser.FieldParentID:
 		m.ResetParentID()
 		return nil
@@ -846,38 +900,39 @@ func (m *AdminUserMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown AdminUser edge %s", name)
 }
 
-// InviteCodeMutation represents an operation that mutates the InviteCode nodes in the graph.
-type InviteCodeMutation struct {
+// ERPModuleRecordMutation represents an operation that mutates the ERPModuleRecord nodes in the graph.
+type ERPModuleRecordMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *int
-	code          *string
-	max_uses      *int
-	addmax_uses   *int
-	used_count    *int
-	addused_count *int
-	expires_at    *time.Time
-	disabled      *bool
-	created_at    *time.Time
-	updated_at    *time.Time
-	clearedFields map[string]struct{}
-	done          bool
-	oldValue      func(context.Context) (*InviteCode, error)
-	predicates    []predicate.InviteCode
+	op                     Op
+	typ                    string
+	id                     *int
+	module_key             *string
+	code                   *string
+	box                    *string
+	payload                *string
+	created_by_admin_id    *int
+	addcreated_by_admin_id *int
+	updated_by_admin_id    *int
+	addupdated_by_admin_id *int
+	created_at             *time.Time
+	updated_at             *time.Time
+	clearedFields          map[string]struct{}
+	done                   bool
+	oldValue               func(context.Context) (*ERPModuleRecord, error)
+	predicates             []predicate.ERPModuleRecord
 }
 
-var _ ent.Mutation = (*InviteCodeMutation)(nil)
+var _ ent.Mutation = (*ERPModuleRecordMutation)(nil)
 
-// invitecodeOption allows management of the mutation configuration using functional options.
-type invitecodeOption func(*InviteCodeMutation)
+// erpmodulerecordOption allows management of the mutation configuration using functional options.
+type erpmodulerecordOption func(*ERPModuleRecordMutation)
 
-// newInviteCodeMutation creates new mutation for the InviteCode entity.
-func newInviteCodeMutation(c config, op Op, opts ...invitecodeOption) *InviteCodeMutation {
-	m := &InviteCodeMutation{
+// newERPModuleRecordMutation creates new mutation for the ERPModuleRecord entity.
+func newERPModuleRecordMutation(c config, op Op, opts ...erpmodulerecordOption) *ERPModuleRecordMutation {
+	m := &ERPModuleRecordMutation{
 		config:        c,
 		op:            op,
-		typ:           TypeInviteCode,
+		typ:           TypeERPModuleRecord,
 		clearedFields: make(map[string]struct{}),
 	}
 	for _, opt := range opts {
@@ -886,20 +941,20 @@ func newInviteCodeMutation(c config, op Op, opts ...invitecodeOption) *InviteCod
 	return m
 }
 
-// withInviteCodeID sets the ID field of the mutation.
-func withInviteCodeID(id int) invitecodeOption {
-	return func(m *InviteCodeMutation) {
+// withERPModuleRecordID sets the ID field of the mutation.
+func withERPModuleRecordID(id int) erpmodulerecordOption {
+	return func(m *ERPModuleRecordMutation) {
 		var (
 			err   error
 			once  sync.Once
-			value *InviteCode
+			value *ERPModuleRecord
 		)
-		m.oldValue = func(ctx context.Context) (*InviteCode, error) {
+		m.oldValue = func(ctx context.Context) (*ERPModuleRecord, error) {
 			once.Do(func() {
 				if m.done {
 					err = errors.New("querying old values post mutation is not allowed")
 				} else {
-					value, err = m.Client().InviteCode.Get(ctx, id)
+					value, err = m.Client().ERPModuleRecord.Get(ctx, id)
 				}
 			})
 			return value, err
@@ -908,10 +963,10 @@ func withInviteCodeID(id int) invitecodeOption {
 	}
 }
 
-// withInviteCode sets the old InviteCode of the mutation.
-func withInviteCode(node *InviteCode) invitecodeOption {
-	return func(m *InviteCodeMutation) {
-		m.oldValue = func(context.Context) (*InviteCode, error) {
+// withERPModuleRecord sets the old ERPModuleRecord of the mutation.
+func withERPModuleRecord(node *ERPModuleRecord) erpmodulerecordOption {
+	return func(m *ERPModuleRecordMutation) {
+		m.oldValue = func(context.Context) (*ERPModuleRecord, error) {
 			return node, nil
 		}
 		m.id = &node.ID
@@ -920,7 +975,7 @@ func withInviteCode(node *InviteCode) invitecodeOption {
 
 // Client returns a new `ent.Client` from the mutation. If the mutation was
 // executed in a transaction (ent.Tx), a transactional client is returned.
-func (m InviteCodeMutation) Client() *Client {
+func (m ERPModuleRecordMutation) Client() *Client {
 	client := &Client{config: m.config}
 	client.init()
 	return client
@@ -928,7 +983,7 @@ func (m InviteCodeMutation) Client() *Client {
 
 // Tx returns an `ent.Tx` for mutations that were executed in transactions;
 // it returns an error otherwise.
-func (m InviteCodeMutation) Tx() (*Tx, error) {
+func (m ERPModuleRecordMutation) Tx() (*Tx, error) {
 	if _, ok := m.driver.(*txDriver); !ok {
 		return nil, errors.New("ent: mutation is not running in a transaction")
 	}
@@ -939,7 +994,7 @@ func (m InviteCodeMutation) Tx() (*Tx, error) {
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *InviteCodeMutation) ID() (id int, exists bool) {
+func (m *ERPModuleRecordMutation) ID() (id int, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -950,7 +1005,7 @@ func (m *InviteCodeMutation) ID() (id int, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *InviteCodeMutation) IDs(ctx context.Context) ([]int, error) {
+func (m *ERPModuleRecordMutation) IDs(ctx context.Context) ([]int, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
@@ -959,19 +1014,55 @@ func (m *InviteCodeMutation) IDs(ctx context.Context) ([]int, error) {
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
-		return m.Client().InviteCode.Query().Where(m.predicates...).IDs(ctx)
+		return m.Client().ERPModuleRecord.Query().Where(m.predicates...).IDs(ctx)
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
 }
 
+// SetModuleKey sets the "module_key" field.
+func (m *ERPModuleRecordMutation) SetModuleKey(s string) {
+	m.module_key = &s
+}
+
+// ModuleKey returns the value of the "module_key" field in the mutation.
+func (m *ERPModuleRecordMutation) ModuleKey() (r string, exists bool) {
+	v := m.module_key
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldModuleKey returns the old "module_key" field's value of the ERPModuleRecord entity.
+// If the ERPModuleRecord object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ERPModuleRecordMutation) OldModuleKey(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldModuleKey is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldModuleKey requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldModuleKey: %w", err)
+	}
+	return oldValue.ModuleKey, nil
+}
+
+// ResetModuleKey resets all changes to the "module_key" field.
+func (m *ERPModuleRecordMutation) ResetModuleKey() {
+	m.module_key = nil
+}
+
 // SetCode sets the "code" field.
-func (m *InviteCodeMutation) SetCode(s string) {
+func (m *ERPModuleRecordMutation) SetCode(s string) {
 	m.code = &s
 }
 
 // Code returns the value of the "code" field in the mutation.
-func (m *InviteCodeMutation) Code() (r string, exists bool) {
+func (m *ERPModuleRecordMutation) Code() (r string, exists bool) {
 	v := m.code
 	if v == nil {
 		return
@@ -979,10 +1070,10 @@ func (m *InviteCodeMutation) Code() (r string, exists bool) {
 	return *v, true
 }
 
-// OldCode returns the old "code" field's value of the InviteCode entity.
-// If the InviteCode object wasn't provided to the builder, the object is fetched from the database.
+// OldCode returns the old "code" field's value of the ERPModuleRecord entity.
+// If the ERPModuleRecord object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *InviteCodeMutation) OldCode(ctx context.Context) (v string, err error) {
+func (m *ERPModuleRecordMutation) OldCode(ctx context.Context) (v *string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCode is only allowed on UpdateOne operations")
 	}
@@ -996,215 +1087,256 @@ func (m *InviteCodeMutation) OldCode(ctx context.Context) (v string, err error) 
 	return oldValue.Code, nil
 }
 
-// ResetCode resets all changes to the "code" field.
-func (m *InviteCodeMutation) ResetCode() {
+// ClearCode clears the value of the "code" field.
+func (m *ERPModuleRecordMutation) ClearCode() {
 	m.code = nil
+	m.clearedFields[erpmodulerecord.FieldCode] = struct{}{}
 }
 
-// SetMaxUses sets the "max_uses" field.
-func (m *InviteCodeMutation) SetMaxUses(i int) {
-	m.max_uses = &i
-	m.addmax_uses = nil
-}
-
-// MaxUses returns the value of the "max_uses" field in the mutation.
-func (m *InviteCodeMutation) MaxUses() (r int, exists bool) {
-	v := m.max_uses
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldMaxUses returns the old "max_uses" field's value of the InviteCode entity.
-// If the InviteCode object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *InviteCodeMutation) OldMaxUses(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldMaxUses is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldMaxUses requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldMaxUses: %w", err)
-	}
-	return oldValue.MaxUses, nil
-}
-
-// AddMaxUses adds i to the "max_uses" field.
-func (m *InviteCodeMutation) AddMaxUses(i int) {
-	if m.addmax_uses != nil {
-		*m.addmax_uses += i
-	} else {
-		m.addmax_uses = &i
-	}
-}
-
-// AddedMaxUses returns the value that was added to the "max_uses" field in this mutation.
-func (m *InviteCodeMutation) AddedMaxUses() (r int, exists bool) {
-	v := m.addmax_uses
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetMaxUses resets all changes to the "max_uses" field.
-func (m *InviteCodeMutation) ResetMaxUses() {
-	m.max_uses = nil
-	m.addmax_uses = nil
-}
-
-// SetUsedCount sets the "used_count" field.
-func (m *InviteCodeMutation) SetUsedCount(i int) {
-	m.used_count = &i
-	m.addused_count = nil
-}
-
-// UsedCount returns the value of the "used_count" field in the mutation.
-func (m *InviteCodeMutation) UsedCount() (r int, exists bool) {
-	v := m.used_count
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUsedCount returns the old "used_count" field's value of the InviteCode entity.
-// If the InviteCode object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *InviteCodeMutation) OldUsedCount(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUsedCount is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUsedCount requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUsedCount: %w", err)
-	}
-	return oldValue.UsedCount, nil
-}
-
-// AddUsedCount adds i to the "used_count" field.
-func (m *InviteCodeMutation) AddUsedCount(i int) {
-	if m.addused_count != nil {
-		*m.addused_count += i
-	} else {
-		m.addused_count = &i
-	}
-}
-
-// AddedUsedCount returns the value that was added to the "used_count" field in this mutation.
-func (m *InviteCodeMutation) AddedUsedCount() (r int, exists bool) {
-	v := m.addused_count
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetUsedCount resets all changes to the "used_count" field.
-func (m *InviteCodeMutation) ResetUsedCount() {
-	m.used_count = nil
-	m.addused_count = nil
-}
-
-// SetExpiresAt sets the "expires_at" field.
-func (m *InviteCodeMutation) SetExpiresAt(t time.Time) {
-	m.expires_at = &t
-}
-
-// ExpiresAt returns the value of the "expires_at" field in the mutation.
-func (m *InviteCodeMutation) ExpiresAt() (r time.Time, exists bool) {
-	v := m.expires_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldExpiresAt returns the old "expires_at" field's value of the InviteCode entity.
-// If the InviteCode object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *InviteCodeMutation) OldExpiresAt(ctx context.Context) (v *time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldExpiresAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldExpiresAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldExpiresAt: %w", err)
-	}
-	return oldValue.ExpiresAt, nil
-}
-
-// ClearExpiresAt clears the value of the "expires_at" field.
-func (m *InviteCodeMutation) ClearExpiresAt() {
-	m.expires_at = nil
-	m.clearedFields[invitecode.FieldExpiresAt] = struct{}{}
-}
-
-// ExpiresAtCleared returns if the "expires_at" field was cleared in this mutation.
-func (m *InviteCodeMutation) ExpiresAtCleared() bool {
-	_, ok := m.clearedFields[invitecode.FieldExpiresAt]
+// CodeCleared returns if the "code" field was cleared in this mutation.
+func (m *ERPModuleRecordMutation) CodeCleared() bool {
+	_, ok := m.clearedFields[erpmodulerecord.FieldCode]
 	return ok
 }
 
-// ResetExpiresAt resets all changes to the "expires_at" field.
-func (m *InviteCodeMutation) ResetExpiresAt() {
-	m.expires_at = nil
-	delete(m.clearedFields, invitecode.FieldExpiresAt)
+// ResetCode resets all changes to the "code" field.
+func (m *ERPModuleRecordMutation) ResetCode() {
+	m.code = nil
+	delete(m.clearedFields, erpmodulerecord.FieldCode)
 }
 
-// SetDisabled sets the "disabled" field.
-func (m *InviteCodeMutation) SetDisabled(b bool) {
-	m.disabled = &b
+// SetBox sets the "box" field.
+func (m *ERPModuleRecordMutation) SetBox(s string) {
+	m.box = &s
 }
 
-// Disabled returns the value of the "disabled" field in the mutation.
-func (m *InviteCodeMutation) Disabled() (r bool, exists bool) {
-	v := m.disabled
+// Box returns the value of the "box" field in the mutation.
+func (m *ERPModuleRecordMutation) Box() (r string, exists bool) {
+	v := m.box
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldDisabled returns the old "disabled" field's value of the InviteCode entity.
-// If the InviteCode object wasn't provided to the builder, the object is fetched from the database.
+// OldBox returns the old "box" field's value of the ERPModuleRecord entity.
+// If the ERPModuleRecord object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *InviteCodeMutation) OldDisabled(ctx context.Context) (v bool, err error) {
+func (m *ERPModuleRecordMutation) OldBox(ctx context.Context) (v *string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldDisabled is only allowed on UpdateOne operations")
+		return v, errors.New("OldBox is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDisabled requires an ID field in the mutation")
+		return v, errors.New("OldBox requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldDisabled: %w", err)
+		return v, fmt.Errorf("querying old value for OldBox: %w", err)
 	}
-	return oldValue.Disabled, nil
+	return oldValue.Box, nil
 }
 
-// ResetDisabled resets all changes to the "disabled" field.
-func (m *InviteCodeMutation) ResetDisabled() {
-	m.disabled = nil
+// ClearBox clears the value of the "box" field.
+func (m *ERPModuleRecordMutation) ClearBox() {
+	m.box = nil
+	m.clearedFields[erpmodulerecord.FieldBox] = struct{}{}
+}
+
+// BoxCleared returns if the "box" field was cleared in this mutation.
+func (m *ERPModuleRecordMutation) BoxCleared() bool {
+	_, ok := m.clearedFields[erpmodulerecord.FieldBox]
+	return ok
+}
+
+// ResetBox resets all changes to the "box" field.
+func (m *ERPModuleRecordMutation) ResetBox() {
+	m.box = nil
+	delete(m.clearedFields, erpmodulerecord.FieldBox)
+}
+
+// SetPayload sets the "payload" field.
+func (m *ERPModuleRecordMutation) SetPayload(s string) {
+	m.payload = &s
+}
+
+// Payload returns the value of the "payload" field in the mutation.
+func (m *ERPModuleRecordMutation) Payload() (r string, exists bool) {
+	v := m.payload
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPayload returns the old "payload" field's value of the ERPModuleRecord entity.
+// If the ERPModuleRecord object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ERPModuleRecordMutation) OldPayload(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPayload is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPayload requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPayload: %w", err)
+	}
+	return oldValue.Payload, nil
+}
+
+// ResetPayload resets all changes to the "payload" field.
+func (m *ERPModuleRecordMutation) ResetPayload() {
+	m.payload = nil
+}
+
+// SetCreatedByAdminID sets the "created_by_admin_id" field.
+func (m *ERPModuleRecordMutation) SetCreatedByAdminID(i int) {
+	m.created_by_admin_id = &i
+	m.addcreated_by_admin_id = nil
+}
+
+// CreatedByAdminID returns the value of the "created_by_admin_id" field in the mutation.
+func (m *ERPModuleRecordMutation) CreatedByAdminID() (r int, exists bool) {
+	v := m.created_by_admin_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedByAdminID returns the old "created_by_admin_id" field's value of the ERPModuleRecord entity.
+// If the ERPModuleRecord object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ERPModuleRecordMutation) OldCreatedByAdminID(ctx context.Context) (v *int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedByAdminID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedByAdminID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedByAdminID: %w", err)
+	}
+	return oldValue.CreatedByAdminID, nil
+}
+
+// AddCreatedByAdminID adds i to the "created_by_admin_id" field.
+func (m *ERPModuleRecordMutation) AddCreatedByAdminID(i int) {
+	if m.addcreated_by_admin_id != nil {
+		*m.addcreated_by_admin_id += i
+	} else {
+		m.addcreated_by_admin_id = &i
+	}
+}
+
+// AddedCreatedByAdminID returns the value that was added to the "created_by_admin_id" field in this mutation.
+func (m *ERPModuleRecordMutation) AddedCreatedByAdminID() (r int, exists bool) {
+	v := m.addcreated_by_admin_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearCreatedByAdminID clears the value of the "created_by_admin_id" field.
+func (m *ERPModuleRecordMutation) ClearCreatedByAdminID() {
+	m.created_by_admin_id = nil
+	m.addcreated_by_admin_id = nil
+	m.clearedFields[erpmodulerecord.FieldCreatedByAdminID] = struct{}{}
+}
+
+// CreatedByAdminIDCleared returns if the "created_by_admin_id" field was cleared in this mutation.
+func (m *ERPModuleRecordMutation) CreatedByAdminIDCleared() bool {
+	_, ok := m.clearedFields[erpmodulerecord.FieldCreatedByAdminID]
+	return ok
+}
+
+// ResetCreatedByAdminID resets all changes to the "created_by_admin_id" field.
+func (m *ERPModuleRecordMutation) ResetCreatedByAdminID() {
+	m.created_by_admin_id = nil
+	m.addcreated_by_admin_id = nil
+	delete(m.clearedFields, erpmodulerecord.FieldCreatedByAdminID)
+}
+
+// SetUpdatedByAdminID sets the "updated_by_admin_id" field.
+func (m *ERPModuleRecordMutation) SetUpdatedByAdminID(i int) {
+	m.updated_by_admin_id = &i
+	m.addupdated_by_admin_id = nil
+}
+
+// UpdatedByAdminID returns the value of the "updated_by_admin_id" field in the mutation.
+func (m *ERPModuleRecordMutation) UpdatedByAdminID() (r int, exists bool) {
+	v := m.updated_by_admin_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedByAdminID returns the old "updated_by_admin_id" field's value of the ERPModuleRecord entity.
+// If the ERPModuleRecord object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ERPModuleRecordMutation) OldUpdatedByAdminID(ctx context.Context) (v *int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedByAdminID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedByAdminID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedByAdminID: %w", err)
+	}
+	return oldValue.UpdatedByAdminID, nil
+}
+
+// AddUpdatedByAdminID adds i to the "updated_by_admin_id" field.
+func (m *ERPModuleRecordMutation) AddUpdatedByAdminID(i int) {
+	if m.addupdated_by_admin_id != nil {
+		*m.addupdated_by_admin_id += i
+	} else {
+		m.addupdated_by_admin_id = &i
+	}
+}
+
+// AddedUpdatedByAdminID returns the value that was added to the "updated_by_admin_id" field in this mutation.
+func (m *ERPModuleRecordMutation) AddedUpdatedByAdminID() (r int, exists bool) {
+	v := m.addupdated_by_admin_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearUpdatedByAdminID clears the value of the "updated_by_admin_id" field.
+func (m *ERPModuleRecordMutation) ClearUpdatedByAdminID() {
+	m.updated_by_admin_id = nil
+	m.addupdated_by_admin_id = nil
+	m.clearedFields[erpmodulerecord.FieldUpdatedByAdminID] = struct{}{}
+}
+
+// UpdatedByAdminIDCleared returns if the "updated_by_admin_id" field was cleared in this mutation.
+func (m *ERPModuleRecordMutation) UpdatedByAdminIDCleared() bool {
+	_, ok := m.clearedFields[erpmodulerecord.FieldUpdatedByAdminID]
+	return ok
+}
+
+// ResetUpdatedByAdminID resets all changes to the "updated_by_admin_id" field.
+func (m *ERPModuleRecordMutation) ResetUpdatedByAdminID() {
+	m.updated_by_admin_id = nil
+	m.addupdated_by_admin_id = nil
+	delete(m.clearedFields, erpmodulerecord.FieldUpdatedByAdminID)
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (m *InviteCodeMutation) SetCreatedAt(t time.Time) {
+func (m *ERPModuleRecordMutation) SetCreatedAt(t time.Time) {
 	m.created_at = &t
 }
 
 // CreatedAt returns the value of the "created_at" field in the mutation.
-func (m *InviteCodeMutation) CreatedAt() (r time.Time, exists bool) {
+func (m *ERPModuleRecordMutation) CreatedAt() (r time.Time, exists bool) {
 	v := m.created_at
 	if v == nil {
 		return
@@ -1212,10 +1344,10 @@ func (m *InviteCodeMutation) CreatedAt() (r time.Time, exists bool) {
 	return *v, true
 }
 
-// OldCreatedAt returns the old "created_at" field's value of the InviteCode entity.
-// If the InviteCode object wasn't provided to the builder, the object is fetched from the database.
+// OldCreatedAt returns the old "created_at" field's value of the ERPModuleRecord entity.
+// If the ERPModuleRecord object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *InviteCodeMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *ERPModuleRecordMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
 	}
@@ -1230,17 +1362,17 @@ func (m *InviteCodeMutation) OldCreatedAt(ctx context.Context) (v time.Time, err
 }
 
 // ResetCreatedAt resets all changes to the "created_at" field.
-func (m *InviteCodeMutation) ResetCreatedAt() {
+func (m *ERPModuleRecordMutation) ResetCreatedAt() {
 	m.created_at = nil
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (m *InviteCodeMutation) SetUpdatedAt(t time.Time) {
+func (m *ERPModuleRecordMutation) SetUpdatedAt(t time.Time) {
 	m.updated_at = &t
 }
 
 // UpdatedAt returns the value of the "updated_at" field in the mutation.
-func (m *InviteCodeMutation) UpdatedAt() (r time.Time, exists bool) {
+func (m *ERPModuleRecordMutation) UpdatedAt() (r time.Time, exists bool) {
 	v := m.updated_at
 	if v == nil {
 		return
@@ -1248,10 +1380,10 @@ func (m *InviteCodeMutation) UpdatedAt() (r time.Time, exists bool) {
 	return *v, true
 }
 
-// OldUpdatedAt returns the old "updated_at" field's value of the InviteCode entity.
-// If the InviteCode object wasn't provided to the builder, the object is fetched from the database.
+// OldUpdatedAt returns the old "updated_at" field's value of the ERPModuleRecord entity.
+// If the ERPModuleRecord object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *InviteCodeMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *ERPModuleRecordMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
 	}
@@ -1266,19 +1398,19 @@ func (m *InviteCodeMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err
 }
 
 // ResetUpdatedAt resets all changes to the "updated_at" field.
-func (m *InviteCodeMutation) ResetUpdatedAt() {
+func (m *ERPModuleRecordMutation) ResetUpdatedAt() {
 	m.updated_at = nil
 }
 
-// Where appends a list predicates to the InviteCodeMutation builder.
-func (m *InviteCodeMutation) Where(ps ...predicate.InviteCode) {
+// Where appends a list predicates to the ERPModuleRecordMutation builder.
+func (m *ERPModuleRecordMutation) Where(ps ...predicate.ERPModuleRecord) {
 	m.predicates = append(m.predicates, ps...)
 }
 
-// WhereP appends storage-level predicates to the InviteCodeMutation builder. Using this method,
+// WhereP appends storage-level predicates to the ERPModuleRecordMutation builder. Using this method,
 // users can use type-assertion to append predicates that do not depend on any generated package.
-func (m *InviteCodeMutation) WhereP(ps ...func(*sql.Selector)) {
-	p := make([]predicate.InviteCode, len(ps))
+func (m *ERPModuleRecordMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.ERPModuleRecord, len(ps))
 	for i := range ps {
 		p[i] = ps[i]
 	}
@@ -1286,45 +1418,48 @@ func (m *InviteCodeMutation) WhereP(ps ...func(*sql.Selector)) {
 }
 
 // Op returns the operation name.
-func (m *InviteCodeMutation) Op() Op {
+func (m *ERPModuleRecordMutation) Op() Op {
 	return m.op
 }
 
 // SetOp allows setting the mutation operation.
-func (m *InviteCodeMutation) SetOp(op Op) {
+func (m *ERPModuleRecordMutation) SetOp(op Op) {
 	m.op = op
 }
 
-// Type returns the node type of this mutation (InviteCode).
-func (m *InviteCodeMutation) Type() string {
+// Type returns the node type of this mutation (ERPModuleRecord).
+func (m *ERPModuleRecordMutation) Type() string {
 	return m.typ
 }
 
 // Fields returns all fields that were changed during this mutation. Note that in
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
-func (m *InviteCodeMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+func (m *ERPModuleRecordMutation) Fields() []string {
+	fields := make([]string, 0, 8)
+	if m.module_key != nil {
+		fields = append(fields, erpmodulerecord.FieldModuleKey)
+	}
 	if m.code != nil {
-		fields = append(fields, invitecode.FieldCode)
+		fields = append(fields, erpmodulerecord.FieldCode)
 	}
-	if m.max_uses != nil {
-		fields = append(fields, invitecode.FieldMaxUses)
+	if m.box != nil {
+		fields = append(fields, erpmodulerecord.FieldBox)
 	}
-	if m.used_count != nil {
-		fields = append(fields, invitecode.FieldUsedCount)
+	if m.payload != nil {
+		fields = append(fields, erpmodulerecord.FieldPayload)
 	}
-	if m.expires_at != nil {
-		fields = append(fields, invitecode.FieldExpiresAt)
+	if m.created_by_admin_id != nil {
+		fields = append(fields, erpmodulerecord.FieldCreatedByAdminID)
 	}
-	if m.disabled != nil {
-		fields = append(fields, invitecode.FieldDisabled)
+	if m.updated_by_admin_id != nil {
+		fields = append(fields, erpmodulerecord.FieldUpdatedByAdminID)
 	}
 	if m.created_at != nil {
-		fields = append(fields, invitecode.FieldCreatedAt)
+		fields = append(fields, erpmodulerecord.FieldCreatedAt)
 	}
 	if m.updated_at != nil {
-		fields = append(fields, invitecode.FieldUpdatedAt)
+		fields = append(fields, erpmodulerecord.FieldUpdatedAt)
 	}
 	return fields
 }
@@ -1332,21 +1467,23 @@ func (m *InviteCodeMutation) Fields() []string {
 // Field returns the value of a field with the given name. The second boolean
 // return value indicates that this field was not set, or was not defined in the
 // schema.
-func (m *InviteCodeMutation) Field(name string) (ent.Value, bool) {
+func (m *ERPModuleRecordMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case invitecode.FieldCode:
+	case erpmodulerecord.FieldModuleKey:
+		return m.ModuleKey()
+	case erpmodulerecord.FieldCode:
 		return m.Code()
-	case invitecode.FieldMaxUses:
-		return m.MaxUses()
-	case invitecode.FieldUsedCount:
-		return m.UsedCount()
-	case invitecode.FieldExpiresAt:
-		return m.ExpiresAt()
-	case invitecode.FieldDisabled:
-		return m.Disabled()
-	case invitecode.FieldCreatedAt:
+	case erpmodulerecord.FieldBox:
+		return m.Box()
+	case erpmodulerecord.FieldPayload:
+		return m.Payload()
+	case erpmodulerecord.FieldCreatedByAdminID:
+		return m.CreatedByAdminID()
+	case erpmodulerecord.FieldUpdatedByAdminID:
+		return m.UpdatedByAdminID()
+	case erpmodulerecord.FieldCreatedAt:
 		return m.CreatedAt()
-	case invitecode.FieldUpdatedAt:
+	case erpmodulerecord.FieldUpdatedAt:
 		return m.UpdatedAt()
 	}
 	return nil, false
@@ -1355,74 +1492,83 @@ func (m *InviteCodeMutation) Field(name string) (ent.Value, bool) {
 // OldField returns the old value of the field from the database. An error is
 // returned if the mutation operation is not UpdateOne, or the query to the
 // database failed.
-func (m *InviteCodeMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+func (m *ERPModuleRecordMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case invitecode.FieldCode:
+	case erpmodulerecord.FieldModuleKey:
+		return m.OldModuleKey(ctx)
+	case erpmodulerecord.FieldCode:
 		return m.OldCode(ctx)
-	case invitecode.FieldMaxUses:
-		return m.OldMaxUses(ctx)
-	case invitecode.FieldUsedCount:
-		return m.OldUsedCount(ctx)
-	case invitecode.FieldExpiresAt:
-		return m.OldExpiresAt(ctx)
-	case invitecode.FieldDisabled:
-		return m.OldDisabled(ctx)
-	case invitecode.FieldCreatedAt:
+	case erpmodulerecord.FieldBox:
+		return m.OldBox(ctx)
+	case erpmodulerecord.FieldPayload:
+		return m.OldPayload(ctx)
+	case erpmodulerecord.FieldCreatedByAdminID:
+		return m.OldCreatedByAdminID(ctx)
+	case erpmodulerecord.FieldUpdatedByAdminID:
+		return m.OldUpdatedByAdminID(ctx)
+	case erpmodulerecord.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
-	case invitecode.FieldUpdatedAt:
+	case erpmodulerecord.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
 	}
-	return nil, fmt.Errorf("unknown InviteCode field %s", name)
+	return nil, fmt.Errorf("unknown ERPModuleRecord field %s", name)
 }
 
 // SetField sets the value of a field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *InviteCodeMutation) SetField(name string, value ent.Value) error {
+func (m *ERPModuleRecordMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case invitecode.FieldCode:
+	case erpmodulerecord.FieldModuleKey:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetModuleKey(v)
+		return nil
+	case erpmodulerecord.FieldCode:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCode(v)
 		return nil
-	case invitecode.FieldMaxUses:
+	case erpmodulerecord.FieldBox:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBox(v)
+		return nil
+	case erpmodulerecord.FieldPayload:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPayload(v)
+		return nil
+	case erpmodulerecord.FieldCreatedByAdminID:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetMaxUses(v)
+		m.SetCreatedByAdminID(v)
 		return nil
-	case invitecode.FieldUsedCount:
+	case erpmodulerecord.FieldUpdatedByAdminID:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetUsedCount(v)
+		m.SetUpdatedByAdminID(v)
 		return nil
-	case invitecode.FieldExpiresAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetExpiresAt(v)
-		return nil
-	case invitecode.FieldDisabled:
-		v, ok := value.(bool)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetDisabled(v)
-		return nil
-	case invitecode.FieldCreatedAt:
+	case erpmodulerecord.FieldCreatedAt:
 		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCreatedAt(v)
 		return nil
-	case invitecode.FieldUpdatedAt:
+	case erpmodulerecord.FieldUpdatedAt:
 		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
@@ -1430,18 +1576,18 @@ func (m *InviteCodeMutation) SetField(name string, value ent.Value) error {
 		m.SetUpdatedAt(v)
 		return nil
 	}
-	return fmt.Errorf("unknown InviteCode field %s", name)
+	return fmt.Errorf("unknown ERPModuleRecord field %s", name)
 }
 
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
-func (m *InviteCodeMutation) AddedFields() []string {
+func (m *ERPModuleRecordMutation) AddedFields() []string {
 	var fields []string
-	if m.addmax_uses != nil {
-		fields = append(fields, invitecode.FieldMaxUses)
+	if m.addcreated_by_admin_id != nil {
+		fields = append(fields, erpmodulerecord.FieldCreatedByAdminID)
 	}
-	if m.addused_count != nil {
-		fields = append(fields, invitecode.FieldUsedCount)
+	if m.addupdated_by_admin_id != nil {
+		fields = append(fields, erpmodulerecord.FieldUpdatedByAdminID)
 	}
 	return fields
 }
@@ -1449,12 +1595,12 @@ func (m *InviteCodeMutation) AddedFields() []string {
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
-func (m *InviteCodeMutation) AddedField(name string) (ent.Value, bool) {
+func (m *ERPModuleRecordMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case invitecode.FieldMaxUses:
-		return m.AddedMaxUses()
-	case invitecode.FieldUsedCount:
-		return m.AddedUsedCount()
+	case erpmodulerecord.FieldCreatedByAdminID:
+		return m.AddedCreatedByAdminID()
+	case erpmodulerecord.FieldUpdatedByAdminID:
+		return m.AddedUpdatedByAdminID()
 	}
 	return nil, false
 }
@@ -1462,129 +1608,150 @@ func (m *InviteCodeMutation) AddedField(name string) (ent.Value, bool) {
 // AddField adds the value to the field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *InviteCodeMutation) AddField(name string, value ent.Value) error {
+func (m *ERPModuleRecordMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case invitecode.FieldMaxUses:
+	case erpmodulerecord.FieldCreatedByAdminID:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddMaxUses(v)
+		m.AddCreatedByAdminID(v)
 		return nil
-	case invitecode.FieldUsedCount:
+	case erpmodulerecord.FieldUpdatedByAdminID:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddUsedCount(v)
+		m.AddUpdatedByAdminID(v)
 		return nil
 	}
-	return fmt.Errorf("unknown InviteCode numeric field %s", name)
+	return fmt.Errorf("unknown ERPModuleRecord numeric field %s", name)
 }
 
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
-func (m *InviteCodeMutation) ClearedFields() []string {
+func (m *ERPModuleRecordMutation) ClearedFields() []string {
 	var fields []string
-	if m.FieldCleared(invitecode.FieldExpiresAt) {
-		fields = append(fields, invitecode.FieldExpiresAt)
+	if m.FieldCleared(erpmodulerecord.FieldCode) {
+		fields = append(fields, erpmodulerecord.FieldCode)
+	}
+	if m.FieldCleared(erpmodulerecord.FieldBox) {
+		fields = append(fields, erpmodulerecord.FieldBox)
+	}
+	if m.FieldCleared(erpmodulerecord.FieldCreatedByAdminID) {
+		fields = append(fields, erpmodulerecord.FieldCreatedByAdminID)
+	}
+	if m.FieldCleared(erpmodulerecord.FieldUpdatedByAdminID) {
+		fields = append(fields, erpmodulerecord.FieldUpdatedByAdminID)
 	}
 	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
 // cleared in this mutation.
-func (m *InviteCodeMutation) FieldCleared(name string) bool {
+func (m *ERPModuleRecordMutation) FieldCleared(name string) bool {
 	_, ok := m.clearedFields[name]
 	return ok
 }
 
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
-func (m *InviteCodeMutation) ClearField(name string) error {
+func (m *ERPModuleRecordMutation) ClearField(name string) error {
 	switch name {
-	case invitecode.FieldExpiresAt:
-		m.ClearExpiresAt()
+	case erpmodulerecord.FieldCode:
+		m.ClearCode()
+		return nil
+	case erpmodulerecord.FieldBox:
+		m.ClearBox()
+		return nil
+	case erpmodulerecord.FieldCreatedByAdminID:
+		m.ClearCreatedByAdminID()
+		return nil
+	case erpmodulerecord.FieldUpdatedByAdminID:
+		m.ClearUpdatedByAdminID()
 		return nil
 	}
-	return fmt.Errorf("unknown InviteCode nullable field %s", name)
+	return fmt.Errorf("unknown ERPModuleRecord nullable field %s", name)
 }
 
 // ResetField resets all changes in the mutation for the field with the given name.
 // It returns an error if the field is not defined in the schema.
-func (m *InviteCodeMutation) ResetField(name string) error {
+func (m *ERPModuleRecordMutation) ResetField(name string) error {
 	switch name {
-	case invitecode.FieldCode:
+	case erpmodulerecord.FieldModuleKey:
+		m.ResetModuleKey()
+		return nil
+	case erpmodulerecord.FieldCode:
 		m.ResetCode()
 		return nil
-	case invitecode.FieldMaxUses:
-		m.ResetMaxUses()
+	case erpmodulerecord.FieldBox:
+		m.ResetBox()
 		return nil
-	case invitecode.FieldUsedCount:
-		m.ResetUsedCount()
+	case erpmodulerecord.FieldPayload:
+		m.ResetPayload()
 		return nil
-	case invitecode.FieldExpiresAt:
-		m.ResetExpiresAt()
+	case erpmodulerecord.FieldCreatedByAdminID:
+		m.ResetCreatedByAdminID()
 		return nil
-	case invitecode.FieldDisabled:
-		m.ResetDisabled()
+	case erpmodulerecord.FieldUpdatedByAdminID:
+		m.ResetUpdatedByAdminID()
 		return nil
-	case invitecode.FieldCreatedAt:
+	case erpmodulerecord.FieldCreatedAt:
 		m.ResetCreatedAt()
 		return nil
-	case invitecode.FieldUpdatedAt:
+	case erpmodulerecord.FieldUpdatedAt:
 		m.ResetUpdatedAt()
 		return nil
 	}
-	return fmt.Errorf("unknown InviteCode field %s", name)
+	return fmt.Errorf("unknown ERPModuleRecord field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
-func (m *InviteCodeMutation) AddedEdges() []string {
+func (m *ERPModuleRecordMutation) AddedEdges() []string {
 	edges := make([]string, 0, 0)
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
-func (m *InviteCodeMutation) AddedIDs(name string) []ent.Value {
+func (m *ERPModuleRecordMutation) AddedIDs(name string) []ent.Value {
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
-func (m *InviteCodeMutation) RemovedEdges() []string {
+func (m *ERPModuleRecordMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 0)
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
-func (m *InviteCodeMutation) RemovedIDs(name string) []ent.Value {
+func (m *ERPModuleRecordMutation) RemovedIDs(name string) []ent.Value {
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *InviteCodeMutation) ClearedEdges() []string {
+func (m *ERPModuleRecordMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 0)
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
-func (m *InviteCodeMutation) EdgeCleared(name string) bool {
+func (m *ERPModuleRecordMutation) EdgeCleared(name string) bool {
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
-func (m *InviteCodeMutation) ClearEdge(name string) error {
-	return fmt.Errorf("unknown InviteCode unique edge %s", name)
+func (m *ERPModuleRecordMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown ERPModuleRecord unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
-func (m *InviteCodeMutation) ResetEdge(name string) error {
-	return fmt.Errorf("unknown InviteCode edge %s", name)
+func (m *ERPModuleRecordMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown ERPModuleRecord edge %s", name)
 }
 
 // UserMutation represents an operation that mutates the User nodes in the graph.
@@ -1595,7 +1762,6 @@ type UserMutation struct {
 	id            *int
 	username      *string
 	password_hash *string
-	invite_code   *string
 	role          *int8
 	addrole       *int8
 	admin_id      *int
@@ -1781,55 +1947,6 @@ func (m *UserMutation) OldPasswordHash(ctx context.Context) (v string, err error
 // ResetPasswordHash resets all changes to the "password_hash" field.
 func (m *UserMutation) ResetPasswordHash() {
 	m.password_hash = nil
-}
-
-// SetInviteCode sets the "invite_code" field.
-func (m *UserMutation) SetInviteCode(s string) {
-	m.invite_code = &s
-}
-
-// InviteCode returns the value of the "invite_code" field in the mutation.
-func (m *UserMutation) InviteCode() (r string, exists bool) {
-	v := m.invite_code
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldInviteCode returns the old "invite_code" field's value of the User entity.
-// If the User object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldInviteCode(ctx context.Context) (v *string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldInviteCode is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldInviteCode requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldInviteCode: %w", err)
-	}
-	return oldValue.InviteCode, nil
-}
-
-// ClearInviteCode clears the value of the "invite_code" field.
-func (m *UserMutation) ClearInviteCode() {
-	m.invite_code = nil
-	m.clearedFields[user.FieldInviteCode] = struct{}{}
-}
-
-// InviteCodeCleared returns if the "invite_code" field was cleared in this mutation.
-func (m *UserMutation) InviteCodeCleared() bool {
-	_, ok := m.clearedFields[user.FieldInviteCode]
-	return ok
-}
-
-// ResetInviteCode resets all changes to the "invite_code" field.
-func (m *UserMutation) ResetInviteCode() {
-	m.invite_code = nil
-	delete(m.clearedFields, user.FieldInviteCode)
 }
 
 // SetRole sets the "role" field.
@@ -2254,15 +2371,12 @@ func (m *UserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserMutation) Fields() []string {
-	fields := make([]string, 0, 11)
+	fields := make([]string, 0, 10)
 	if m.username != nil {
 		fields = append(fields, user.FieldUsername)
 	}
 	if m.password_hash != nil {
 		fields = append(fields, user.FieldPasswordHash)
-	}
-	if m.invite_code != nil {
-		fields = append(fields, user.FieldInviteCode)
 	}
 	if m.role != nil {
 		fields = append(fields, user.FieldRole)
@@ -2300,8 +2414,6 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 		return m.Username()
 	case user.FieldPasswordHash:
 		return m.PasswordHash()
-	case user.FieldInviteCode:
-		return m.InviteCode()
 	case user.FieldRole:
 		return m.Role()
 	case user.FieldAdminID:
@@ -2331,8 +2443,6 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldUsername(ctx)
 	case user.FieldPasswordHash:
 		return m.OldPasswordHash(ctx)
-	case user.FieldInviteCode:
-		return m.OldInviteCode(ctx)
 	case user.FieldRole:
 		return m.OldRole(ctx)
 	case user.FieldAdminID:
@@ -2371,13 +2481,6 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetPasswordHash(v)
-		return nil
-	case user.FieldInviteCode:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetInviteCode(v)
 		return nil
 	case user.FieldRole:
 		v, ok := value.(int8)
@@ -2504,9 +2607,6 @@ func (m *UserMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *UserMutation) ClearedFields() []string {
 	var fields []string
-	if m.FieldCleared(user.FieldInviteCode) {
-		fields = append(fields, user.FieldInviteCode)
-	}
 	if m.FieldCleared(user.FieldAdminID) {
 		fields = append(fields, user.FieldAdminID)
 	}
@@ -2530,9 +2630,6 @@ func (m *UserMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *UserMutation) ClearField(name string) error {
 	switch name {
-	case user.FieldInviteCode:
-		m.ClearInviteCode()
-		return nil
 	case user.FieldAdminID:
 		m.ClearAdminID()
 		return nil
@@ -2555,9 +2652,6 @@ func (m *UserMutation) ResetField(name string) error {
 		return nil
 	case user.FieldPasswordHash:
 		m.ResetPasswordHash()
-		return nil
-	case user.FieldInviteCode:
-		m.ResetInviteCode()
 		return nil
 	case user.FieldRole:
 		m.ResetRole()

@@ -69,10 +69,58 @@ body {
   padding: 16px;
 }
 
+.erp-layout-loading {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .erp-page-card {
   border: 1px solid #e5f1e8;
   box-shadow: 0 8px 24px rgb(34 99 52 / 7%);
   animation: card-enter 0.45s ease-out;
+}
+
+.erp-login-page {
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  overflow: hidden;
+}
+
+.erp-login-page__bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 12% 18%, rgb(13 70 110 / 14%) 0, transparent 40%),
+    radial-gradient(circle at 90% 84%, rgb(229 169 47 / 22%) 0, transparent 36%),
+    linear-gradient(130deg, #eef5fa 0%, #f8fbfd 45%, #f6faf7 100%);
+}
+
+.erp-login-card {
+  width: 100%;
+  max-width: 560px;
+  position: relative;
+  border: 1px solid #dbe7ef;
+  border-radius: 16px;
+  box-shadow: 0 18px 46px rgb(15 23 42 / 10%);
+}
+
+.erp-login-logo {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+}
+
+.erp-permission-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 12px;
 }
 
 @keyframes card-enter {
@@ -94,5 +142,13 @@ body {
 
   .erp-content {
     padding: 12px;
+  }
+
+  .erp-login-page {
+    padding: 12px;
+  }
+
+  .erp-permission-grid {
+    grid-template-columns: 1fr;
   }
 }

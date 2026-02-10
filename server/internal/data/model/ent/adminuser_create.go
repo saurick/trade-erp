@@ -46,6 +46,20 @@ func (_c *AdminUserCreate) SetNillableLevel(v *int8) *AdminUserCreate {
 	return _c
 }
 
+// SetMenuPermissions sets the "menu_permissions" field.
+func (_c *AdminUserCreate) SetMenuPermissions(v string) *AdminUserCreate {
+	_c.mutation.SetMenuPermissions(v)
+	return _c
+}
+
+// SetNillableMenuPermissions sets the "menu_permissions" field if the given value is not nil.
+func (_c *AdminUserCreate) SetNillableMenuPermissions(v *string) *AdminUserCreate {
+	if v != nil {
+		_c.SetMenuPermissions(*v)
+	}
+	return _c
+}
+
 // SetParentID sets the "parent_id" field.
 func (_c *AdminUserCreate) SetParentID(v int) *AdminUserCreate {
 	_c.mutation.SetParentID(v)
@@ -155,6 +169,10 @@ func (_c *AdminUserCreate) defaults() {
 		v := adminuser.DefaultLevel
 		_c.mutation.SetLevel(v)
 	}
+	if _, ok := _c.mutation.MenuPermissions(); !ok {
+		v := adminuser.DefaultMenuPermissions
+		_c.mutation.SetMenuPermissions(v)
+	}
 	if _, ok := _c.mutation.Disabled(); !ok {
 		v := adminuser.DefaultDisabled
 		_c.mutation.SetDisabled(v)
@@ -189,6 +207,14 @@ func (_c *AdminUserCreate) check() error {
 	}
 	if _, ok := _c.mutation.Level(); !ok {
 		return &ValidationError{Name: "level", err: errors.New(`ent: missing required field "AdminUser.level"`)}
+	}
+	if _, ok := _c.mutation.MenuPermissions(); !ok {
+		return &ValidationError{Name: "menu_permissions", err: errors.New(`ent: missing required field "AdminUser.menu_permissions"`)}
+	}
+	if v, ok := _c.mutation.MenuPermissions(); ok {
+		if err := adminuser.MenuPermissionsValidator(v); err != nil {
+			return &ValidationError{Name: "menu_permissions", err: fmt.Errorf(`ent: validator failed for field "AdminUser.menu_permissions": %w`, err)}
+		}
 	}
 	if _, ok := _c.mutation.Disabled(); !ok {
 		return &ValidationError{Name: "disabled", err: errors.New(`ent: missing required field "AdminUser.disabled"`)}
@@ -236,6 +262,10 @@ func (_c *AdminUserCreate) createSpec() (*AdminUser, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.Level(); ok {
 		_spec.SetField(adminuser.FieldLevel, field.TypeInt8, value)
 		_node.Level = value
+	}
+	if value, ok := _c.mutation.MenuPermissions(); ok {
+		_spec.SetField(adminuser.FieldMenuPermissions, field.TypeString, value)
+		_node.MenuPermissions = value
 	}
 	if value, ok := _c.mutation.ParentID(); ok {
 		_spec.SetField(adminuser.FieldParentID, field.TypeInt, value)

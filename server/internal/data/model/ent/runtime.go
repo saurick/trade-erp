@@ -4,7 +4,7 @@ package ent
 
 import (
 	"server/internal/data/model/ent/adminuser"
-	"server/internal/data/model/ent/invitecode"
+	"server/internal/data/model/ent/erpmodulerecord"
 	"server/internal/data/model/ent/user"
 	"server/internal/data/model/schema"
 	"time"
@@ -42,62 +42,68 @@ func init() {
 	adminuserDescLevel := adminuserFields[2].Descriptor()
 	// adminuser.DefaultLevel holds the default value on creation for the level field.
 	adminuser.DefaultLevel = adminuserDescLevel.Default.(int8)
+	// adminuserDescMenuPermissions is the schema descriptor for menu_permissions field.
+	adminuserDescMenuPermissions := adminuserFields[3].Descriptor()
+	// adminuser.DefaultMenuPermissions holds the default value on creation for the menu_permissions field.
+	adminuser.DefaultMenuPermissions = adminuserDescMenuPermissions.Default.(string)
+	// adminuser.MenuPermissionsValidator is a validator for the "menu_permissions" field. It is called by the builders before save.
+	adminuser.MenuPermissionsValidator = adminuserDescMenuPermissions.Validators[0].(func(string) error)
 	// adminuserDescDisabled is the schema descriptor for disabled field.
-	adminuserDescDisabled := adminuserFields[4].Descriptor()
+	adminuserDescDisabled := adminuserFields[5].Descriptor()
 	// adminuser.DefaultDisabled holds the default value on creation for the disabled field.
 	adminuser.DefaultDisabled = adminuserDescDisabled.Default.(bool)
 	// adminuserDescCreatedAt is the schema descriptor for created_at field.
-	adminuserDescCreatedAt := adminuserFields[6].Descriptor()
+	adminuserDescCreatedAt := adminuserFields[7].Descriptor()
 	// adminuser.DefaultCreatedAt holds the default value on creation for the created_at field.
 	adminuser.DefaultCreatedAt = adminuserDescCreatedAt.Default.(func() time.Time)
 	// adminuserDescUpdatedAt is the schema descriptor for updated_at field.
-	adminuserDescUpdatedAt := adminuserFields[7].Descriptor()
+	adminuserDescUpdatedAt := adminuserFields[8].Descriptor()
 	// adminuser.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	adminuser.DefaultUpdatedAt = adminuserDescUpdatedAt.Default.(func() time.Time)
 	// adminuser.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	adminuser.UpdateDefaultUpdatedAt = adminuserDescUpdatedAt.UpdateDefault.(func() time.Time)
-	invitecodeFields := schema.InviteCode{}.Fields()
-	_ = invitecodeFields
-	// invitecodeDescCode is the schema descriptor for code field.
-	invitecodeDescCode := invitecodeFields[0].Descriptor()
-	// invitecode.CodeValidator is a validator for the "code" field. It is called by the builders before save.
-	invitecode.CodeValidator = func() func(string) error {
-		validators := invitecodeDescCode.Validators
+	erpmodulerecordFields := schema.ERPModuleRecord{}.Fields()
+	_ = erpmodulerecordFields
+	// erpmodulerecordDescModuleKey is the schema descriptor for module_key field.
+	erpmodulerecordDescModuleKey := erpmodulerecordFields[0].Descriptor()
+	// erpmodulerecord.ModuleKeyValidator is a validator for the "module_key" field. It is called by the builders before save.
+	erpmodulerecord.ModuleKeyValidator = func() func(string) error {
+		validators := erpmodulerecordDescModuleKey.Validators
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),
 		}
-		return func(code string) error {
+		return func(module_key string) error {
 			for _, fn := range fns {
-				if err := fn(code); err != nil {
+				if err := fn(module_key); err != nil {
 					return err
 				}
 			}
 			return nil
 		}
 	}()
-	// invitecodeDescMaxUses is the schema descriptor for max_uses field.
-	invitecodeDescMaxUses := invitecodeFields[1].Descriptor()
-	// invitecode.DefaultMaxUses holds the default value on creation for the max_uses field.
-	invitecode.DefaultMaxUses = invitecodeDescMaxUses.Default.(int)
-	// invitecodeDescUsedCount is the schema descriptor for used_count field.
-	invitecodeDescUsedCount := invitecodeFields[2].Descriptor()
-	// invitecode.DefaultUsedCount holds the default value on creation for the used_count field.
-	invitecode.DefaultUsedCount = invitecodeDescUsedCount.Default.(int)
-	// invitecodeDescDisabled is the schema descriptor for disabled field.
-	invitecodeDescDisabled := invitecodeFields[4].Descriptor()
-	// invitecode.DefaultDisabled holds the default value on creation for the disabled field.
-	invitecode.DefaultDisabled = invitecodeDescDisabled.Default.(bool)
-	// invitecodeDescCreatedAt is the schema descriptor for created_at field.
-	invitecodeDescCreatedAt := invitecodeFields[5].Descriptor()
-	// invitecode.DefaultCreatedAt holds the default value on creation for the created_at field.
-	invitecode.DefaultCreatedAt = invitecodeDescCreatedAt.Default.(func() time.Time)
-	// invitecodeDescUpdatedAt is the schema descriptor for updated_at field.
-	invitecodeDescUpdatedAt := invitecodeFields[6].Descriptor()
-	// invitecode.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	invitecode.DefaultUpdatedAt = invitecodeDescUpdatedAt.Default.(func() time.Time)
-	// invitecode.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	invitecode.UpdateDefaultUpdatedAt = invitecodeDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// erpmodulerecordDescCode is the schema descriptor for code field.
+	erpmodulerecordDescCode := erpmodulerecordFields[1].Descriptor()
+	// erpmodulerecord.CodeValidator is a validator for the "code" field. It is called by the builders before save.
+	erpmodulerecord.CodeValidator = erpmodulerecordDescCode.Validators[0].(func(string) error)
+	// erpmodulerecordDescBox is the schema descriptor for box field.
+	erpmodulerecordDescBox := erpmodulerecordFields[2].Descriptor()
+	// erpmodulerecord.BoxValidator is a validator for the "box" field. It is called by the builders before save.
+	erpmodulerecord.BoxValidator = erpmodulerecordDescBox.Validators[0].(func(string) error)
+	// erpmodulerecordDescPayload is the schema descriptor for payload field.
+	erpmodulerecordDescPayload := erpmodulerecordFields[3].Descriptor()
+	// erpmodulerecord.DefaultPayload holds the default value on creation for the payload field.
+	erpmodulerecord.DefaultPayload = erpmodulerecordDescPayload.Default.(string)
+	// erpmodulerecordDescCreatedAt is the schema descriptor for created_at field.
+	erpmodulerecordDescCreatedAt := erpmodulerecordFields[6].Descriptor()
+	// erpmodulerecord.DefaultCreatedAt holds the default value on creation for the created_at field.
+	erpmodulerecord.DefaultCreatedAt = erpmodulerecordDescCreatedAt.Default.(func() time.Time)
+	// erpmodulerecordDescUpdatedAt is the schema descriptor for updated_at field.
+	erpmodulerecordDescUpdatedAt := erpmodulerecordFields[7].Descriptor()
+	// erpmodulerecord.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	erpmodulerecord.DefaultUpdatedAt = erpmodulerecordDescUpdatedAt.Default.(func() time.Time)
+	// erpmodulerecord.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	erpmodulerecord.UpdateDefaultUpdatedAt = erpmodulerecordDescUpdatedAt.UpdateDefault.(func() time.Time)
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescUsername is the schema descriptor for username field.
@@ -122,28 +128,24 @@ func init() {
 	userDescPasswordHash := userFields[1].Descriptor()
 	// user.PasswordHashValidator is a validator for the "password_hash" field. It is called by the builders before save.
 	user.PasswordHashValidator = userDescPasswordHash.Validators[0].(func(string) error)
-	// userDescInviteCode is the schema descriptor for invite_code field.
-	userDescInviteCode := userFields[2].Descriptor()
-	// user.InviteCodeValidator is a validator for the "invite_code" field. It is called by the builders before save.
-	user.InviteCodeValidator = userDescInviteCode.Validators[0].(func(string) error)
 	// userDescRole is the schema descriptor for role field.
-	userDescRole := userFields[3].Descriptor()
+	userDescRole := userFields[2].Descriptor()
 	// user.DefaultRole holds the default value on creation for the role field.
 	user.DefaultRole = userDescRole.Default.(int8)
 	// userDescDisabled is the schema descriptor for disabled field.
-	userDescDisabled := userFields[5].Descriptor()
+	userDescDisabled := userFields[4].Descriptor()
 	// user.DefaultDisabled holds the default value on creation for the disabled field.
 	user.DefaultDisabled = userDescDisabled.Default.(bool)
 	// userDescPoints is the schema descriptor for points field.
-	userDescPoints := userFields[7].Descriptor()
+	userDescPoints := userFields[6].Descriptor()
 	// user.DefaultPoints holds the default value on creation for the points field.
 	user.DefaultPoints = userDescPoints.Default.(int64)
 	// userDescCreatedAt is the schema descriptor for created_at field.
-	userDescCreatedAt := userFields[9].Descriptor()
+	userDescCreatedAt := userFields[8].Descriptor()
 	// user.DefaultCreatedAt holds the default value on creation for the created_at field.
 	user.DefaultCreatedAt = userDescCreatedAt.Default.(func() time.Time)
 	// userDescUpdatedAt is the schema descriptor for updated_at field.
-	userDescUpdatedAt := userFields[10].Descriptor()
+	userDescUpdatedAt := userFields[9].Descriptor()
 	// user.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	user.DefaultUpdatedAt = userDescUpdatedAt.Default.(func() time.Time)
 	// user.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

@@ -23,8 +23,19 @@
 | 结汇 | `/finance/settlements` | 已实现 |
 | 水单→招领→认领确认 | `/finance/bank-receipts` | 已实现 |
 | 打印输出 | `/docs/print-center` | 已实现 |
+| 登录页 | `/admin-login` | 已实现 |
+| 权限管理（菜单显示） | `/system/permissions` | 已实现 |
 
 ## 说明
 
 - 第一阶段为前端可运行版本，已覆盖流程、字段、状态箱及模板打印。
-- 下一阶段建议对接后端 API、权限与文件上传。
+- 已补充后端管理员菜单权限接口与 `admin_users.menu_permissions` 字段。
+- 已补充后端 ERP 统一 CRUD 接口与 `erp_module_records` 持久化表。
+- 已补充后端 ERP 模块级规则校验（模块白名单、必填字段、数值范围、状态箱合法值）。
+- 已补充后端关键派生字段计算（`totalAmount`、`totalPackages`、`receivableDate`）。
+- 前端模块列表仅展示后端真实数据，已移除演示 seed 数据。
+- 已补充模板上传与可编辑打印能力（Excel 模板单元格可编辑后打印）。
+- 已补充开票信息模板（来源 `杭州科森磁材开票信息.pdf`）并接入打印中心。
+- 已补充附件上传接口（`/files/upload`）与访问路径（`/files/...`）。
+- 已启用 HTTP tracing middleware，并补充 `request_id`、`latency_ms` 访问日志字段。
+- 下一阶段建议补齐导入导出能力。

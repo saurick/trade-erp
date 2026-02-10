@@ -20,16 +20,16 @@ func (f AdminUserFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, e
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AdminUserMutation", m)
 }
 
-// The InviteCodeFunc type is an adapter to allow the use of ordinary
-// function as InviteCode mutator.
-type InviteCodeFunc func(context.Context, *ent.InviteCodeMutation) (ent.Value, error)
+// The ERPModuleRecordFunc type is an adapter to allow the use of ordinary
+// function as ERPModuleRecord mutator.
+type ERPModuleRecordFunc func(context.Context, *ent.ERPModuleRecordMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f InviteCodeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.InviteCodeMutation); ok {
+func (f ERPModuleRecordFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ERPModuleRecordMutation); ok {
 		return f(ctx, mv)
 	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.InviteCodeMutation", m)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ERPModuleRecordMutation", m)
 }
 
 // The UserFunc type is an adapter to allow the use of ordinary

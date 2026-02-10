@@ -24,6 +24,10 @@ func (AdminUser) Fields() []ent.Field {
 		field.Int8("level").
 			Default(2).
 			Comment("0=super,1=level1,2=level2"),
+		field.String("menu_permissions").
+			Default("").
+			MaxLen(4096).
+			Comment("逗号分隔菜单权限"),
 		field.Int("parent_id").
 			Optional().
 			Nillable().

@@ -34,6 +34,7 @@ type AdminAccount struct {
 	ID                  int
 	Username            string
 	Level               AdminLevel
+	MenuPermissions     []string
 	ParentID            *int
 	Disabled            bool
 	LastLoginAt         *time.Time
@@ -45,10 +46,11 @@ type AdminAccount struct {
 }
 
 type AdminCreate struct {
-	Username     string
-	PasswordHash string
-	Level        AdminLevel
-	ParentID     *int
+	Username        string
+	PasswordHash    string
+	Level           AdminLevel
+	MenuPermissions []string
+	ParentID        *int
 }
 
 type AdminRevokeResult struct {
@@ -66,6 +68,7 @@ type AdminManageRepo interface {
 	CountChildAdminsByParent(ctx context.Context, parentID int) (int, error)
 	CreateAdmin(ctx context.Context, admin *AdminCreate) (*AdminAccount, error)
 	UpdateAdminHierarchy(ctx context.Context, id int, level AdminLevel, parentID *int) error
+	UpdateAdminMenuPermissions(ctx context.Context, id int, menuPermissions []string) error
 	SetAdminDisabled(ctx context.Context, id int, disabled bool) error
 	TransferUsers(ctx context.Context, fromAdminID int, toAdminID *int) (int, error)
 	TransferChildAdmins(ctx context.Context, fromAdminID int, toAdminID *int) (int, error)
@@ -155,7 +158,11 @@ func (uc *AdminManageUsecase) requireSuperAdmin(ctx context.Context) (*AuthClaim
 
 func (uc *AdminManageUsecase) GetCurrent(ctx context.Context) (*AdminAccount, error) {
 	_, admin, err := uc.requireAdminAccount(ctx)
-	return admin, err
+	if err != nil || admin == nil {
+		return admin, err
+	}
+	uc.fillEffectiveMenuPermissions(admin)
+	return admin, nil
 }
 
 func (uc *AdminManageUsecase) List(ctx context.Context) ([]*AdminAccount, error) {
@@ -211,6 +218,7 @@ func (uc *AdminManageUsecase) List(ctx context.Context) ([]*AdminAccount, error)
 	for _, a := range filtered {
 		a.UserCount = userCounts[a.ID]
 		a.ChildAdminCount = childCounts[a.ID]
+		uc.fillEffectiveMenuPermissions(a)
 
 		// 展示“可管理总用户数”口径：
 		// super=全量，level1=自己+二级下级，level2=自己。
@@ -235,6 +243,7 @@ func (uc *AdminManageUsecase) Create(
 	username string,
 	password string,
 	level AdminLevel,
+	menuPermissions []string,
 	parentID *int,
 ) (*AdminAccount, error) {
 	_, operator, err := uc.requireAdminAccount(ctx)
@@ -276,6 +285,11 @@ func (uc *AdminManageUsecase) Create(
 		}
 	}
 
+	normalizedMenus := NormalizeAdminMenuPermissions(menuPermissions)
+	if level != AdminLevelSuper && len(normalizedMenus) == 0 {
+		normalizedMenus = DefaultAdminMenuPermissions()
+	}
+
 	if existing, err := uc.repo.GetAdminByUsername(ctx, username); err == nil && existing != nil {
 		return nil, ErrAdminExists
 	} else if err != nil && !errors.Is(err, ErrAdminNotFound) && !errors.Is(err, ErrBadParam) {
@@ -287,12 +301,18 @@ func (uc *AdminManageUsecase) Create(
 		return nil, err
 	}
 
-	return uc.repo.CreateAdmin(ctx, &AdminCreate{
-		Username:     username,
-		PasswordHash: string(hash),
-		Level:        level,
-		ParentID:     parentID,
+	created, err := uc.repo.CreateAdmin(ctx, &AdminCreate{
+		Username:        username,
+		PasswordHash:    string(hash),
+		Level:           level,
+		MenuPermissions: normalizedMenus,
+		ParentID:        parentID,
 	})
+	if err != nil {
+		return nil, err
+	}
+	uc.fillEffectiveMenuPermissions(created)
+	return created, nil
 }
 
 func (uc *AdminManageUsecase) UpdateHierarchy(
@@ -365,7 +385,12 @@ func (uc *AdminManageUsecase) UpdateHierarchy(
 	if err := uc.repo.UpdateAdminHierarchy(ctx, adminID, level, parentID); err != nil {
 		return nil, err
 	}
-	return uc.repo.GetAdminByID(ctx, adminID)
+	updated, err := uc.repo.GetAdminByID(ctx, adminID)
+	if err != nil {
+		return nil, err
+	}
+	uc.fillEffectiveMenuPermissions(updated)
+	return updated, nil
 }
 
 func (uc *AdminManageUsecase) Revoke(
@@ -459,4 +484,48 @@ func (uc *AdminManageUsecase) Revoke(
 		TransferredChildAdmins: childMoved,
 		TransferToAdminID:      toID,
 	}, nil
+}
+
+func (uc *AdminManageUsecase) SetMenuPermissions(
+	ctx context.Context,
+	adminID int,
+	menuPermissions []string,
+) (*AdminAccount, error) {
+	if _, _, err := uc.requireSuperAdmin(ctx); err != nil {
+		return nil, err
+	}
+	if adminID <= 0 {
+		return nil, ErrBadParam
+	}
+
+	target, err := uc.repo.GetAdminByID(ctx, adminID)
+	if err != nil {
+		return nil, err
+	}
+	if target.Level == AdminLevelSuper {
+		return nil, ErrNoPermission
+	}
+
+	normalizedMenus := NormalizeAdminMenuPermissions(menuPermissions)
+	if len(normalizedMenus) == 0 {
+		normalizedMenus = DefaultAdminMenuPermissions()
+	}
+
+	if err := uc.repo.UpdateAdminMenuPermissions(ctx, adminID, normalizedMenus); err != nil {
+		return nil, err
+	}
+
+	updated, err := uc.repo.GetAdminByID(ctx, adminID)
+	if err != nil {
+		return nil, err
+	}
+	uc.fillEffectiveMenuPermissions(updated)
+	return updated, nil
+}
+
+func (uc *AdminManageUsecase) fillEffectiveMenuPermissions(admin *AdminAccount) {
+	if admin == nil {
+		return
+	}
+	admin.MenuPermissions = EffectiveAdminMenuPermissions(admin.Level, admin.MenuPermissions)
 }

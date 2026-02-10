@@ -23,6 +23,8 @@ type AdminUser struct {
 	PasswordHash string `json:"-"`
 	// 0=super,1=level1,2=level2
 	Level int8 `json:"level,omitempty"`
+	// 逗号分隔菜单权限
+	MenuPermissions string `json:"menu_permissions,omitempty"`
 	// 上级管理员ID
 	ParentID *int `json:"parent_id,omitempty"`
 	// Disabled holds the value of the "disabled" field.
@@ -45,7 +47,7 @@ func (*AdminUser) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case adminuser.FieldID, adminuser.FieldLevel, adminuser.FieldParentID:
 			values[i] = new(sql.NullInt64)
-		case adminuser.FieldUsername, adminuser.FieldPasswordHash:
+		case adminuser.FieldUsername, adminuser.FieldPasswordHash, adminuser.FieldMenuPermissions:
 			values[i] = new(sql.NullString)
 		case adminuser.FieldLastLoginAt, adminuser.FieldCreatedAt, adminuser.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -87,6 +89,12 @@ func (_m *AdminUser) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field level", values[i])
 			} else if value.Valid {
 				_m.Level = int8(value.Int64)
+			}
+		case adminuser.FieldMenuPermissions:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field menu_permissions", values[i])
+			} else if value.Valid {
+				_m.MenuPermissions = value.String
 			}
 		case adminuser.FieldParentID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -163,6 +171,9 @@ func (_m *AdminUser) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("level=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Level))
+	builder.WriteString(", ")
+	builder.WriteString("menu_permissions=")
+	builder.WriteString(_m.MenuPermissions)
 	builder.WriteString(", ")
 	if v := _m.ParentID; v != nil {
 		builder.WriteString("parent_id=")

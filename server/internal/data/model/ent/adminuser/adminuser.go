@@ -19,6 +19,8 @@ const (
 	FieldPasswordHash = "password_hash"
 	// FieldLevel holds the string denoting the level field in the database.
 	FieldLevel = "level"
+	// FieldMenuPermissions holds the string denoting the menu_permissions field in the database.
+	FieldMenuPermissions = "menu_permissions"
 	// FieldParentID holds the string denoting the parent_id field in the database.
 	FieldParentID = "parent_id"
 	// FieldDisabled holds the string denoting the disabled field in the database.
@@ -39,6 +41,7 @@ var Columns = []string{
 	FieldUsername,
 	FieldPasswordHash,
 	FieldLevel,
+	FieldMenuPermissions,
 	FieldParentID,
 	FieldDisabled,
 	FieldLastLoginAt,
@@ -63,6 +66,10 @@ var (
 	PasswordHashValidator func(string) error
 	// DefaultLevel holds the default value on creation for the "level" field.
 	DefaultLevel int8
+	// DefaultMenuPermissions holds the default value on creation for the "menu_permissions" field.
+	DefaultMenuPermissions string
+	// MenuPermissionsValidator is a validator for the "menu_permissions" field. It is called by the builders before save.
+	MenuPermissionsValidator func(string) error
 	// DefaultDisabled holds the default value on creation for the "disabled" field.
 	DefaultDisabled bool
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
@@ -94,6 +101,11 @@ func ByPasswordHash(opts ...sql.OrderTermOption) OrderOption {
 // ByLevel orders the results by the level field.
 func ByLevel(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldLevel, opts...).ToFunc()
+}
+
+// ByMenuPermissions orders the results by the menu_permissions field.
+func ByMenuPermissions(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMenuPermissions, opts...).ToFunc()
 }
 
 // ByParentID orders the results by the parent_id field.

@@ -120,19 +120,6 @@ export const moduleDefinitions = [
       { name: 'taxNo', label: '税号', type: 'input' },
       { name: 'paymentCycleDays', label: '付款周期(天)', type: 'number', required: true },
     ],
-    seed: [
-      {
-        code: 'CS-20260209-0001',
-        partnerType: '合作客户',
-        name: '杭州科森磁材有限公司',
-        address: '浙江省杭州市萧山区北干街道永久路288号912室',
-        contact: '李凌',
-        contactPhone: '18058808575',
-        taxNo: '91330109MA7N1W9P5Y',
-        paymentCycleDays: 45,
-        box: BOX_STATUS.AUTO,
-      },
-    ],
   },
   {
     key: 'products',
@@ -157,18 +144,7 @@ export const moduleDefinitions = [
       { name: 'specCode', label: '规格编码/图号', type: 'input', required: true },
       { name: 'cnDesc', label: '中文描述', type: 'input', required: true },
       { name: 'enDesc', label: '英文描述', type: 'input', required: true },
-      { name: 'attachment', label: '附件（图纸等）', type: 'textarea' },
-    ],
-    seed: [
-      {
-        code: 'PD-20260209-0001',
-        hsCode: '85051110',
-        specCode: 'KS-MAG-001',
-        cnDesc: '钕铁硼磁材组件',
-        enDesc: 'Neodymium magnet assembly',
-        attachment: '图纸 Rev.B',
-        box: BOX_STATUS.AUTO,
-      },
+      { name: 'attachment', label: '附件（图纸等）', type: 'upload', uploadCategory: 'attachments' },
     ],
   },
   {
@@ -253,25 +229,6 @@ export const moduleDefinitions = [
         key: 'print-pi',
         label: '打印PI',
         onRun: (record, helpers) => helpers.openPrintWindow('pi', record),
-      },
-    ],
-    seed: [
-      {
-        code: 'QT-20260209-0001',
-        customerName: '杭州科森磁材有限公司',
-        quotedDate: '2026-02-09',
-        currency: 'USD',
-        items: [
-          {
-            productName: 'Neodymium magnet assembly',
-            quantity: 1200,
-            unitPrice: 5.6,
-            totalPrice: 6720,
-          },
-        ],
-        totalAmount: 6720,
-        remark: '交期 30 天',
-        box: BOX_STATUS.DRAFT,
       },
     ],
   },
@@ -391,31 +348,6 @@ export const moduleDefinitions = [
         onRun: (record, helpers) => helpers.openPrintWindow('production', record),
       },
     ],
-    seed: [
-      {
-        code: 'XS-20260209-0001',
-        customerContractNo: 'KSE-2026-PO01',
-        customerName: '杭州科森磁材有限公司',
-        signDate: '2026-02-09',
-        deliveryDate: '2026-03-10',
-        transportType: '海运',
-        prepayRatio: 30,
-        orderFlow: '成品采购',
-        remark: '木箱包装',
-        items: [
-          {
-            productName: 'Neodymium magnet assembly',
-            cnDesc: '钕铁硼磁材组件',
-            enDesc: 'Neodymium magnet assembly',
-            quantity: 1200,
-            unitPrice: 5.6,
-            totalPrice: 6720,
-          },
-        ],
-        totalAmount: 6720,
-        box: BOX_STATUS.PENDING,
-      },
-    ],
   },
   {
     key: 'purchaseContracts',
@@ -443,7 +375,7 @@ export const moduleDefinitions = [
       { name: 'follower', label: '跟单员', type: 'input' },
       { name: 'buyer', label: '采购业务员', type: 'input' },
       { name: 'invoiceRequired', label: '开票与否', type: 'select', options: yesNoOptions, required: true },
-      { name: 'attachment', label: '附件（图纸等）', type: 'textarea' },
+      { name: 'attachment', label: '附件（图纸等）', type: 'upload', uploadCategory: 'attachments' },
       { name: 'remark', label: '备注', type: 'textarea' },
       {
         name: 'items',
@@ -481,25 +413,6 @@ export const moduleDefinitions = [
         onRun: (record, helpers) => helpers.openPrintWindow('purchase', record),
       },
     ],
-    seed: [
-      {
-        code: 'CG-20260209-0001',
-        supplierName: '宁波新磁科技有限公司',
-        signDate: '2026-02-10',
-        salesNo: 'S001',
-        deliveryDate: '2026-03-01',
-        deliveryAddress: '杭州临平仓',
-        follower: '周婷',
-        buyer: '李杰',
-        invoiceRequired: '是',
-        remark: '附图纸 Rev.B',
-        items: [
-          { productName: 'Neodymium magnet assembly', specCode: 'KS-MAG-001', quantity: 1200, unitPrice: 28, totalPrice: 33600 },
-        ],
-        totalAmount: 33600,
-        box: BOX_STATUS.DRAFT,
-      },
-    ],
   },
   {
     key: 'inbound',
@@ -535,7 +448,7 @@ export const moduleDefinitions = [
         required: true,
       },
       { name: 'quantity', label: '数量', type: 'number', required: true },
-      { name: 'qcAttachment', label: '检测报告附件', type: 'textarea' },
+      { name: 'qcAttachment', label: '检测报告附件', type: 'upload', uploadCategory: 'attachments' },
       { name: 'remark', label: '备注（装箱明细）', type: 'textarea' },
     ],
     rowActions: [
@@ -551,20 +464,6 @@ export const moduleDefinitions = [
           helpers.receiveInbound(record)
           helpers.notify.success('已生成入库单并更新库存')
         },
-      },
-    ],
-    seed: [
-      {
-        code: 'RK-20260209-0001',
-        purchaseCode: 'CG-20260209-0001',
-        productName: 'Neodymium magnet assembly',
-        warehouseName: '杭州一号仓',
-        location: 'A-01-03',
-        qcStatus: '待检验',
-        quantity: 1200,
-        qcAttachment: '待上传',
-        remark: '40 箱',
-        box: BOX_STATUS.DRAFT,
       },
     ],
   },
@@ -590,17 +489,6 @@ export const moduleDefinitions = [
       { name: 'location', label: '货位', type: 'input', required: true },
       { name: 'availableQty', label: '可用数量', type: 'number', required: true },
       { name: 'lockedQty', label: '锁定数量', type: 'number', required: true },
-    ],
-    seed: [
-      {
-        code: 'KC-20260209-0001',
-        productName: 'Neodymium magnet assembly',
-        warehouseName: '杭州一号仓',
-        location: 'A-01-03',
-        availableQty: 1200,
-        lockedQty: 100,
-        box: BOX_STATUS.AUTO,
-      },
     ],
   },
   {
@@ -643,7 +531,7 @@ export const moduleDefinitions = [
       { name: 'woodCaseSize', label: '木箱尺寸', type: 'input' },
       { name: 'customsChannel', label: '报关渠道', type: 'input' },
       { name: 'marking', label: '唛头', type: 'textarea' },
-      { name: 'attachments', label: '附件（进仓通知/随货发票）', type: 'textarea' },
+      { name: 'attachments', label: '附件（进仓通知/随货发票）', type: 'upload', multiple: true, uploadCategory: 'attachments' },
       { name: 'remark', label: '备注（收件人详细信息）', type: 'textarea' },
       {
         name: 'items',
@@ -718,34 +606,6 @@ export const moduleDefinitions = [
         onRun: (record, helpers) => helpers.openPrintWindow('delivery', record),
       },
     ],
-    seed: [
-      {
-        code: 'CY-20260209-0001',
-        customerName: '杭州科森磁材有限公司',
-        startPort: '宁波港',
-        destPort: '汉堡港',
-        shipToAddress: 'Germany Hamburg Logistics Center',
-        transportType: '海运',
-        arriveCountry: 'Germany',
-        goodsNameEn: 'Neodymium magnet assembly',
-        salesOwner: '赵琳',
-        totalPackages: 40,
-        marking: 'KOSEN/PO01/NO.1-40',
-        remark: '附进仓通知',
-        items: [
-          {
-            productModel: 'KS-MAG-001',
-            quantity: 1100,
-            unitPrice: 5.6,
-            packDetail: '木箱',
-            netWeight: 2100,
-            grossWeight: 2260,
-            volume: 5.8,
-          },
-        ],
-        box: BOX_STATUS.PENDING,
-      },
-    ],
   },
   {
     key: 'outbound',
@@ -770,18 +630,6 @@ export const moduleDefinitions = [
       { name: 'warehouseName', label: '仓库', type: 'input', required: true },
       { name: 'location', label: '货位', type: 'input', required: true },
       { name: 'remark', label: '备注', type: 'textarea' },
-    ],
-    seed: [
-      {
-        code: 'CK-20260209-0001',
-        shipmentCode: 'CY-20260209-0001',
-        productName: 'Neodymium magnet assembly',
-        quantity: 1100,
-        warehouseName: '杭州一号仓',
-        location: 'A-01-03',
-        remark: '销售出库',
-        box: BOX_STATUS.AUTO,
-      },
     ],
   },
   {
@@ -811,18 +659,6 @@ export const moduleDefinitions = [
       ...values,
       receivableDate: calcReceivableDate(values.shipDate, values.paymentCycleDays),
     }),
-    seed: [
-      {
-        code: 'JH-20260209-0001',
-        invoiceNo: 'CY-20260209-0001',
-        shipDate: '2026-02-09',
-        paymentCycleDays: 45,
-        receivableDate: '2026-03-26',
-        amount: 6720,
-        remark: '免批入账',
-        box: BOX_STATUS.AUTO,
-      },
-    ],
   },
   {
     key: 'bankReceipts',
@@ -868,18 +704,6 @@ export const moduleDefinitions = [
         },
       },
     ],
-    seed: [
-      {
-        code: 'SD-20260209-0001',
-        fundType: '预收客户货款',
-        refNo: 'QT-20260209-0001',
-        receivedAmount: 2000,
-        bankFee: 20,
-        registerDate: '2026-02-09',
-        remark: '待业务认领',
-        box: BOX_STATUS.CLAIM,
-      },
-    ],
   },
 ]
 
@@ -921,6 +745,11 @@ export const menuSections = [
     key: 'documents',
     title: '单据模板',
     items: [{ key: '/docs/print-center', label: '打印模板中心', moduleKey: 'print-center' }],
+  },
+  {
+    key: 'system',
+    title: '系统管理',
+    items: [{ key: '/system/permissions', label: '权限管理', moduleKey: 'permission-center' }],
   },
 ]
 

@@ -94,6 +94,23 @@ export default defineConfig(({ command, mode }) => {
           target: 'http://localhost:8003',
           changeOrigin: true,
         },
+        // 仅代理模板接口，避免 /templates/*.xls 静态文件被错误转发到后端
+        '/templates/file': {
+          target: 'http://localhost:8003',
+          changeOrigin: true,
+        },
+        '/templates/upload': {
+          target: 'http://localhost:8003',
+          changeOrigin: true,
+        },
+        '/files': {
+          target: 'http://localhost:8003',
+          changeOrigin: true,
+        },
+        '/metrics': {
+          target: 'http://localhost:8003',
+          changeOrigin: true,
+        },
       },
       // 如果挂 NAS / WSL / Docker 卷，再打开下面这个
       // watch: {

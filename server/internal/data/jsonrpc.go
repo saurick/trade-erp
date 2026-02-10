@@ -4,6 +4,7 @@ package data
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -32,6 +33,7 @@ type JsonrpcData struct {
 	adminAuthUC   *biz.AdminAuthUsecase
 	adminManageUC *biz.AdminManageUsecase
 	userAdminUC   *biz.UserAdminUsecase
+	erpUC         *biz.ERPUsecase
 
 	adminManageRepo biz.AdminManageRepo
 }
@@ -84,6 +86,8 @@ func NewJsonrpcData(
 
 	userAdminUC := biz.NewUserAdminUsecase(userAdminRepo, logger, tracerProvider)
 	helper.Info("JsonrpcData created (user admin usecase constructed inside)")
+	erpUC := biz.NewERPUsecase(NewERPRepo(data, logger), logger, tracerProvider)
+	helper.Info("JsonrpcData created (erp usecase constructed inside)")
 
 	return &JsonrpcData{
 		data:            data,
@@ -93,6 +97,7 @@ func NewJsonrpcData(
 		adminAuthUC:     adminAuthUC,
 		adminManageUC:   adminManageUC,
 		userAdminUC:     userAdminUC,
+		erpUC:           erpUC,
 		adminManageRepo: adminManageRepo,
 	}
 }
@@ -137,6 +142,8 @@ func (d *JsonrpcData) Handle(
 		return d.handleAdmin(ctx, method, id, params)
 	case "subscription":
 		return d.handleSubscription(ctx, method, id, params)
+	case "erp":
+		return d.handleERP(ctx, method, id, params)
 	default:
 		return id, &v1.JsonrpcResult{
 			Code:    40001,
@@ -238,16 +245,27 @@ func (d *JsonrpcData) handleAuth(
 			return id, d.mapAuthError(ctx, err), nil
 		}
 
+		adminLevel := int(biz.AdminLevelSecondary)
+		menuPermissions := []string{}
+		if d.adminManageRepo != nil {
+			if currentAdmin, getErr := d.adminManageRepo.GetAdminByUsername(ctx, admin.Username); getErr == nil && currentAdmin != nil {
+				adminLevel = int(currentAdmin.Level)
+				menuPermissions = biz.EffectiveAdminMenuPermissions(currentAdmin.Level, currentAdmin.MenuPermissions)
+			}
+		}
+
 		return id, &v1.JsonrpcResult{
 			Code:    0,
 			Message: "登录成功",
 			Data: newDataStruct(map[string]any{
-				"user_id":      admin.ID,
-				"username":     admin.Username,
-				"access_token": token,
-				"expires_at":   expireAt.Unix(),
-				"token_type":   "Bearer",
-				"issued_at":    time.Now().Unix(),
+				"user_id":          admin.ID,
+				"username":         admin.Username,
+				"access_token":     token,
+				"expires_at":       expireAt.Unix(),
+				"token_type":       "Bearer",
+				"issued_at":        time.Now().Unix(),
+				"admin_level":      adminLevel,
+				"menu_permissions": toAnySliceString(menuPermissions),
 			}),
 		}, nil
 
@@ -333,6 +351,7 @@ func (d *JsonrpcData) handleAuth(
 					data["admin_parent_id"] = *admin.ParentID
 				}
 				data["admin_id"] = admin.ID
+				data["menu_permissions"] = toAnySliceString(admin.MenuPermissions)
 			}
 		}
 
@@ -461,6 +480,60 @@ func getBool(m map[string]any, key string, def bool) bool {
 		return b
 	}
 	return def
+}
+
+func getStringSlice(m map[string]any, key string) []string {
+	v, ok := m[key]
+	if !ok || v == nil {
+		return []string{}
+	}
+	rawList, ok := v.([]any)
+	if !ok {
+		return []string{}
+	}
+	out := make([]string, 0, len(rawList))
+	for _, item := range rawList {
+		str, ok := item.(string)
+		if !ok {
+			continue
+		}
+		out = append(out, str)
+	}
+	return out
+}
+
+func toAnySliceString(values []string) []any {
+	if len(values) == 0 {
+		return []any{}
+	}
+	out := make([]any, 0, len(values))
+	for _, item := range values {
+		out = append(out, item)
+	}
+	return out
+}
+
+func toAnySliceMap(values []map[string]any) []any {
+	if len(values) == 0 {
+		return []any{}
+	}
+	out := make([]any, 0, len(values))
+	for _, item := range values {
+		out = append(out, item)
+	}
+	return out
+}
+
+func getMap(m map[string]any, key string) map[string]any {
+	raw, ok := m[key]
+	if !ok || raw == nil {
+		return map[string]any{}
+	}
+	value, ok := raw.(map[string]any)
+	if !ok {
+		return map[string]any{}
+	}
+	return value
 }
 
 func newDataStruct(m map[string]any) *structpb.Struct {
@@ -914,6 +987,11 @@ func (d *JsonrpcData) handleAdmin(
 		pm = params.AsMap()
 	}
 
+	if _, res := d.requireAdmin(ctx); res != nil {
+		l.Warnf("[admin] requireAdmin denied method=%s id=%s code=%d msg=%s", method, id, res.Code, res.Message)
+		return id, res, nil
+	}
+
 	switch method {
 	case "me":
 		admin, err := d.adminManageUC.GetCurrent(ctx)
@@ -930,13 +1008,14 @@ func (d *JsonrpcData) handleAdmin(
 			Code:    0,
 			Message: "OK",
 			Data: newDataStruct(map[string]any{
-				"id":         admin.ID,
-				"username":   admin.Username,
-				"level":      int(admin.Level),
-				"parent_id":  parentID,
-				"disabled":   admin.Disabled,
-				"created_at": admin.CreatedAt.Unix(),
-				"updated_at": admin.UpdatedAt.Unix(),
+				"id":               admin.ID,
+				"username":         admin.Username,
+				"level":            int(admin.Level),
+				"parent_id":        parentID,
+				"disabled":         admin.Disabled,
+				"menu_permissions": toAnySliceString(admin.MenuPermissions),
+				"created_at":       admin.CreatedAt.Unix(),
+				"updated_at":       admin.UpdatedAt.Unix(),
 			}),
 		}, nil
 
@@ -962,6 +1041,7 @@ func (d *JsonrpcData) handleAdmin(
 				"level":                 int(a.Level),
 				"parent_id":             parentID,
 				"disabled":              a.Disabled,
+				"menu_permissions":      toAnySliceString(a.MenuPermissions),
 				"user_count":            a.UserCount,
 				"manageable_user_count": a.ManageableUserCount,
 				"child_admin_count":     a.ChildAdminCount,
@@ -982,13 +1062,14 @@ func (d *JsonrpcData) handleAdmin(
 		password := getString(pm, "password")
 		level := biz.AdminLevel(getInt(pm, "level", 0))
 		parentID := getInt(pm, "parent_id", 0)
+		menuPermissions := getStringSlice(pm, "menu_permissions")
 
 		var parentPtr *int
 		if parentID > 0 {
 			parentPtr = &parentID
 		}
 
-		admin, err := d.adminManageUC.Create(ctx, username, password, level, parentPtr)
+		admin, err := d.adminManageUC.Create(ctx, username, password, level, menuPermissions, parentPtr)
 		if err != nil {
 			return id, d.mapAdminManageError(ctx, err), nil
 		}
@@ -998,9 +1079,10 @@ func (d *JsonrpcData) handleAdmin(
 			Message: "OK",
 			Data: newDataStruct(map[string]any{
 				"admin": map[string]any{
-					"id":       admin.ID,
-					"username": admin.Username,
-					"level":    int(admin.Level),
+					"id":               admin.ID,
+					"username":         admin.Username,
+					"level":            int(admin.Level),
+					"menu_permissions": toAnySliceString(admin.MenuPermissions),
 				},
 			}),
 		}, nil
@@ -1030,11 +1112,54 @@ func (d *JsonrpcData) handleAdmin(
 			Message: "OK",
 			Data: newDataStruct(map[string]any{
 				"admin": map[string]any{
-					"id":        admin.ID,
-					"username":  admin.Username,
-					"level":     int(admin.Level),
-					"parent_id": parentOut,
-					"disabled":  admin.Disabled,
+					"id":               admin.ID,
+					"username":         admin.Username,
+					"level":            int(admin.Level),
+					"parent_id":        parentOut,
+					"disabled":         admin.Disabled,
+					"menu_permissions": toAnySliceString(admin.MenuPermissions),
+				},
+			}),
+		}, nil
+
+	case "menu_options":
+		options := biz.AdminMenuPermissionOptions()
+		menuOptions := make([]any, 0, len(options))
+		for _, item := range options {
+			menuOptions = append(menuOptions, map[string]any{
+				"key":   item.Key,
+				"label": item.Label,
+			})
+		}
+		return id, &v1.JsonrpcResult{
+			Code:    0,
+			Message: "OK",
+			Data:    newDataStruct(map[string]any{"menu_options": menuOptions}),
+		}, nil
+
+	case "set_permissions":
+		adminID := getInt(pm, "id", 0)
+		menuPermissions := getStringSlice(pm, "menu_permissions")
+		admin, err := d.adminManageUC.SetMenuPermissions(ctx, adminID, menuPermissions)
+		if err != nil {
+			return id, d.mapAdminManageError(ctx, err), nil
+		}
+
+		parentOut := 0
+		if admin.ParentID != nil {
+			parentOut = *admin.ParentID
+		}
+		return id, &v1.JsonrpcResult{
+			Code:    0,
+			Message: "OK",
+			Data: newDataStruct(map[string]any{
+				"admin": map[string]any{
+					"id":               admin.ID,
+					"username":         admin.Username,
+					"level":            int(admin.Level),
+					"parent_id":        parentOut,
+					"disabled":         admin.Disabled,
+					"menu_permissions": toAnySliceString(admin.MenuPermissions),
 				},
 			}),
 		}, nil
@@ -1094,6 +1219,120 @@ func (d *JsonrpcData) mapAdminManageError(ctx context.Context, err error) *v1.Js
 		return &v1.JsonrpcResult{Code: 40012, Message: "上级管理员不合法"}
 	default:
 		l.Errorf("[admin] internal err=%v", err)
+		return &v1.JsonrpcResult{Code: 50000, Message: "服务器内部错误"}
+	}
+}
+
+func (d *JsonrpcData) handleERP(
+	ctx context.Context,
+	method, id string,
+	params *structpb.Struct,
+) (string, *v1.JsonrpcResult, error) {
+	l := d.log.WithContext(ctx)
+	if _, res := d.requireAdmin(ctx); res != nil {
+		l.Warnf("[erp] requireAdmin denied method=%s id=%s code=%d msg=%s", method, id, res.Code, res.Message)
+		return id, res, nil
+	}
+
+	pm := map[string]any{}
+	if params != nil {
+		pm = params.AsMap()
+	}
+
+	moduleKey := getString(pm, "module_key")
+
+	switch method {
+	case "list":
+		records, err := d.erpUC.List(ctx, moduleKey)
+		if err != nil {
+			return id, d.mapERPError(ctx, err), nil
+		}
+		return id, &v1.JsonrpcResult{
+			Code:    0,
+			Message: "OK",
+			Data: newDataStruct(map[string]any{
+				"records": toAnySliceMap(records),
+			}),
+		}, nil
+
+	case "create":
+		record := getMap(pm, "record")
+		claims, _ := biz.GetClaimsFromContext(ctx)
+		operatorID := 0
+		if claims != nil {
+			operatorID = claims.UserID
+		}
+
+		created, err := d.erpUC.Create(ctx, moduleKey, record, operatorID)
+		if err != nil {
+			return id, d.mapERPError(ctx, err), nil
+		}
+		return id, &v1.JsonrpcResult{
+			Code:    0,
+			Message: "创建成功",
+			Data: newDataStruct(map[string]any{
+				"record": created,
+			}),
+		}, nil
+
+	case "update":
+		recordID := getInt(pm, "id", 0)
+		record := getMap(pm, "record")
+		claims, _ := biz.GetClaimsFromContext(ctx)
+		operatorID := 0
+		if claims != nil {
+			operatorID = claims.UserID
+		}
+
+		updated, err := d.erpUC.Update(ctx, moduleKey, recordID, record, operatorID)
+		if err != nil {
+			return id, d.mapERPError(ctx, err), nil
+		}
+		return id, &v1.JsonrpcResult{
+			Code:    0,
+			Message: "更新成功",
+			Data: newDataStruct(map[string]any{
+				"record": updated,
+			}),
+		}, nil
+
+	case "delete":
+		recordID := getInt(pm, "id", 0)
+		if err := d.erpUC.Delete(ctx, moduleKey, recordID); err != nil {
+			return id, d.mapERPError(ctx, err), nil
+		}
+		return id, &v1.JsonrpcResult{
+			Code:    0,
+			Message: "删除成功",
+			Data:    newDataStruct(map[string]any{"success": true}),
+		}, nil
+
+	default:
+		return id, &v1.JsonrpcResult{
+			Code:    40020,
+			Message: fmt.Sprintf("未知 ERP 接口 method=%s", method),
+		}, nil
+	}
+}
+
+func (d *JsonrpcData) mapERPError(ctx context.Context, err error) *v1.JsonrpcResult {
+	l := d.log.WithContext(ctx)
+
+	switch {
+	case errors.Is(err, biz.ErrERPInvalidModule):
+		return &v1.JsonrpcResult{Code: 40040, Message: "模块标识不合法"}
+	case errors.Is(err, biz.ErrERPInvalidRecord):
+		return &v1.JsonrpcResult{Code: 40041, Message: "记录内容不合法"}
+	case errors.Is(err, biz.ErrERPRecordNotFound):
+		return &v1.JsonrpcResult{Code: 40440, Message: "记录不存在"}
+	case errors.Is(err, biz.ErrBadParam):
+		return &v1.JsonrpcResult{Code: 40010, Message: "参数不合法"}
+	case errors.Is(err, biz.ErrForbidden):
+		return &v1.JsonrpcResult{Code: 40301, Message: "需要管理员权限"}
+	case errors.Is(err, biz.ErrNoPermission):
+		return &v1.JsonrpcResult{Code: 40302, Message: "权限不足"}
+	default:
+		l.Errorf("[erp] internal err=%v", err)
 		return &v1.JsonrpcResult{Code: 50000, Message: "服务器内部错误"}
 	}
 }

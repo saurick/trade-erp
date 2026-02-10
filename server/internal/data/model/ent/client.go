@@ -12,7 +12,7 @@ import (
 	"server/internal/data/model/ent/migrate"
 
 	"server/internal/data/model/ent/adminuser"
-	"server/internal/data/model/ent/invitecode"
+	"server/internal/data/model/ent/erpmodulerecord"
 	"server/internal/data/model/ent/user"
 
 	"entgo.io/ent"
@@ -27,8 +27,8 @@ type Client struct {
 	Schema *migrate.Schema
 	// AdminUser is the client for interacting with the AdminUser builders.
 	AdminUser *AdminUserClient
-	// InviteCode is the client for interacting with the InviteCode builders.
-	InviteCode *InviteCodeClient
+	// ERPModuleRecord is the client for interacting with the ERPModuleRecord builders.
+	ERPModuleRecord *ERPModuleRecordClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 }
@@ -43,7 +43,7 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.AdminUser = NewAdminUserClient(c.config)
-	c.InviteCode = NewInviteCodeClient(c.config)
+	c.ERPModuleRecord = NewERPModuleRecordClient(c.config)
 	c.User = NewUserClient(c.config)
 }
 
@@ -135,11 +135,11 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:        ctx,
-		config:     cfg,
-		AdminUser:  NewAdminUserClient(cfg),
-		InviteCode: NewInviteCodeClient(cfg),
-		User:       NewUserClient(cfg),
+		ctx:             ctx,
+		config:          cfg,
+		AdminUser:       NewAdminUserClient(cfg),
+		ERPModuleRecord: NewERPModuleRecordClient(cfg),
+		User:            NewUserClient(cfg),
 	}, nil
 }
 
@@ -157,11 +157,11 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:        ctx,
-		config:     cfg,
-		AdminUser:  NewAdminUserClient(cfg),
-		InviteCode: NewInviteCodeClient(cfg),
-		User:       NewUserClient(cfg),
+		ctx:             ctx,
+		config:          cfg,
+		AdminUser:       NewAdminUserClient(cfg),
+		ERPModuleRecord: NewERPModuleRecordClient(cfg),
+		User:            NewUserClient(cfg),
 	}, nil
 }
 
@@ -191,7 +191,7 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	c.AdminUser.Use(hooks...)
-	c.InviteCode.Use(hooks...)
+	c.ERPModuleRecord.Use(hooks...)
 	c.User.Use(hooks...)
 }
 
@@ -199,7 +199,7 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	c.AdminUser.Intercept(interceptors...)
-	c.InviteCode.Intercept(interceptors...)
+	c.ERPModuleRecord.Intercept(interceptors...)
 	c.User.Intercept(interceptors...)
 }
 
@@ -208,8 +208,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *AdminUserMutation:
 		return c.AdminUser.mutate(ctx, m)
-	case *InviteCodeMutation:
-		return c.InviteCode.mutate(ctx, m)
+	case *ERPModuleRecordMutation:
+		return c.ERPModuleRecord.mutate(ctx, m)
 	case *UserMutation:
 		return c.User.mutate(ctx, m)
 	default:
@@ -350,107 +350,107 @@ func (c *AdminUserClient) mutate(ctx context.Context, m *AdminUserMutation) (Val
 	}
 }
 
-// InviteCodeClient is a client for the InviteCode schema.
-type InviteCodeClient struct {
+// ERPModuleRecordClient is a client for the ERPModuleRecord schema.
+type ERPModuleRecordClient struct {
 	config
 }
 
-// NewInviteCodeClient returns a client for the InviteCode from the given config.
-func NewInviteCodeClient(c config) *InviteCodeClient {
-	return &InviteCodeClient{config: c}
+// NewERPModuleRecordClient returns a client for the ERPModuleRecord from the given config.
+func NewERPModuleRecordClient(c config) *ERPModuleRecordClient {
+	return &ERPModuleRecordClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `invitecode.Hooks(f(g(h())))`.
-func (c *InviteCodeClient) Use(hooks ...Hook) {
-	c.hooks.InviteCode = append(c.hooks.InviteCode, hooks...)
+// A call to `Use(f, g, h)` equals to `erpmodulerecord.Hooks(f(g(h())))`.
+func (c *ERPModuleRecordClient) Use(hooks ...Hook) {
+	c.hooks.ERPModuleRecord = append(c.hooks.ERPModuleRecord, hooks...)
 }
 
 // Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `invitecode.Intercept(f(g(h())))`.
-func (c *InviteCodeClient) Intercept(interceptors ...Interceptor) {
-	c.inters.InviteCode = append(c.inters.InviteCode, interceptors...)
+// A call to `Intercept(f, g, h)` equals to `erpmodulerecord.Intercept(f(g(h())))`.
+func (c *ERPModuleRecordClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ERPModuleRecord = append(c.inters.ERPModuleRecord, interceptors...)
 }
 
-// Create returns a builder for creating a InviteCode entity.
-func (c *InviteCodeClient) Create() *InviteCodeCreate {
-	mutation := newInviteCodeMutation(c.config, OpCreate)
-	return &InviteCodeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a ERPModuleRecord entity.
+func (c *ERPModuleRecordClient) Create() *ERPModuleRecordCreate {
+	mutation := newERPModuleRecordMutation(c.config, OpCreate)
+	return &ERPModuleRecordCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of InviteCode entities.
-func (c *InviteCodeClient) CreateBulk(builders ...*InviteCodeCreate) *InviteCodeCreateBulk {
-	return &InviteCodeCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of ERPModuleRecord entities.
+func (c *ERPModuleRecordClient) CreateBulk(builders ...*ERPModuleRecordCreate) *ERPModuleRecordCreateBulk {
+	return &ERPModuleRecordCreateBulk{config: c.config, builders: builders}
 }
 
 // MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
 // a builder and applies setFunc on it.
-func (c *InviteCodeClient) MapCreateBulk(slice any, setFunc func(*InviteCodeCreate, int)) *InviteCodeCreateBulk {
+func (c *ERPModuleRecordClient) MapCreateBulk(slice any, setFunc func(*ERPModuleRecordCreate, int)) *ERPModuleRecordCreateBulk {
 	rv := reflect.ValueOf(slice)
 	if rv.Kind() != reflect.Slice {
-		return &InviteCodeCreateBulk{err: fmt.Errorf("calling to InviteCodeClient.MapCreateBulk with wrong type %T, need slice", slice)}
+		return &ERPModuleRecordCreateBulk{err: fmt.Errorf("calling to ERPModuleRecordClient.MapCreateBulk with wrong type %T, need slice", slice)}
 	}
-	builders := make([]*InviteCodeCreate, rv.Len())
+	builders := make([]*ERPModuleRecordCreate, rv.Len())
 	for i := 0; i < rv.Len(); i++ {
 		builders[i] = c.Create()
 		setFunc(builders[i], i)
 	}
-	return &InviteCodeCreateBulk{config: c.config, builders: builders}
+	return &ERPModuleRecordCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for InviteCode.
-func (c *InviteCodeClient) Update() *InviteCodeUpdate {
-	mutation := newInviteCodeMutation(c.config, OpUpdate)
-	return &InviteCodeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for ERPModuleRecord.
+func (c *ERPModuleRecordClient) Update() *ERPModuleRecordUpdate {
+	mutation := newERPModuleRecordMutation(c.config, OpUpdate)
+	return &ERPModuleRecordUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *InviteCodeClient) UpdateOne(_m *InviteCode) *InviteCodeUpdateOne {
-	mutation := newInviteCodeMutation(c.config, OpUpdateOne, withInviteCode(_m))
-	return &InviteCodeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *ERPModuleRecordClient) UpdateOne(_m *ERPModuleRecord) *ERPModuleRecordUpdateOne {
+	mutation := newERPModuleRecordMutation(c.config, OpUpdateOne, withERPModuleRecord(_m))
+	return &ERPModuleRecordUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *InviteCodeClient) UpdateOneID(id int) *InviteCodeUpdateOne {
-	mutation := newInviteCodeMutation(c.config, OpUpdateOne, withInviteCodeID(id))
-	return &InviteCodeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *ERPModuleRecordClient) UpdateOneID(id int) *ERPModuleRecordUpdateOne {
+	mutation := newERPModuleRecordMutation(c.config, OpUpdateOne, withERPModuleRecordID(id))
+	return &ERPModuleRecordUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for InviteCode.
-func (c *InviteCodeClient) Delete() *InviteCodeDelete {
-	mutation := newInviteCodeMutation(c.config, OpDelete)
-	return &InviteCodeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for ERPModuleRecord.
+func (c *ERPModuleRecordClient) Delete() *ERPModuleRecordDelete {
+	mutation := newERPModuleRecordMutation(c.config, OpDelete)
+	return &ERPModuleRecordDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *InviteCodeClient) DeleteOne(_m *InviteCode) *InviteCodeDeleteOne {
+func (c *ERPModuleRecordClient) DeleteOne(_m *ERPModuleRecord) *ERPModuleRecordDeleteOne {
 	return c.DeleteOneID(_m.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *InviteCodeClient) DeleteOneID(id int) *InviteCodeDeleteOne {
-	builder := c.Delete().Where(invitecode.ID(id))
+func (c *ERPModuleRecordClient) DeleteOneID(id int) *ERPModuleRecordDeleteOne {
+	builder := c.Delete().Where(erpmodulerecord.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &InviteCodeDeleteOne{builder}
+	return &ERPModuleRecordDeleteOne{builder}
 }
 
-// Query returns a query builder for InviteCode.
-func (c *InviteCodeClient) Query() *InviteCodeQuery {
-	return &InviteCodeQuery{
+// Query returns a query builder for ERPModuleRecord.
+func (c *ERPModuleRecordClient) Query() *ERPModuleRecordQuery {
+	return &ERPModuleRecordQuery{
 		config: c.config,
-		ctx:    &QueryContext{Type: TypeInviteCode},
+		ctx:    &QueryContext{Type: TypeERPModuleRecord},
 		inters: c.Interceptors(),
 	}
 }
 
-// Get returns a InviteCode entity by its id.
-func (c *InviteCodeClient) Get(ctx context.Context, id int) (*InviteCode, error) {
-	return c.Query().Where(invitecode.ID(id)).Only(ctx)
+// Get returns a ERPModuleRecord entity by its id.
+func (c *ERPModuleRecordClient) Get(ctx context.Context, id int) (*ERPModuleRecord, error) {
+	return c.Query().Where(erpmodulerecord.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *InviteCodeClient) GetX(ctx context.Context, id int) *InviteCode {
+func (c *ERPModuleRecordClient) GetX(ctx context.Context, id int) *ERPModuleRecord {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -459,27 +459,27 @@ func (c *InviteCodeClient) GetX(ctx context.Context, id int) *InviteCode {
 }
 
 // Hooks returns the client hooks.
-func (c *InviteCodeClient) Hooks() []Hook {
-	return c.hooks.InviteCode
+func (c *ERPModuleRecordClient) Hooks() []Hook {
+	return c.hooks.ERPModuleRecord
 }
 
 // Interceptors returns the client interceptors.
-func (c *InviteCodeClient) Interceptors() []Interceptor {
-	return c.inters.InviteCode
+func (c *ERPModuleRecordClient) Interceptors() []Interceptor {
+	return c.inters.ERPModuleRecord
 }
 
-func (c *InviteCodeClient) mutate(ctx context.Context, m *InviteCodeMutation) (Value, error) {
+func (c *ERPModuleRecordClient) mutate(ctx context.Context, m *ERPModuleRecordMutation) (Value, error) {
 	switch m.Op() {
 	case OpCreate:
-		return (&InviteCodeCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&ERPModuleRecordCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdate:
-		return (&InviteCodeUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&ERPModuleRecordUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdateOne:
-		return (&InviteCodeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&ERPModuleRecordUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpDelete, OpDeleteOne:
-		return (&InviteCodeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+		return (&ERPModuleRecordDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
-		return nil, fmt.Errorf("ent: unknown InviteCode mutation op: %q", m.Op())
+		return nil, fmt.Errorf("ent: unknown ERPModuleRecord mutation op: %q", m.Op())
 	}
 }
 
@@ -619,9 +619,9 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		AdminUser, InviteCode, User []ent.Hook
+		AdminUser, ERPModuleRecord, User []ent.Hook
 	}
 	inters struct {
-		AdminUser, InviteCode, User []ent.Interceptor
+		AdminUser, ERPModuleRecord, User []ent.Interceptor
 	}
 )
