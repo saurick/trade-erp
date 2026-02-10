@@ -34,7 +34,7 @@ const PrintCenterPage = () => {
     () => templateList.find((item) => item.key === activeKey),
     [activeKey]
   )
-  const uploadDisabled = activeKey === 'billingInfo'
+  const uploadDisabled = activeKey === 'billingInfo' || activeKey === 'pi' || activeKey === 'purchase'
 
   const handleOpenEditablePrint = async () => {
     try {
@@ -69,7 +69,7 @@ const PrintCenterPage = () => {
           打印模板中心
         </Title>
         <Paragraph type="secondary" style={{ marginBottom: 0, marginTop: 8 }}>
-          打印会加载原始模板。Excel 模板单元格支持编辑后再打印；开票信息模板左右字段双向同步，右侧文字均可编辑（logo/水印除外）。已接入：外销形式发票模版、采购合同模版、杭州科森磁材开票信息模板。
+          打印会加载原始模板。Excel 模板单元格支持编辑后再打印；开票信息、外销形式发票、采购合同为固定版式模板（参考原始文件坐标），支持左右字段双向同步并可编辑（logo/水印/示意图除外）。已接入：外销形式发票模版、采购合同模版、杭州科森磁材开票信息模板。
         </Paragraph>
       </Card>
 
@@ -118,11 +118,16 @@ const PrintCenterPage = () => {
                 </Space>
 
                 <Paragraph style={{ marginBottom: 0 }}>
-                  模板提示：采购合同默认使用 `purchase-contract-template.xls`；发票相关默认使用
-                  `export-invoice-template.xls`；开票信息默认使用 `billing-info-template.html`（固定版式，来源于开票信息原始文件）。
+                  模板提示：采购合同、PI、开票信息默认使用固定版式（来源于原始文件版式），不再走 Excel 自动解析；其余发票相关默认使用 `export-invoice-template.xls`。
                 </Paragraph>
                 {uploadDisabled ? (
-                  <Text type="secondary">开票信息模板已锁定为 1:1 固定版式，不支持上传覆盖。</Text>
+                  <Text type="secondary">
+                    {activeKey === 'billingInfo'
+                      ? '开票信息模板已锁定为 1:1 固定版式，不支持上传覆盖。'
+                      : activeKey === 'pi'
+                        ? '外销形式发票模板已锁定为 1:1 固定版式，不支持上传覆盖。'
+                        : '采购合同模板已锁定为 1:1 固定版式，不支持上传覆盖。'}
+                  </Text>
                 ) : null}
 
                 <div>

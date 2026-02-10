@@ -26,6 +26,7 @@ const DEFAULT_TEMPLATE_ASSET_MAP = {
 const EXCEL_XLS_MAGIC = [0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1]
 const EXCEL_XLSX_MAGIC = [0x50, 0x4b, 0x03, 0x04]
 const PDF_MAGIC = [0x25, 0x50, 0x44, 0x46]
+const FIXED_LAYOUT_TEMPLATE_KEYS = new Set(['billingInfo', 'pi', 'purchase'])
 
 const escapeHTML = (raw) =>
   String(raw ?? '')
@@ -75,6 +76,186 @@ const normalizeBillingDateValue = (raw) => {
     return `${Number(dateMatch[1])}年${Number(dateMatch[2])}月${Number(dateMatch[3])}日`
   }
   return text
+}
+
+const normalizeEnglishDateValue = (raw) => {
+  const text = String(raw || '').trim()
+  if (!text) {
+    return ''
+  }
+
+  const months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ]
+
+  if (/^\d{10,13}$/.test(text)) {
+    const ts = Number(text)
+    if (!Number.isNaN(ts)) {
+      const millis = text.length === 10 ? ts * 1000 : ts
+      const dateFromTs = new Date(millis)
+      if (!Number.isNaN(dateFromTs.getTime())) {
+        return `${months[dateFromTs.getMonth()]} ${dateFromTs.getDate()}, ${dateFromTs.getFullYear()}`
+      }
+    }
+  }
+
+  const dateMatch = text.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})$/)
+  if (dateMatch) {
+    const year = Number(dateMatch[1])
+    const month = Number(dateMatch[2])
+    const day = Number(dateMatch[3])
+    if (month >= 1 && month <= 12) {
+      return `${months[month - 1]} ${day}, ${year}`
+    }
+  }
+
+  const parsed = new Date(text)
+  if (!Number.isNaN(parsed.getTime())) {
+    return `${months[parsed.getMonth()]} ${parsed.getDate()}, ${parsed.getFullYear()}`
+  }
+  return text
+}
+
+const parseNumericValue = (raw) => {
+  if (typeof raw === 'number' && Number.isFinite(raw)) {
+    return raw
+  }
+  const text = String(raw ?? '')
+    .trim()
+    .replaceAll(',', '')
+    .replace(/[^0-9.-]/g, '')
+  if (!text || text === '-' || text === '.' || text === '-.') {
+    return Number.NaN
+  }
+  const parsed = Number(text)
+  return Number.isFinite(parsed) ? parsed : Number.NaN
+}
+
+const formatUSDMoney = (raw, fractionDigits = 2) => {
+  const numeric = parseNumericValue(raw)
+  if (Number.isNaN(numeric)) {
+    return ''
+  }
+  return `US$${numeric.toFixed(fractionDigits)}`
+}
+
+const SMALL_NUMBER_WORDS = [
+  'ZERO',
+  'ONE',
+  'TWO',
+  'THREE',
+  'FOUR',
+  'FIVE',
+  'SIX',
+  'SEVEN',
+  'EIGHT',
+  'NINE',
+  'TEN',
+  'ELEVEN',
+  'TWELVE',
+  'THIRTEEN',
+  'FOURTEEN',
+  'FIFTEEN',
+  'SIXTEEN',
+  'SEVENTEEN',
+  'EIGHTEEN',
+  'NINETEEN',
+]
+
+const TENS_NUMBER_WORDS = ['', '', 'TWENTY', 'THIRTY', 'FORTY', 'FIFTY', 'SIXTY', 'SEVENTY', 'EIGHTY', 'NINETY']
+
+const numberToWordsUnder1000 = (value) => {
+  const numeric = Math.floor(Math.abs(value))
+  if (numeric < 20) {
+    return SMALL_NUMBER_WORDS[numeric]
+  }
+  if (numeric < 100) {
+    const tens = Math.floor(numeric / 10)
+    const ones = numeric % 10
+    return ones ? `${TENS_NUMBER_WORDS[tens]} ${SMALL_NUMBER_WORDS[ones]}` : TENS_NUMBER_WORDS[tens]
+  }
+  const hundreds = Math.floor(numeric / 100)
+  const rest = numeric % 100
+  return rest
+    ? `${SMALL_NUMBER_WORDS[hundreds]} HUNDRED ${numberToWordsUnder1000(rest)}`
+    : `${SMALL_NUMBER_WORDS[hundreds]} HUNDRED`
+}
+
+const numberToEnglishWords = (raw) => {
+  const numeric = parseNumericValue(raw)
+  if (Number.isNaN(numeric)) {
+    return ''
+  }
+  if (numeric === 0) {
+    return 'ZERO'
+  }
+
+  const negative = numeric < 0
+  let remaining = Math.floor(Math.abs(numeric))
+  const chunks = [
+    { base: 1000000000, label: 'BILLION' },
+    { base: 1000000, label: 'MILLION' },
+    { base: 1000, label: 'THOUSAND' },
+  ]
+  const parts = []
+  chunks.forEach(({ base, label }) => {
+    if (remaining >= base) {
+      const chunk = Math.floor(remaining / base)
+      parts.push(`${numberToWordsUnder1000(chunk)} ${label}`)
+      remaining -= chunk * base
+    }
+  })
+  if (remaining > 0) {
+    parts.push(numberToWordsUnder1000(remaining))
+  }
+  const joined = parts.join(' ').replace(/\s+/g, ' ').trim()
+  return negative ? `MINUS ${joined}` : joined
+}
+
+const toUSDWords = (raw) => {
+  const numeric = parseNumericValue(raw)
+  if (Number.isNaN(numeric)) {
+    return ''
+  }
+  const abs = Math.abs(numeric)
+  const whole = Math.floor(abs)
+  const cents = Math.round((abs - whole) * 100)
+  const wholeWords = numberToEnglishWords(whole)
+  if (cents > 0) {
+    return `SAY US DOLLARS ${wholeWords} AND ${String(cents).padStart(2, '0')}/100 ONLY`
+  }
+  return `SAY US DOLLARS ${wholeWords} ONLY`
+}
+
+const buildFieldsBySchema = (record = {}, fieldSchema = []) => {
+  const flattened = flattenRecord(record)
+  const flattenedMap = {}
+  Object.entries(flattened).forEach(([key, value]) => {
+    flattenedMap[normalizeFieldKey(key)] = String(value).trim()
+  })
+
+  const values = {}
+  const hasExplicit = {}
+  fieldSchema.forEach((field) => {
+    const aliases = [field.key, ...(field.aliases || [])]
+    const matched = aliases
+      .map((alias) => flattenedMap[normalizeFieldKey(alias)] || '')
+      .find((value) => value !== '')
+    hasExplicit[field.key] = Boolean(matched)
+    values[field.key] = matched || field.defaultValue || ''
+  })
+  return { values, hasExplicit, flattenedMap }
 }
 
 const BILLING_INFO_FIELD_SCHEMA = [
@@ -212,23 +393,239 @@ const BILLING_INFO_FIELD_SCHEMA = [
   },
 ]
 
+const PROFORMA_INVOICE_FIELD_SCHEMA = [
+  {
+    key: 'headerCompanyName',
+    label: '顶部公司名',
+    defaultValue: 'HANGZHOU KESEN MAGNETICS CO., LTD.',
+    aliases: ['header_company_name', 'company_name_en', 'companynameen'],
+  },
+  {
+    key: 'headerAddressLine1',
+    label: '顶部地址行1',
+    defaultValue: '288 YONGJIU ROAD,HANGZHOU',
+    aliases: ['header_address_line1', 'address_line_1_en', 'addressline1en'],
+  },
+  {
+    key: 'headerAddressLine2',
+    label: '顶部地址行2',
+    defaultValue: 'ZHEJIANG 311202,CHINA',
+    aliases: ['header_address_line2', 'address_line_2_en', 'addressline2en'],
+  },
+  {
+    key: 'headerPhone',
+    label: '顶部电话',
+    defaultValue: 'PHONE: +86 571 8679 0529',
+    aliases: ['header_phone', 'phone', 'contact_phone', 'contacttel'],
+  },
+  {
+    key: 'headerWebsite',
+    label: '顶部网址',
+    defaultValue: 'WWW.KSMAGNETIC.COM',
+    aliases: ['header_website', 'website', 'web', 'url'],
+  },
+  {
+    key: 'title',
+    label: '标题',
+    defaultValue: 'PROFORMA INVOICE',
+    aliases: ['title', 'doc_title'],
+  },
+  {
+    key: 'buyerCompanyName',
+    label: '买方公司名',
+    defaultValue: "(Buyer's Company Name)",
+    aliases: ['buyer_company_name', 'customername', 'customer_name', 'name'],
+  },
+  {
+    key: 'buyerAddressTel',
+    label: '买方地址电话',
+    defaultValue: '(Address & Tel.)',
+    aliases: ['buyer_address_tel', 'customer_address_tel', 'customeraddress', 'address'],
+  },
+  {
+    key: 'invoiceNo',
+    label: 'Invoice No.',
+    defaultValue: 'KSMPI20260115001',
+    aliases: ['invoice_no', 'invoiceno', 'code', 'pi_no', 'pi'],
+  },
+  {
+    key: 'orderNo',
+    label: 'Order No.',
+    defaultValue: 'KSMPI20260115001',
+    aliases: ['order_no', 'orderno', 'customer_contract_no', 'customercontractno'],
+  },
+  {
+    key: 'date',
+    label: 'Date',
+    defaultValue: 'January 15, 2026',
+    aliases: ['date', 'sign_date', 'signdate', 'order_date', 'orderdate', 'quoteddate', 'created_at'],
+  },
+  {
+    key: 'email',
+    label: 'Email',
+    defaultValue: 'info@ksmagnetic.com',
+    aliases: ['email', 'contact_email', 'contactemail'],
+  },
+  { key: 'item1No', label: '条目1-序号', defaultValue: '1', aliases: ['item1_no', 'line1_no'] },
+  { key: 'item1Ref', label: '条目1-Ref', defaultValue: 'I1001I', aliases: ['item1_ref', 'line1_ref'] },
+  {
+    key: 'item1Desc',
+    label: '条目1-品名',
+    defaultValue: 'NDFEB DISC MAGNET, N35, D9,5X1,5MM, NICKEL COATING, PLASTIC TUBE PACKING, 10PCS/TUBE',
+    aliases: ['item1_desc', 'line1_desc'],
+  },
+  { key: 'item1Qty', label: '条目1-数量', defaultValue: '1', aliases: ['item1_qty', 'line1_qty'] },
+  { key: 'item1NetPrice', label: '条目1-单价', defaultValue: 'US$1.0000', aliases: ['item1_net_price', 'line1_net_price'] },
+  { key: 'item1NetValue', label: '条目1-金额', defaultValue: 'US$1.00', aliases: ['item1_net_value', 'line1_net_value'] },
+  { key: 'item2No', label: '条目2-序号', defaultValue: '2', aliases: ['item2_no', 'line2_no'] },
+  { key: 'item2Ref', label: '条目2-Ref', defaultValue: 'I1002I', aliases: ['item2_ref', 'line2_ref'] },
+  {
+    key: 'item2Desc',
+    label: '条目2-品名',
+    defaultValue: 'NDFEB DISC MAGNET, N35, D10X3MM, NICKEL COATING, PLASTIC TUBE PACKING, 10PCS/TUBE',
+    aliases: ['item2_desc', 'line2_desc'],
+  },
+  { key: 'item2Qty', label: '条目2-数量', defaultValue: '1', aliases: ['item2_qty', 'line2_qty'] },
+  { key: 'item2NetPrice', label: '条目2-单价', defaultValue: 'US$1.0000', aliases: ['item2_net_price', 'line2_net_price'] },
+  { key: 'item2NetValue', label: '条目2-金额', defaultValue: 'US$1.00', aliases: ['item2_net_value', 'line2_net_value'] },
+  {
+    key: 'totalNetValue',
+    label: '合计金额',
+    defaultValue: 'US$2.00',
+    aliases: ['total_net_value', 'total_amount', 'totalamount'],
+  },
+  {
+    key: 'amountInWords',
+    label: '金额大写',
+    defaultValue: 'SAY US DOLLARS *** ONLY',
+    aliases: ['amount_in_words', 'amount_words'],
+  },
+  {
+    key: 'incoterms',
+    label: 'Incoterms',
+    defaultValue: 'DAP Barcelona,Spain',
+    aliases: ['incoterms', 'price_term', 'priceterm'],
+  },
+  {
+    key: 'deliveryMethod',
+    label: 'Delivery Method',
+    defaultValue: 'By FedEx',
+    aliases: ['delivery_method', 'transport_type', 'transporttype', 'deliverymethod'],
+  },
+  {
+    key: 'leadTime',
+    label: 'Lead-time',
+    defaultValue: '2-5 Days',
+    aliases: ['lead_time', 'leadtime', 'delivery_cycle'],
+  },
+  {
+    key: 'paymentTerms',
+    label: 'Payment Terms',
+    defaultValue: 'T/T 30% deposit and 70% against the copy of B/L',
+    aliases: ['payment_terms', 'paymentterms', 'payment_method', 'paymentmethod'],
+  },
+  { key: 'notes', label: 'Notes', defaultValue: '', aliases: ['notes', 'remark'] },
+  {
+    key: 'authorizedBuyer',
+    label: '买方签章标题',
+    defaultValue: 'Authorized Signature Buyer',
+    aliases: ['authorized_buyer', 'buyer_signature_label'],
+  },
+  {
+    key: 'authorizedSeller',
+    label: '卖方签章标题',
+    defaultValue: 'Authorized Signature Seller',
+    aliases: ['authorized_seller', 'seller_signature_label'],
+  },
+  {
+    key: 'sellerCompanyEn',
+    label: '卖方签章英文',
+    defaultValue: 'HANGZHOU KESEN MAGNETICS CO., LTD.',
+    aliases: ['seller_company_en', 'company_name_en'],
+  },
+  {
+    key: 'sellerCompanyCn',
+    label: '卖方签章中文',
+    defaultValue: '杭州科森磁材有限公司',
+    aliases: ['seller_company_cn', 'company_name_cn'],
+  },
+  {
+    key: 'sellerSigner',
+    label: '卖方签字',
+    defaultValue: 'Gina Liu',
+    aliases: ['seller_signer', 'signer'],
+  },
+  {
+    key: 'bankName',
+    label: 'BANK NAME',
+    defaultValue: 'THE AGRICULTURAL BANK OF CHINA XIAOSHAN BR.',
+    aliases: ['bank_name', 'bankname'],
+  },
+  {
+    key: 'bankAddress1',
+    label: 'BANK ADDRESS 行1',
+    defaultValue: 'NO. 88 HAOYUE ROAD XIAOSHAN DISTRICT',
+    aliases: ['bank_address_1', 'bankaddress1'],
+  },
+  {
+    key: 'bankAddress2',
+    label: 'BANK ADDRESS 行2',
+    defaultValue: 'HANGZHOU ZHEJIANG CHINA',
+    aliases: ['bank_address_2', 'bankaddress2'],
+  },
+  {
+    key: 'beneficiaryName',
+    label: 'BENEFICIARY NAME',
+    defaultValue: 'HANGZHOU KESEN MAGNETICS CO., LTD.',
+    aliases: ['beneficiary_name', 'beneficiaryname'],
+  },
+  {
+    key: 'beneficiaryAddress',
+    label: 'BENEFICIARY ADDRESS',
+    defaultValue: '288 YONGJIU ROAD,HANGZHOU,ZHEJIANG 311202 CHINA',
+    aliases: ['beneficiary_address', 'beneficiaryaddress'],
+  },
+  {
+    key: 'accountUsd',
+    label: 'A/C NO. USD',
+    defaultValue: '19085014040030909',
+    aliases: ['account_usd', 'ac_no_usd', 'acusd'],
+  },
+  {
+    key: 'accountEuro',
+    label: 'A/C NO. EURO',
+    defaultValue: '19085038040006163',
+    aliases: ['account_euro', 'ac_no_euro', 'aceuro'],
+  },
+  {
+    key: 'swiftCode',
+    label: 'SWIFT CODE',
+    defaultValue: 'ABOCCNBJ110',
+    aliases: ['swift_code', 'swiftcode'],
+  },
+]
+
+const DEFAULT_PROFORMA_INVOICE_ITEMS = [
+  {
+    no: '1',
+    ref: 'I1001I',
+    description: 'NDFEB DISC MAGNET, N35, D9,5X1,5MM, NICKEL COATING, PLASTIC TUBE PACKING, 10PCS/TUBE',
+    quantity: 1,
+    netPrice: 1,
+    netValue: 1,
+  },
+  {
+    no: '2',
+    ref: 'I1002I',
+    description: 'NDFEB DISC MAGNET, N35, D10X3MM, NICKEL COATING, PLASTIC TUBE PACKING, 10PCS/TUBE',
+    quantity: 1,
+    netPrice: 1,
+    netValue: 1,
+  },
+]
+
 const buildBillingInfoFields = (record = {}) => {
-  const flattened = flattenRecord(record)
-  const flattenedMap = {}
-  Object.entries(flattened).forEach(([key, value]) => {
-    flattenedMap[normalizeFieldKey(key)] = String(value).trim()
-  })
-
-  const values = {}
-  const hasExplicit = {}
-
-  BILLING_INFO_FIELD_SCHEMA.forEach((field) => {
-    const matched = (field.aliases || [])
-      .map((alias) => flattenedMap[normalizeFieldKey(alias)] || '')
-      .find((value) => value !== '')
-    hasExplicit[field.key] = Boolean(matched)
-    values[field.key] = matched || field.defaultValue
-  })
+  const { values, hasExplicit } = buildFieldsBySchema(record, BILLING_INFO_FIELD_SCHEMA)
 
   if (!hasExplicit.titleCompanyCn && values.companyName) {
     values.titleCompanyCn = values.companyName
@@ -243,6 +640,961 @@ const buildBillingInfoFields = (record = {}) => {
   }
   values.date = normalizeBillingDateValue(values.date)
   return values
+}
+
+const buildProformaInvoiceFields = (record = {}) => {
+  const { values, hasExplicit, flattenedMap } = buildFieldsBySchema(record, PROFORMA_INVOICE_FIELD_SCHEMA)
+  const recordItems = Array.isArray(record?.items) ? record.items.slice(0, 2) : []
+
+  if (!hasExplicit.buyerCompanyName) {
+    values.buyerCompanyName =
+      flattenedMap.customername || flattenedMap.name || flattenedMap.partnername || values.buyerCompanyName
+  }
+
+  if (!hasExplicit.buyerAddressTel) {
+    const address = flattenedMap.customeraddress || flattenedMap.shiptoaddress || flattenedMap.address || ''
+    const contact =
+      flattenedMap.contacttel || flattenedMap.contactphone || flattenedMap.contact || flattenedMap.phone || ''
+    const combined = [address, contact].filter(Boolean).join(' ')
+    if (combined) {
+      values.buyerAddressTel = combined
+    }
+  }
+
+  if (!hasExplicit.invoiceNo) {
+    values.invoiceNo = flattenedMap.code || flattenedMap.invoiceno || values.invoiceNo
+  }
+  if (!hasExplicit.orderNo) {
+    values.orderNo =
+      flattenedMap.orderno ||
+      flattenedMap.customercontractno ||
+      flattenedMap.customer_contract_no ||
+      flattenedMap.code ||
+      values.orderNo
+  }
+  if (!hasExplicit.date) {
+    values.date =
+      flattenedMap.signdate ||
+      flattenedMap.sign_date ||
+      flattenedMap.orderdate ||
+      flattenedMap.order_date ||
+      flattenedMap.quoteddate ||
+      flattenedMap.created_at ||
+      values.date
+  }
+  if (!hasExplicit.email) {
+    values.email =
+      flattenedMap.contactemail || flattenedMap.contact_email || flattenedMap.email || flattenedMap.mail || values.email
+  }
+  if (!hasExplicit.incoterms) {
+    const term = flattenedMap.priceterm || flattenedMap.price_term || ''
+    const place = flattenedMap.endplace || flattenedMap.end_place || ''
+    const combined = term && place ? `${term} ${place}` : term || place
+    if (combined) {
+      values.incoterms = combined
+    }
+  }
+  if (!hasExplicit.deliveryMethod) {
+    const transport =
+      flattenedMap.transporttype || flattenedMap.transport_type || flattenedMap.deliverymethod || values.deliveryMethod
+    values.deliveryMethod = transport ? `By ${transport}` : values.deliveryMethod
+  }
+  if (!hasExplicit.leadTime) {
+    values.leadTime = flattenedMap.leadtime || flattenedMap.deliverycycle || values.leadTime
+  }
+  if (!hasExplicit.paymentTerms) {
+    const payment = flattenedMap.paymentmethod || flattenedMap.payment_method || ''
+    if (payment) {
+      values.paymentTerms = payment
+    }
+  }
+  if (!hasExplicit.notes) {
+    values.notes = flattenedMap.remark || values.notes
+  }
+
+  const mappedItems = DEFAULT_PROFORMA_INVOICE_ITEMS.map((fallback, index) => {
+    const source = recordItems[index] || {}
+    const quantity = parseNumericValue(source.quantity)
+    const netPrice = parseNumericValue(source.netPrice ?? source.unitPrice ?? source.price)
+    const explicitNetValue = parseNumericValue(source.netValue ?? source.totalPrice ?? source.amount)
+    const normalizedQuantity = Number.isNaN(quantity) ? fallback.quantity : quantity
+    const normalizedNetPrice = Number.isNaN(netPrice) ? fallback.netPrice : netPrice
+    const normalizedNetValue = Number.isNaN(explicitNetValue)
+      ? normalizedQuantity * normalizedNetPrice
+      : explicitNetValue
+
+    return {
+      no: String(index + 1),
+      ref: String(source.refNo || source.ref || source.productCode || source.specCode || fallback.ref),
+      description: String(
+        source.enDesc ||
+          source.goodsDescription ||
+          source.productName ||
+          source.productModel ||
+          source.cnDesc ||
+          fallback.description
+      ),
+      quantity: normalizedQuantity,
+      netPrice: normalizedNetPrice,
+      netValue: normalizedNetValue,
+    }
+  })
+
+  const applyRowValues = (index) => {
+    const row = mappedItems[index - 1]
+    if (!row) {
+      return
+    }
+    if (!hasExplicit[`item${index}No`]) {
+      values[`item${index}No`] = row.no
+    }
+    if (!hasExplicit[`item${index}Ref`]) {
+      values[`item${index}Ref`] = row.ref
+    }
+    if (!hasExplicit[`item${index}Desc`]) {
+      values[`item${index}Desc`] = row.description
+    }
+    if (!hasExplicit[`item${index}Qty`]) {
+      values[`item${index}Qty`] = String(row.quantity)
+    }
+    if (!hasExplicit[`item${index}NetPrice`]) {
+      values[`item${index}NetPrice`] = formatUSDMoney(row.netPrice, 4)
+    }
+    if (!hasExplicit[`item${index}NetValue`]) {
+      values[`item${index}NetValue`] = formatUSDMoney(row.netValue, 2)
+    }
+  }
+
+  applyRowValues(1)
+  applyRowValues(2)
+
+  const totalFromItems = mappedItems.reduce((sum, item) => sum + item.netValue, 0)
+  const explicitTotal = hasExplicit.totalNetValue ? parseNumericValue(values.totalNetValue) : Number.NaN
+  const normalizedTotal = Number.isNaN(explicitTotal) ? totalFromItems : explicitTotal
+  if (!hasExplicit.totalNetValue) {
+    values.totalNetValue = formatUSDMoney(normalizedTotal, 2)
+  } else if (values.totalNetValue && !String(values.totalNetValue).includes('US$')) {
+    values.totalNetValue = formatUSDMoney(values.totalNetValue, 2)
+  }
+
+  if (!hasExplicit.amountInWords) {
+    const amountWords = toUSDWords(normalizedTotal)
+    values.amountInWords = amountWords || values.amountInWords
+  }
+
+  if (values.headerPhone && !String(values.headerPhone).toUpperCase().startsWith('PHONE:')) {
+    values.headerPhone = `PHONE: ${values.headerPhone}`
+  }
+  values.headerWebsite = String(values.headerWebsite || '').trim().toUpperCase() || 'WWW.KSMAGNETIC.COM'
+  values.title = String(values.title || 'PROFORMA INVOICE').trim().toUpperCase()
+  values.date = normalizeEnglishDateValue(values.date)
+  const normalizedDeliveryMethod = String(values.deliveryMethod || '').trim()
+  if (!normalizedDeliveryMethod) {
+    values.deliveryMethod = 'By FedEx'
+  } else if (/^by\s+/i.test(normalizedDeliveryMethod)) {
+    values.deliveryMethod = normalizedDeliveryMethod
+  } else {
+    values.deliveryMethod = `By ${normalizedDeliveryMethod}`
+  }
+  return values
+}
+
+const PURCHASE_CONTRACT_FIELD_SCHEMA = [
+  {
+    key: 'buyerCompany',
+    label: '买方公司',
+    defaultValue: '杭州科森磁材有限公司',
+    aliases: ['buyercompany', 'companyname', 'company_name', 'customername', 'name'],
+  },
+  {
+    key: 'buyerAddress',
+    label: '买方地址',
+    defaultValue: '浙江省杭州市萧山区北干街道永久路288号万象汇B座912',
+    aliases: ['buyeraddress', 'companyaddress', 'address', 'customeraddress'],
+  },
+  {
+    key: 'buyerZip',
+    label: '买方邮编',
+    defaultValue: '邮编: 311202',
+    aliases: ['buyerzip', 'zipcode', 'zip', 'post_code', 'postcode'],
+  },
+  {
+    key: 'buyerPhone',
+    label: '买方电话',
+    defaultValue: '电话: 0571 8679 0529',
+    aliases: ['buyerphone', 'companyphone', 'phone', 'tel', 'contactphone', 'contact_phone'],
+  },
+  {
+    key: 'website',
+    label: '网址',
+    defaultValue: 'WWW.KSMAGNETIC.COM',
+    aliases: ['website', 'web', 'url'],
+  },
+  {
+    key: 'sellerName',
+    label: '卖方',
+    defaultValue: '宁波星升磁性材料有限公司',
+    aliases: ['sellername', 'suppliername', 'vendorname', 'partnername'],
+  },
+  {
+    key: 'sellerAddress',
+    label: '卖方地址',
+    defaultValue: '浙江省余姚市河姆渡镇万洋(河姆渡镇)众创城27幢102',
+    aliases: ['selleraddress', 'supplieraddress', 'vendoraddress'],
+  },
+  {
+    key: 'sellerPhone',
+    label: '卖方电话',
+    defaultValue: '电话：0574-87475218',
+    aliases: ['sellerphone', 'supplierphone', 'vendorphone'],
+  },
+  {
+    key: 'contractNo',
+    label: '合同编号',
+    defaultValue: 'KSMC20260104001',
+    aliases: ['contractno', 'contract_no', 'code', 'purchasecode'],
+  },
+  {
+    key: 'signDate',
+    label: '签订日期',
+    defaultValue: '2026年1月4日',
+    aliases: ['signdate', 'sign_date', 'date', 'created_at'],
+  },
+  {
+    key: 'priceTerm',
+    label: '价格条件',
+    defaultValue: '含13%增值税及运费',
+    aliases: ['priceterm', 'price_term', 'trade_term', 'trade_terms'],
+  },
+  {
+    key: 'settlement',
+    label: '结算方式',
+    defaultValue: '月结30天',
+    aliases: ['settlement', 'settlementmethod', 'paymentmethod', 'payment_method'],
+  },
+  {
+    key: 'itemNo',
+    label: '序号',
+    defaultValue: '1',
+    aliases: ['itemno', 'item_no'],
+  },
+  {
+    key: 'itemDescription',
+    label: '产品描述',
+    defaultValue:
+      '如图，圆环沉孔磁钢，D9.525XD3.048X3.175-82°沉孔、深度约1mm，N42(不含管制元素钐、钆、镝、铽、镥、钪、钇)，镀镍铜镍，內圆公差+0.1/-0，厚度公差+0/-0.1，其余公差+/-0.1, 轴向充磁供货，沉孔面为N极。产品外观好，避免缺边掉角。',
+    aliases: ['itemdescription', 'item_desc', 'productname', 'goodsdescription', 'description'],
+  },
+  {
+    key: 'quantity',
+    label: '数量',
+    defaultValue: '100',
+    aliases: ['quantity', 'qty', 'itemqty'],
+  },
+  {
+    key: 'unitPrice',
+    label: '单价',
+    defaultValue: '¥1.000',
+    aliases: ['unitprice', 'price', 'itemunitprice', 'netprice'],
+  },
+  {
+    key: 'amount',
+    label: '金额',
+    defaultValue: '¥100.00',
+    aliases: ['amount', 'itemamount', 'totalprice', 'total_price'],
+  },
+  {
+    key: 'totalAmount',
+    label: '总计',
+    defaultValue: '¥100.00',
+    aliases: ['totalamount', 'grandtotal', 'sumamount'],
+  },
+  {
+    key: 'requiredDeliveryDate',
+    label: '要求交货日期',
+    defaultValue: '2026/03/05',
+    aliases: ['requireddeliverydate', 'required_delivery_date', 'deliverydate', 'delivery_date'],
+  },
+  {
+    key: 'sellerConfirmDeliveryDate',
+    label: '卖方确认交货日期',
+    defaultValue: '',
+    aliases: ['sellerconfirmdeliverydate', 'confirm_delivery_date'],
+  },
+  {
+    key: 'innerPackaging',
+    label: '内包装',
+    defaultValue: '八孔泡沫箱+真空包装',
+    aliases: ['innerpackaging', 'inner_package', 'innerpack', 'packdetail'],
+  },
+  {
+    key: 'outerPackaging',
+    label: '外包装',
+    defaultValue: '纸箱+防潮袋',
+    aliases: ['outerpackaging', 'outer_package', 'outerpack'],
+  },
+  {
+    key: 'shield',
+    label: '是否屏蔽',
+    defaultValue: '否',
+    aliases: ['shield', 'isshielded', 'is_shielded'],
+  },
+  {
+    key: 'deliveryAddress',
+    label: '交货地点',
+    defaultValue: '直接进仓',
+    aliases: ['deliveryaddress', 'delivery_address', 'deliveryplace'],
+  },
+  {
+    key: 'shippingDocs',
+    label: '随货单据',
+    defaultValue:
+      '1.( √ )送货单 2.(  )检测报告(尺寸,磁通,退磁曲线) 3.( )毛坯测试样柱D10X10  4.( )盐雾试验报告 5.( )镀层厚度报告  6.( )材质成分报告',
+    aliases: ['shippingdocs', 'shipping_docs', 'docs', 'documents'],
+  },
+  {
+    key: 'otherRequirement',
+    label: '其他要求',
+    defaultValue: '',
+    aliases: ['otherrequirement', 'other_requirement', 'remark'],
+  },
+]
+
+const PURCHASE_CONTRACT_PANEL_FIELD_SCHEMA = [
+  { key: 'buyerCompany', label: '买方公司' },
+  { key: 'buyerAddress', label: '买方地址' },
+  { key: 'buyerZip', label: '买方邮编' },
+  { key: 'buyerPhone', label: '买方电话' },
+  { key: 'website', label: '网址' },
+  { key: 'sellerName', label: '卖方' },
+  { key: 'sellerAddress', label: '卖方地址' },
+  { key: 'sellerPhone', label: '卖方电话' },
+  { key: 'contractNo', label: '合同编号' },
+  { key: 'signDate', label: '签订日期' },
+  { key: 'priceTerm', label: '价格条件' },
+  { key: 'settlement', label: '结算方式' },
+  { key: 'itemDescription', label: '产品描述' },
+  { key: 'quantity', label: '数量(个)' },
+  { key: 'unitPrice', label: '单价' },
+  { key: 'amount', label: '金额' },
+  { key: 'totalAmount', label: '总计' },
+  { key: 'requiredDeliveryDate', label: '要求交货日期' },
+  { key: 'sellerConfirmDeliveryDate', label: '卖方确认交货日期' },
+  { key: 'innerPackaging', label: '内包装' },
+  { key: 'outerPackaging', label: '外包装' },
+  { key: 'shield', label: '是否屏蔽' },
+  { key: 'deliveryAddress', label: '交货地点' },
+  { key: 'shippingDocs', label: '随货单据' },
+  { key: 'otherRequirement', label: '其他要求' },
+]
+
+const PURCHASE_CONTRACT_COLUMN_WIDTHS = [35, 58, 199, 53, 45, 72, 72, 72, 38, 38, 38, 38, 38]
+const PURCHASE_CONTRACT_ROW_HEIGHTS = [
+  26.1,
+  13.15,
+  13.15,
+  13.15,
+  37.05,
+  16.05,
+  20,
+  16.05,
+  16.05,
+  16.05,
+  11,
+  36,
+  77.65,
+  13.25,
+  13.25,
+  19.9,
+  19.9,
+  19.9,
+  19.9,
+  25.05,
+  26.1,
+  36,
+  19.15,
+  19.15,
+  34.25,
+  4.8,
+  16,
+  20.95,
+  50,
+  29,
+  36,
+  16,
+  16,
+  98.35,
+  16,
+  16,
+  16,
+  16,
+  16,
+  16,
+  16,
+  16,
+  16,
+  16,
+  16,
+  16,
+  16,
+  16,
+  16,
+]
+
+const PURCHASE_CONTRACT_MERGES = [
+  { startRow: 0, startCol: 0, endRow: 0, endCol: 2 },
+  { startRow: 0, startCol: 3, endRow: 0, endCol: 5 },
+  { startRow: 0, startCol: 6, endRow: 0, endCol: 7 },
+  { startRow: 1, startCol: 0, endRow: 1, endCol: 2 },
+  { startRow: 1, startCol: 3, endRow: 1, endCol: 5 },
+  { startRow: 1, startCol: 6, endRow: 1, endCol: 7 },
+  { startRow: 2, startCol: 0, endRow: 2, endCol: 2 },
+  { startRow: 2, startCol: 3, endRow: 2, endCol: 5 },
+  { startRow: 2, startCol: 6, endRow: 2, endCol: 7 },
+  { startRow: 3, startCol: 0, endRow: 3, endCol: 2 },
+  { startRow: 3, startCol: 5, endRow: 3, endCol: 7 },
+  { startRow: 4, startCol: 2, endRow: 4, endCol: 5 },
+  { startRow: 5, startCol: 0, endRow: 5, endCol: 3 },
+  { startRow: 6, startCol: 0, endRow: 6, endCol: 4 },
+  { startRow: 7, startCol: 0, endRow: 7, endCol: 3 },
+  { startRow: 7, startCol: 6, endRow: 7, endCol: 7 },
+  { startRow: 8, startCol: 0, endRow: 8, endCol: 3 },
+  { startRow: 9, startCol: 0, endRow: 9, endCol: 2 },
+  { startRow: 9, startCol: 6, endRow: 9, endCol: 7 },
+  { startRow: 11, startCol: 1, endRow: 11, endCol: 4 },
+  { startRow: 12, startCol: 1, endRow: 12, endCol: 4 },
+  { startRow: 13, startCol: 6, endRow: 14, endCol: 6 },
+  { startRow: 13, startCol: 7, endRow: 14, endCol: 7 },
+  { startRow: 15, startCol: 0, endRow: 18, endCol: 0 },
+  { startRow: 15, startCol: 1, endRow: 18, endCol: 1 },
+  { startRow: 15, startCol: 3, endRow: 18, endCol: 4 },
+  { startRow: 15, startCol: 5, endRow: 18, endCol: 7 },
+  { startRow: 19, startCol: 0, endRow: 19, endCol: 1 },
+  { startRow: 19, startCol: 3, endRow: 19, endCol: 4 },
+  { startRow: 19, startCol: 5, endRow: 19, endCol: 7 },
+  { startRow: 20, startCol: 0, endRow: 20, endCol: 1 },
+  { startRow: 20, startCol: 3, endRow: 20, endCol: 4 },
+  { startRow: 20, startCol: 5, endRow: 20, endCol: 7 },
+  { startRow: 21, startCol: 0, endRow: 21, endCol: 1 },
+  { startRow: 21, startCol: 3, endRow: 21, endCol: 4 },
+  { startRow: 21, startCol: 5, endRow: 21, endCol: 7 },
+  { startRow: 22, startCol: 0, endRow: 23, endCol: 1 },
+  { startRow: 22, startCol: 2, endRow: 23, endCol: 7 },
+  { startRow: 24, startCol: 0, endRow: 24, endCol: 1 },
+  { startRow: 24, startCol: 2, endRow: 24, endCol: 7 },
+  { startRow: 27, startCol: 0, endRow: 27, endCol: 7 },
+  { startRow: 28, startCol: 0, endRow: 28, endCol: 7 },
+  { startRow: 29, startCol: 0, endRow: 29, endCol: 7 },
+  { startRow: 30, startCol: 0, endRow: 30, endCol: 7 },
+]
+
+const PURCHASE_CONTRACT_BASE_CELL_VALUES = {
+  A1: '杭州科森磁材有限公司',
+  A2: '浙江省杭州市萧山区北干街道永久路288号万象汇B座912',
+  A3: '邮编: 311202',
+  A4: '电话: 0571 8679 0529',
+  F4: 'WWW.KSMAGNETIC.COM',
+  C5: '采购合同',
+  A6: '卖方:',
+  A7: '宁波星升磁性材料有限公司',
+  F7: '合同编号',
+  G7: 'KSMC20260104001',
+  A8: '浙江省余姚市河姆渡镇万洋(河姆渡镇)众创城27幢102',
+  F8: '签订日期',
+  G8: '2026年1月4日',
+  A9: '电话：0574-87475218',
+  F9: '价格条件',
+  G9: '含13%增值税及运费',
+  F10: '结算方式',
+  G10: '月结30天',
+  A12: '序号',
+  B12: '产品描述',
+  F12: '数量(个)',
+  G12: '单价',
+  H12: '金额',
+  A13: '1',
+  B13:
+    '如图，圆环沉孔磁钢，D9.525XD3.048X3.175-82°沉孔、深度约1mm，N42(不含管制元素钐、钆、镝、铽、镥、钪、钇)，镀镍铜镍，內圆公差+0.1/-0，厚度公差+0/-0.1，其余公差+/-0.1, 轴向充磁供货，沉孔面为N极。产品外观好，避免缺边掉角。',
+  F13: '100',
+  G13: '¥1.000',
+  H13: '¥100.00',
+  G14: '总计',
+  H14: '¥100.00',
+  A16: '唛头  格式',
+  B16: '内箱(小白盒)',
+  C16: 'SIZE: D9.525XD3.048X3.175',
+  D16: '纸箱(外箱)',
+  F16: '由我司提供',
+  C17: 'GRADE: N42',
+  C18: 'COATING: NICUNI',
+  C19: "Q'TY:",
+  A20: '要求交货日期',
+  C20: '2026/03/05',
+  D20: '卖方确认交货日期',
+  A21: '内包装',
+  C21: '八孔泡沫箱+真空包装',
+  D21: '外包装',
+  F21: '纸箱+防潮袋',
+  A22: '是否屏蔽',
+  C22: '否',
+  D22: '交货地点',
+  F22: '直接进仓',
+  A23: '随货单据',
+  C23:
+    '1.( √ )送货单 2.(  )检测报告(尺寸,磁通,退磁曲线) 3.( )毛坯测试样柱D10X10  4.( )盐雾试验报告 5.( )镀层厚度报告  6.( )材质成分报告',
+  A25: '其他要求',
+  A27: '其他条款:',
+  A28: '1. 双方本着平等, 自愿, 公平, 互惠互利和诚实守信的原则, 就零部件采购有关事宜协商一致订立本合同,以便共同遵守。',
+  A29:
+    '2. 包装要求: 防潮防碎,唛头清晰,适合长途运输,保证产品在运输过程中不受损。由于包装不当导致运输过程中货物的损坏，相应损失由乙方承担。',
+  A30:
+    '3.如乙方未能按照合同双方确定的期限交货，每延迟交付一日，应向甲方支付合同金额的1%作为违约金，若超过15天，甲方有权取消本合同，乙方需承担不低于合同金额20%的违约金。',
+  A31:
+    '4.若乙方交货的质量不符合合同的约定,则应向甲方赔偿因质量不符给甲方带来损失,包括但不限于预期利润损失、停工损失、对第三方的违约赔偿责任等等。',
+  A32: '5. 解决合同纠纷的方式：本合同若发生纠纷，双方应及时协商解决，协商不成时，按《民法典》执行。',
+  A33: '6. 本合同自双方签字之日起生效。',
+  A35: '买方签章:',
+  F35: '卖方签章:',
+}
+
+const PURCHASE_CONTRACT_CELL_FIELD_MAP = {
+  A1: 'buyerCompany',
+  A2: 'buyerAddress',
+  A3: 'buyerZip',
+  A4: 'buyerPhone',
+  F4: 'website',
+  A7: 'sellerName',
+  A8: 'sellerAddress',
+  A9: 'sellerPhone',
+  G7: 'contractNo',
+  G8: 'signDate',
+  G9: 'priceTerm',
+  G10: 'settlement',
+  A13: 'itemNo',
+  B13: 'itemDescription',
+  F13: 'quantity',
+  G13: 'unitPrice',
+  H13: 'amount',
+  H14: 'totalAmount',
+  C20: 'requiredDeliveryDate',
+  F20: 'sellerConfirmDeliveryDate',
+  C21: 'innerPackaging',
+  F21: 'outerPackaging',
+  C22: 'shield',
+  F22: 'deliveryAddress',
+  C23: 'shippingDocs',
+  C25: 'otherRequirement',
+}
+
+const PURCHASE_CONTRACT_IMAGE_LAYOUT = {
+  logo: {
+    left: 434.65,
+    top: 7.85,
+    width: 157.01,
+    height: 29.5,
+  },
+  stamp: {
+    left: 67.46,
+    top: 784.82,
+    width: 147.2,
+    height: 180.34,
+  },
+  spec: {
+    left: 35,
+    top: 1024.35,
+    width: 393.32,
+    height: 213.69,
+  },
+}
+
+const PURCHASE_CONTRACT_BORDER_RANGES = [
+  { startRow: 11, endRow: 13, startCol: 0, endCol: 7 },
+  { startRow: 15, endRow: 24, startCol: 0, endCol: 7 },
+]
+
+const PURCHASE_CONTRACT_CENTER_CELL_SET = new Set([
+  'C5',
+  'A12',
+  'B12',
+  'F12',
+  'G12',
+  'H12',
+  'A13',
+  'F13',
+  'G13',
+  'H13',
+  'G14',
+  'H14',
+  'A16',
+  'B16',
+  'D16',
+  'F16',
+  'A20',
+  'D20',
+  'A21',
+  'D21',
+  'A22',
+  'D22',
+  'A23',
+  'A25',
+])
+
+const PURCHASE_CONTRACT_RIGHT_CELL_SET = new Set(['F4'])
+
+const PURCHASE_CONTRACT_TOP_CELL_SET = new Set([
+  'A2',
+  'A8',
+  'B13',
+  'C23',
+  'A28',
+  'A29',
+  'A30',
+  'A31',
+  'A32',
+  'A33',
+])
+
+const PURCHASE_CONTRACT_WRAP_CELL_SET = new Set([
+  'A2',
+  'A8',
+  'B13',
+  'C23',
+  'A28',
+  'A29',
+  'A30',
+  'A31',
+  'A32',
+  'A33',
+])
+
+const PURCHASE_CONTRACT_SMALL_CELL_SET = new Set(['A2', 'A3', 'A4', 'F4', 'A8', 'A9', 'A28', 'A29', 'A30', 'A31', 'A32', 'A33'])
+
+const PURCHASE_CONTRACT_BOLD_CELL_SET = new Set(['A1', 'A7', 'C5', 'G14', 'H14'])
+
+const PURCHASE_CONTRACT_COMPANY_CELL_SET = new Set(['A1'])
+const PURCHASE_CONTRACT_TITLE_CELL_SET = new Set(['C5'])
+const PURCHASE_CONTRACT_SELLER_NAME_CELL_SET = new Set(['A7'])
+const PURCHASE_CONTRACT_TERM_HEADER_CELL_SET = new Set(['A27'])
+
+const getChinaDateParts = (dateValue) => {
+  if (!(dateValue instanceof Date) || Number.isNaN(dateValue.getTime())) {
+    return null
+  }
+  const chinaMillis = dateValue.getTime() + 8 * 60 * 60 * 1000
+  const chinaDate = new Date(chinaMillis)
+  return {
+    year: chinaDate.getUTCFullYear(),
+    month: chinaDate.getUTCMonth() + 1,
+    day: chinaDate.getUTCDate(),
+  }
+}
+
+const parsePurchaseDateParts = (raw) => {
+  const text = String(raw || '').trim()
+  if (!text) {
+    return null
+  }
+
+  if (/^\d{10,13}$/.test(text)) {
+    const ts = Number(text)
+    if (!Number.isNaN(ts)) {
+      const millis = text.length === 10 ? ts * 1000 : ts
+      return getChinaDateParts(new Date(millis))
+    }
+  }
+
+  const basicDateMatch = text.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})$/)
+  if (basicDateMatch) {
+    return {
+      year: Number(basicDateMatch[1]),
+      month: Number(basicDateMatch[2]),
+      day: Number(basicDateMatch[3]),
+    }
+  }
+
+  const parsedDate = new Date(text)
+  if (!Number.isNaN(parsedDate.getTime())) {
+    return getChinaDateParts(parsedDate)
+  }
+  return null
+}
+
+const normalizePurchaseDateValue = (raw, mode = 'cn') => {
+  const text = String(raw || '').trim()
+  if (!text) {
+    return ''
+  }
+  const dateParts = parsePurchaseDateParts(text)
+  if (!dateParts) {
+    return text
+  }
+  if (mode === 'slash') {
+    return `${dateParts.year}/${String(dateParts.month).padStart(2, '0')}/${String(dateParts.day).padStart(2, '0')}`
+  }
+  return `${dateParts.year}年${dateParts.month}月${dateParts.day}日`
+}
+
+const formatPurchaseCurrencyValue = (raw, fractionDigits = 2) => {
+  const numeric = parseNumericValue(raw)
+  if (Number.isNaN(numeric)) {
+    return String(raw || '').trim()
+  }
+  return `¥${numeric.toFixed(fractionDigits)}`
+}
+
+const formatPurchaseQuantityValue = (raw) => {
+  const numeric = parseNumericValue(raw)
+  if (Number.isNaN(numeric)) {
+    return String(raw || '').trim()
+  }
+  if (Number.isInteger(numeric)) {
+    return String(numeric)
+  }
+  return String(Number(numeric.toFixed(4)))
+}
+
+const buildPurchaseContractFields = (record = {}) => {
+  const { values, hasExplicit, flattenedMap } = buildFieldsBySchema(record, PURCHASE_CONTRACT_FIELD_SCHEMA)
+  const recordItems = Array.isArray(record?.items) ? record.items : []
+  const firstItem = recordItems[0] || {}
+
+  if (!hasExplicit.sellerName) {
+    values.sellerName = flattenedMap.suppliername || flattenedMap.partnername || flattenedMap.name || values.sellerName
+  }
+  if (!hasExplicit.sellerAddress) {
+    values.sellerAddress =
+      flattenedMap.supplieraddress || flattenedMap.partneraddress || flattenedMap.address || values.sellerAddress
+  }
+  if (!hasExplicit.sellerPhone) {
+    const phoneText =
+      flattenedMap.supplierphone || flattenedMap.contactphone || flattenedMap.phone || flattenedMap.tel || ''
+    if (phoneText) {
+      values.sellerPhone = phoneText.startsWith('电话') ? phoneText : `电话：${phoneText}`
+    }
+  }
+  if (!hasExplicit.contractNo) {
+    values.contractNo = flattenedMap.code || flattenedMap.purchasecode || values.contractNo
+  }
+  if (!hasExplicit.signDate) {
+    values.signDate = flattenedMap.signdate || flattenedMap.sign_date || flattenedMap.created_at || values.signDate
+  }
+  if (!hasExplicit.priceTerm) {
+    values.priceTerm = flattenedMap.priceterm || flattenedMap.price_term || values.priceTerm
+  }
+  if (!hasExplicit.settlement) {
+    values.settlement = flattenedMap.settlement || flattenedMap.paymentmethod || values.settlement
+  }
+
+  if (!hasExplicit.itemDescription) {
+    const itemDescription =
+      firstItem.productName ||
+      firstItem.cnDesc ||
+      firstItem.enDesc ||
+      firstItem.productModel ||
+      firstItem.description ||
+      values.itemDescription
+    const spec = String(firstItem.specCode || '').trim()
+    values.itemDescription = spec && !String(itemDescription).includes(spec) ? `${itemDescription}，${spec}` : itemDescription
+  }
+  if (!hasExplicit.quantity) {
+    values.quantity =
+      firstItem.quantity != null && firstItem.quantity !== '' ? String(firstItem.quantity) : values.quantity
+  }
+  if (!hasExplicit.unitPrice) {
+    const unitPriceRaw = firstItem.unitPrice ?? firstItem.price
+    if (unitPriceRaw != null && unitPriceRaw !== '') {
+      values.unitPrice = String(unitPriceRaw)
+    }
+  }
+  if (!hasExplicit.amount) {
+    const explicitAmount = firstItem.totalPrice ?? firstItem.totalAmount ?? firstItem.amount
+    if (explicitAmount != null && explicitAmount !== '') {
+      values.amount = String(explicitAmount)
+    } else {
+      const quantityValue = parseNumericValue(values.quantity)
+      const unitPriceValue = parseNumericValue(values.unitPrice)
+      if (!Number.isNaN(quantityValue) && !Number.isNaN(unitPriceValue)) {
+        values.amount = String(quantityValue * unitPriceValue)
+      }
+    }
+  }
+  if (!hasExplicit.totalAmount) {
+    const explicitTotal = flattenedMap.totalamount || flattenedMap.total_price || flattenedMap.totalprice || ''
+    if (explicitTotal) {
+      values.totalAmount = explicitTotal
+    } else {
+      values.totalAmount = values.amount
+    }
+  }
+  if (!hasExplicit.requiredDeliveryDate) {
+    values.requiredDeliveryDate =
+      flattenedMap.deliverydate || flattenedMap.delivery_date || flattenedMap.requireddeliverydate || values.requiredDeliveryDate
+  }
+  if (!hasExplicit.sellerConfirmDeliveryDate) {
+    values.sellerConfirmDeliveryDate =
+      flattenedMap.sellerconfirmdeliverydate || flattenedMap.confirm_delivery_date || values.sellerConfirmDeliveryDate
+  }
+  if (!hasExplicit.innerPackaging) {
+    values.innerPackaging =
+      flattenedMap.innerpackaging || flattenedMap.inner_package || firstItem.packDetail || values.innerPackaging
+  }
+  if (!hasExplicit.outerPackaging) {
+    values.outerPackaging = flattenedMap.outerpackaging || flattenedMap.outer_package || values.outerPackaging
+  }
+  if (!hasExplicit.shield) {
+    values.shield = flattenedMap.shield || flattenedMap.isshielded || values.shield
+  }
+  if (!hasExplicit.deliveryAddress) {
+    values.deliveryAddress =
+      flattenedMap.deliveryaddress || flattenedMap.delivery_address || flattenedMap.deliveryplace || values.deliveryAddress
+  }
+  if (!hasExplicit.shippingDocs) {
+    values.shippingDocs = flattenedMap.shippingdocs || flattenedMap.documents || values.shippingDocs
+  }
+  if (!hasExplicit.otherRequirement) {
+    values.otherRequirement = flattenedMap.otherrequirement || flattenedMap.remark || values.otherRequirement
+  }
+
+  values.website = String(values.website || 'WWW.KSMAGNETIC.COM').trim().toUpperCase()
+  values.signDate = normalizePurchaseDateValue(values.signDate, 'cn')
+  values.requiredDeliveryDate = normalizePurchaseDateValue(values.requiredDeliveryDate, 'slash')
+  values.sellerConfirmDeliveryDate = normalizePurchaseDateValue(values.sellerConfirmDeliveryDate, 'slash')
+  values.quantity = formatPurchaseQuantityValue(values.quantity)
+  values.unitPrice = formatPurchaseCurrencyValue(values.unitPrice, 3)
+  values.amount = formatPurchaseCurrencyValue(values.amount, 2)
+  values.totalAmount = formatPurchaseCurrencyValue(values.totalAmount, 2)
+  return values
+}
+
+const buildPurchaseContractCellValues = (record = {}) => {
+  const values = { ...PURCHASE_CONTRACT_BASE_CELL_VALUES }
+  const fields = buildPurchaseContractFields(record)
+  Object.entries(PURCHASE_CONTRACT_CELL_FIELD_MAP).forEach(([cellKey, fieldKey]) => {
+    const value = String(fields[fieldKey] || '').trim()
+    if (value !== '') {
+      values[cellKey] = value
+    }
+  })
+  return values
+}
+
+const isPurchaseBorderCell = (rowIndex, colIndex) =>
+  PURCHASE_CONTRACT_BORDER_RANGES.some(
+    (range) =>
+      rowIndex >= range.startRow &&
+      rowIndex <= range.endRow &&
+      colIndex >= range.startCol &&
+      colIndex <= range.endCol
+  )
+
+const buildPurchaseContractCellClassName = (cellRef, rowIndex, colIndex) => {
+  const classes = ['purchase-grid-cell']
+  if (isPurchaseBorderCell(rowIndex, colIndex)) {
+    classes.push('purchase-cell-bordered')
+  }
+  if (PURCHASE_CONTRACT_CENTER_CELL_SET.has(cellRef)) {
+    classes.push('purchase-cell-center')
+  }
+  if (PURCHASE_CONTRACT_RIGHT_CELL_SET.has(cellRef)) {
+    classes.push('purchase-cell-right')
+  }
+  if (PURCHASE_CONTRACT_TOP_CELL_SET.has(cellRef)) {
+    classes.push('purchase-cell-top')
+  }
+  if (PURCHASE_CONTRACT_WRAP_CELL_SET.has(cellRef)) {
+    classes.push('purchase-cell-wrap')
+  }
+  if (PURCHASE_CONTRACT_SMALL_CELL_SET.has(cellRef)) {
+    classes.push('purchase-cell-small')
+  }
+  if (PURCHASE_CONTRACT_BOLD_CELL_SET.has(cellRef)) {
+    classes.push('purchase-cell-bold')
+  }
+  if (PURCHASE_CONTRACT_COMPANY_CELL_SET.has(cellRef)) {
+    classes.push('purchase-cell-company')
+  }
+  if (PURCHASE_CONTRACT_TITLE_CELL_SET.has(cellRef)) {
+    classes.push('purchase-cell-title')
+  }
+  if (PURCHASE_CONTRACT_SELLER_NAME_CELL_SET.has(cellRef)) {
+    classes.push('purchase-cell-seller-name')
+  }
+  if (PURCHASE_CONTRACT_TERM_HEADER_CELL_SET.has(cellRef)) {
+    classes.push('purchase-cell-term-header')
+  }
+  return classes.join(' ')
+}
+
+const buildPurchaseContractGridHTML = (cellValues = {}) => {
+  const mergeMap = new Map()
+  const coveredCells = new Set()
+
+  PURCHASE_CONTRACT_MERGES.forEach((merge) => {
+    mergeMap.set(`${merge.startRow}:${merge.startCol}`, merge)
+    for (let row = merge.startRow; row <= merge.endRow; row += 1) {
+      for (let col = merge.startCol; col <= merge.endCol; col += 1) {
+        if (row === merge.startRow && col === merge.startCol) {
+          continue
+        }
+        coveredCells.add(`${row}:${col}`)
+      }
+    }
+  })
+
+  return PURCHASE_CONTRACT_ROW_HEIGHTS.map((rowHeight, rowIndex) => {
+    const rowCells = []
+    for (let colIndex = 0; colIndex < PURCHASE_CONTRACT_COLUMN_WIDTHS.length; colIndex += 1) {
+      const positionKey = `${rowIndex}:${colIndex}`
+      if (coveredCells.has(positionKey)) {
+        continue
+      }
+      const cellRef = XLSX.utils.encode_cell({ r: rowIndex, c: colIndex })
+      const cellValue = String(cellValues[cellRef] || '')
+      const merge = mergeMap.get(positionKey)
+      const rowSpan = merge ? merge.endRow - merge.startRow + 1 : 1
+      const colSpan = merge ? merge.endCol - merge.startCol + 1 : 1
+      const className = buildPurchaseContractCellClassName(cellRef, rowIndex, colIndex)
+      const fieldKey = PURCHASE_CONTRACT_CELL_FIELD_MAP[cellRef]
+
+      const attrs = [`class="${className}"`, `data-purchase-cell="${cellRef}"`]
+      if (rowSpan > 1) {
+        attrs.push(`rowspan="${rowSpan}"`)
+      }
+      if (colSpan > 1) {
+        attrs.push(`colspan="${colSpan}"`)
+      }
+      if (colIndex <= 7 || cellValue) {
+        attrs.push('contenteditable="true"', 'spellcheck="false"')
+      }
+      if (fieldKey) {
+        attrs.push(`data-billing-field="${escapeHTML(fieldKey)}"`, `data-default="${escapeHTML(cellValue)}"`)
+      }
+      rowCells.push(`<td ${attrs.join(' ')}>${escapeHTML(cellValue)}</td>`)
+    }
+    return `<tr style="height:${rowHeight}px">${rowCells.join('')}</tr>`
+  }).join('')
+}
+
+const buildPurchaseContractTemplateHTML = (record = {}) => {
+  const cellValues = buildPurchaseContractCellValues(record)
+  const gridRowsHTML = buildPurchaseContractGridHTML(cellValues)
+  const colgroupHTML = PURCHASE_CONTRACT_COLUMN_WIDTHS.map((width) => `<col style="width:${width}px" />`).join('')
+
+  return `
+    <section class="purchase-contract-template">
+      <article class="purchase-contract-paper">
+        <div class="purchase-contract-canvas" role="img" aria-label="采购合同模板">
+          <table class="purchase-contract-grid">
+            <colgroup>${colgroupHTML}</colgroup>
+            <tbody>${gridRowsHTML}</tbody>
+          </table>
+          <img class="purchase-contract-logo" src="/templates/purchase-contract-logo.png" alt="KS MAGNETICS" draggable="false" />
+          <img class="purchase-contract-stamp" src="/templates/purchase-contract-stamp.png" alt="合同专用章" draggable="false" />
+          <img class="purchase-contract-spec" src="/templates/purchase-contract-spec.png" alt="产品尺寸示意图" draggable="false" />
+        </div>
+      </article>
+    </section>
+  `
 }
 
 const matchMagic = (arrayBuffer, expectedMagic) => {
@@ -327,7 +1679,12 @@ const buildEditableSheetHTML = (arrayBuffer) => {
   }
 }
 
-const buildTemplateHTMLFromResponse = (templateKey, arrayBuffer, contentType = '') => {
+const buildTemplateHTMLFromResponse = (templateKey, arrayBuffer, contentType = '', record = {}) => {
+  const fixedTemplateHTML = getFixedTemplateHTML(templateKey, record)
+  if (fixedTemplateHTML) {
+    return fixedTemplateHTML
+  }
+
   if (isExcelArrayBuffer(arrayBuffer)) {
     return buildEditableSheetHTML(arrayBuffer)
   }
@@ -341,9 +1698,6 @@ const buildTemplateHTMLFromResponse = (templateKey, arrayBuffer, contentType = '
   }
 
   if (isPDFArrayBuffer(arrayBuffer)) {
-    if (templateKey === 'billingInfo') {
-      return withEditableCells(DEFAULT_BILLING_INFO_TEMPLATE_HTML)
-    }
     throw new Error('当前模板是 PDF，无法直接编辑；请上传 xls/xlsx 模板')
   }
 
@@ -361,9 +1715,10 @@ const fetchBinaryWithMeta = async (url, options = {}) => {
   }
 }
 
-const fetchTemplateHTML = async (templateKey) => {
-  if (templateKey === 'billingInfo') {
-    return { source: 'default', templateHTML: DEFAULT_BILLING_INFO_TEMPLATE_HTML }
+const fetchTemplateHTML = async (templateKey, record = {}) => {
+  const fixedTemplateHTML = getFixedTemplateHTML(templateKey, record)
+  if (fixedTemplateHTML) {
+    return { source: 'default', templateHTML: fixedTemplateHTML }
   }
 
   const authToken = getToken(AUTH_SCOPE.ADMIN)
@@ -377,7 +1732,8 @@ const fetchTemplateHTML = async (templateKey) => {
       const serverHTML = buildTemplateHTMLFromResponse(
         templateKey,
         serverResp.arrayBuffer,
-        serverResp.contentType
+        serverResp.contentType,
+        record
       )
       return { source: 'server', templateHTML: serverHTML }
     }
@@ -393,7 +1749,8 @@ const fetchTemplateHTML = async (templateKey) => {
   const fallbackHTML = buildTemplateHTMLFromResponse(
     templateKey,
     fallbackResp.arrayBuffer,
-    fallbackResp.contentType
+    fallbackResp.contentType,
+    record
   )
   return { source: 'default', templateHTML: fallbackHTML }
 }
@@ -441,21 +1798,229 @@ const DEFAULT_BILLING_INFO_TEMPLATE_HTML = `
   </section>
 `
 
+const buildProformaInvoiceTemplateHTML = (record = {}) => {
+  const fields = buildProformaInvoiceFields(record)
+  const buildEditableNode = (fieldKey, className = '', multiline = false) => {
+    const value = String(fields[fieldKey] || '')
+    return `
+      <div class="proforma-editable ${className}" data-billing-field="${escapeHTML(fieldKey)}" data-default="${escapeHTML(value)}" contenteditable="true" spellcheck="false"${multiline ? ' data-multiline="true"' : ''}>${escapeHTML(value)}</div>
+    `
+  }
+
+  return `
+    <section class="proforma-template">
+      <article class="proforma-paper">
+        <div class="proforma-sheet" role="img" aria-label="外销形式发票模板">
+          <header class="proforma-header">
+            <div class="proforma-header-left">
+              ${buildEditableNode('headerCompanyName', 'proforma-header-company')}
+              ${buildEditableNode('headerAddressLine1', 'proforma-header-address')}
+              ${buildEditableNode('headerAddressLine2', 'proforma-header-address')}
+              ${buildEditableNode('headerPhone', 'proforma-header-phone')}
+            </div>
+            <div class="proforma-header-right">
+              <img class="proforma-logo" src="/templates/billing-info-logo.png" alt="KS MAGNETICS" draggable="false" />
+              ${buildEditableNode('headerWebsite', 'proforma-header-website')}
+            </div>
+          </header>
+
+          <div class="proforma-divider"></div>
+          <div class="proforma-title-wrap">
+            ${buildEditableNode('title', 'proforma-title')}
+          </div>
+
+          <section class="proforma-meta">
+            <div class="proforma-buyer">
+              ${buildEditableNode('buyerCompanyName', 'proforma-buyer-company')}
+              ${buildEditableNode('buyerAddressTel', 'proforma-buyer-address', true)}
+            </div>
+            <table class="proforma-meta-table">
+              <tbody>
+                <tr>
+                  <th>Invoice No.:</th>
+                  <td>${buildEditableNode('invoiceNo')}</td>
+                </tr>
+                <tr>
+                  <th>Order No.:</th>
+                  <td>${buildEditableNode('orderNo')}</td>
+                </tr>
+                <tr>
+                  <th>Date:</th>
+                  <td>${buildEditableNode('date')}</td>
+                </tr>
+                <tr>
+                  <th>Email:</th>
+                  <td>${buildEditableNode('email')}</td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+
+          <table class="proforma-items-table">
+            <colgroup>
+              <col style="width:7.587%" />
+              <col style="width:10.199%" />
+              <col style="width:38.557%" />
+              <col style="width:13.308%" />
+              <col style="width:11.94%" />
+              <col style="width:18.408%" />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Ref. No.</th>
+                <th>Goods Description</th>
+                <th>Quantity</th>
+                <th>Net Price</th>
+                <th>Net Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>${buildEditableNode('item1No', 'proforma-cell-center')}</td>
+                <td>${buildEditableNode('item1Ref', 'proforma-cell-center')}</td>
+                <td>${buildEditableNode('item1Desc', 'proforma-cell-left', true)}</td>
+                <td>${buildEditableNode('item1Qty', 'proforma-cell-center')}</td>
+                <td>${buildEditableNode('item1NetPrice', 'proforma-cell-right')}</td>
+                <td>${buildEditableNode('item1NetValue', 'proforma-cell-right')}</td>
+              </tr>
+              <tr>
+                <td>${buildEditableNode('item2No', 'proforma-cell-center')}</td>
+                <td>${buildEditableNode('item2Ref', 'proforma-cell-center')}</td>
+                <td>${buildEditableNode('item2Desc', 'proforma-cell-left', true)}</td>
+                <td>${buildEditableNode('item2Qty', 'proforma-cell-center')}</td>
+                <td>${buildEditableNode('item2NetPrice', 'proforma-cell-right')}</td>
+                <td>${buildEditableNode('item2NetValue', 'proforma-cell-right')}</td>
+              </tr>
+              <tr class="proforma-total-title-row">
+                <td colspan="5"><strong>Total Net Value:</strong></td>
+                <td>${buildEditableNode('totalNetValue', 'proforma-cell-right proforma-cell-strong')}</td>
+              </tr>
+              <tr class="proforma-total-words-row">
+                <td colspan="5">${buildEditableNode('amountInWords', 'proforma-amount-words')}</td>
+                <td>${buildEditableNode('totalNetValue', 'proforma-cell-right proforma-cell-strong')}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <table class="proforma-terms-table">
+            <tbody>
+              <tr>
+                <th>Incoterms:</th>
+                <td>${buildEditableNode('incoterms')}</td>
+                <th>Delivery Method:</th>
+                <td>${buildEditableNode('deliveryMethod')}</td>
+              </tr>
+              <tr>
+                <th>Lead-time:</th>
+                <td>${buildEditableNode('leadTime')}</td>
+                <th>Payment Terms:</th>
+                <td>${buildEditableNode('paymentTerms', '', true)}</td>
+              </tr>
+              <tr>
+                <th>Notes:</th>
+                <td colspan="3">${buildEditableNode('notes', '', true)}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <section class="proforma-signature-zone">
+            <div class="proforma-seller-signature">
+              ${buildEditableNode('sellerCompanyEn', 'proforma-seller-company-en')}
+              ${buildEditableNode('sellerCompanyCn', 'proforma-seller-company-cn')}
+              ${buildEditableNode('sellerSigner', 'proforma-seller-signer')}
+              <div class="proforma-seller-sign-line"></div>
+              <div class="proforma-seller-sign-note">Authorized Signature(s)</div>
+            </div>
+            <div class="proforma-signature-labels">
+              ${buildEditableNode('authorizedBuyer', 'proforma-signature-label')}
+              ${buildEditableNode('authorizedSeller', 'proforma-signature-label')}
+            </div>
+          </section>
+
+          <table class="proforma-bank-table">
+            <tbody>
+              <tr>
+                <th>BANK NAME:</th>
+                <th>BENEFICIARY NAME:</th>
+                <td>${buildEditableNode('beneficiaryName')}</td>
+              </tr>
+              <tr>
+                <td>${buildEditableNode('bankName')}</td>
+                <th>ADDRESS:</th>
+                <td>${buildEditableNode('beneficiaryAddress')}</td>
+              </tr>
+              <tr>
+                <th>BANK ADDRESS:</th>
+                <th>A/C NO. USD:</th>
+                <td>${buildEditableNode('accountUsd')}</td>
+              </tr>
+              <tr>
+                <td>${buildEditableNode('bankAddress1')}</td>
+                <th>A/C NO. EURO:</th>
+                <td>${buildEditableNode('accountEuro')}</td>
+              </tr>
+              <tr>
+                <td>${buildEditableNode('bankAddress2')}</td>
+                <th>SWIFT CODE:</th>
+                <td>${buildEditableNode('swiftCode')}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+  `
+}
+
+const getFixedTemplateHTML = (templateKey, record = {}) => {
+  if (!FIXED_LAYOUT_TEMPLATE_KEYS.has(templateKey)) {
+    return ''
+  }
+  if (templateKey === 'billingInfo') {
+    return DEFAULT_BILLING_INFO_TEMPLATE_HTML
+  }
+  if (templateKey === 'pi') {
+    return buildProformaInvoiceTemplateHTML(record)
+  }
+  if (templateKey === 'purchase') {
+    return buildPurchaseContractTemplateHTML(record)
+  }
+  return ''
+}
+
 const buildRecordPanelHTML = (record, templateKey) => {
   const isBillingInfo = templateKey === 'billingInfo'
-  const fields = isBillingInfo ? buildBillingInfoFields(record) : flattenRecord(record)
+  const isProformaInvoice = templateKey === 'pi'
+  const isPurchaseContract = templateKey === 'purchase'
+  const isFieldSyncTemplate = isBillingInfo || isProformaInvoice || isPurchaseContract
+  const fields = isBillingInfo
+    ? buildBillingInfoFields(record)
+    : isProformaInvoice
+      ? buildProformaInvoiceFields(record)
+      : isPurchaseContract
+        ? buildPurchaseContractFields(record)
+        : flattenRecord(record)
   const panelTip = isBillingInfo
     ? '提示：左右两侧字段双向同步，右侧文本均可编辑（logo/水印除外），打印时仅输出右侧模板。'
-    : '提示：模板区每个单元格都可直接编辑，字段区用于复制参考值。'
+    : isProformaInvoice
+      ? '提示：左侧字段与右侧 PI 固定版式双向同步，右侧表格单元格可直接编辑，打印时仅输出右侧模板。'
+      : isPurchaseContract
+        ? '提示：左侧字段与右侧采购合同固定版式双向同步，模板按原始合同坐标锁定，印章/图示为模板素材。'
+        : '提示：模板区每个单元格都可直接编辑，字段区用于复制参考值。'
   const rows = (isBillingInfo
     ? BILLING_INFO_FIELD_SCHEMA.map((field) => [field.label, fields[field.key] || '', field.key])
-    : Object.entries(fields).map(([key, value]) => [key, value, key])
+    : isProformaInvoice
+      ? PROFORMA_INVOICE_FIELD_SCHEMA.map((field) => [field.label, fields[field.key] || '', field.key])
+      : isPurchaseContract
+        ? PURCHASE_CONTRACT_PANEL_FIELD_SCHEMA.map((field) => [field.label, fields[field.key] || '', field.key])
+        : Object.entries(fields).map(([key, value]) => [key, value, key])
   )
     .map(
       ([label, value, fieldKey]) => `
         <tr>
           <td class="field-key">${escapeHTML(label)}</td>
-          <td class="field-value" data-field-key="${escapeHTML(String(fieldKey))}" contenteditable="true">${escapeHTML(value)}</td>
+          <td class="field-value"${isFieldSyncTemplate ? ` data-field-key="${escapeHTML(String(fieldKey))}"` : ''} contenteditable="true">${escapeHTML(value)}</td>
         </tr>
       `
     )
@@ -739,6 +2304,361 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
       .template-wrap .billing-value-bank-account { left: 169.62px; top: 388.74px; width: 250px; }
       .template-wrap .billing-footer-company { left: 379.5px; top: 542.52px; width: 190px; }
       .template-wrap .billing-footer-date { left: 396px; top: 576.18px; width: 170px; }
+      .template-wrap .proforma-template {
+        display: flex;
+        justify-content: center;
+        min-height: 100%;
+        padding: 24px 0;
+        background: #d9d9d9;
+      }
+      .template-wrap .proforma-paper {
+        width: 842px;
+        min-height: 760px;
+        background: #fff;
+        box-shadow: 0 2px 14px rgba(0, 0, 0, 0.2);
+        padding: 10px 12px;
+        font-family: Arial, Helvetica, sans-serif;
+        color: #111;
+      }
+      .template-wrap .proforma-sheet {
+        border: 1px solid #000;
+        min-height: 100%;
+      }
+      .template-wrap .proforma-editable {
+        outline: 1px dashed transparent;
+        border-radius: 2px;
+        min-height: 14px;
+        line-height: 1.2;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .template-wrap .proforma-editable[data-multiline="true"] {
+        white-space: pre-wrap;
+        overflow: visible;
+        text-overflow: initial;
+      }
+      .template-wrap .proforma-editable:focus {
+        outline-color: #1f7a3f;
+        background: rgba(31, 122, 63, 0.08);
+      }
+      .template-wrap .proforma-header {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 8px 10px 2px;
+      }
+      .template-wrap .proforma-header-left {
+        flex: 1;
+      }
+      .template-wrap .proforma-header-company {
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.1px;
+      }
+      .template-wrap .proforma-header-address {
+        margin-top: 2px;
+        font-size: 9px;
+      }
+      .template-wrap .proforma-header-phone {
+        margin-top: 2px;
+        font-size: 9px;
+      }
+      .template-wrap .proforma-header-right {
+        width: 252px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+      }
+      .template-wrap .proforma-logo {
+        width: 252px;
+        max-width: 100%;
+        margin-top: 2px;
+        user-select: none;
+        -webkit-user-drag: none;
+      }
+      .template-wrap .proforma-header-website {
+        margin-top: 3px;
+        font-size: 9px;
+        text-align: right;
+        width: 100%;
+      }
+      .template-wrap .proforma-divider {
+        border-top: 1px solid #000;
+      }
+      .template-wrap .proforma-title-wrap {
+        padding: 8px 0 0;
+        text-align: center;
+      }
+      .template-wrap .proforma-title {
+        font-size: 17px;
+        font-weight: 700;
+        letter-spacing: 0.2px;
+      }
+      .template-wrap .proforma-meta {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 8px 10px 8px;
+      }
+      .template-wrap .proforma-buyer {
+        flex: 1;
+        min-height: 86px;
+      }
+      .template-wrap .proforma-buyer-company {
+        font-size: 12px;
+        font-weight: 700;
+      }
+      .template-wrap .proforma-buyer-address {
+        margin-top: 2px;
+        font-size: 8px;
+      }
+      .template-wrap .proforma-meta-table {
+        width: 43%;
+        border-collapse: collapse;
+        table-layout: fixed;
+      }
+      .template-wrap .proforma-meta-table th,
+      .template-wrap .proforma-meta-table td {
+        border: 0;
+        padding: 1px 3px;
+        vertical-align: top;
+      }
+      .template-wrap .proforma-meta-table th {
+        width: 34%;
+        text-align: left;
+        white-space: nowrap;
+        font-size: 8px;
+        font-weight: 700;
+      }
+      .template-wrap .proforma-meta-table td {
+        font-size: 8px;
+      }
+      .template-wrap .proforma-items-table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+        border-top: 1px solid #000;
+      }
+      .template-wrap .proforma-items-table th,
+      .template-wrap .proforma-items-table td {
+        border: 1px solid #000;
+        padding: 3px 4px;
+        font-size: 8.5px;
+        vertical-align: middle;
+      }
+      .template-wrap .proforma-items-table th {
+        text-align: center;
+        font-weight: 700;
+      }
+      .template-wrap .proforma-cell-left {
+        text-align: left;
+      }
+      .template-wrap .proforma-cell-center {
+        text-align: center;
+      }
+      .template-wrap .proforma-cell-right {
+        text-align: right;
+      }
+      .template-wrap .proforma-cell-strong {
+        font-weight: 700;
+      }
+      .template-wrap .proforma-total-title-row td {
+        font-size: 8.8px;
+      }
+      .template-wrap .proforma-total-words-row td {
+        min-height: 26px;
+        font-size: 8.8px;
+        font-weight: 700;
+      }
+      .template-wrap .proforma-amount-words {
+        white-space: normal;
+      }
+      .template-wrap .proforma-terms-table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+      }
+      .template-wrap .proforma-terms-table th,
+      .template-wrap .proforma-terms-table td {
+        border: 1px solid #000;
+        padding: 3px 4px;
+        vertical-align: middle;
+        font-size: 8.5px;
+      }
+      .template-wrap .proforma-terms-table th {
+        width: 18%;
+        text-align: left;
+        font-weight: 700;
+      }
+      .template-wrap .proforma-terms-table td {
+        width: 32%;
+      }
+      .template-wrap .proforma-signature-zone {
+        border-left: 1px solid #000;
+        border-right: 1px solid #000;
+        padding: 8px 10px 6px;
+      }
+      .template-wrap .proforma-seller-signature {
+        width: 48%;
+        margin: 0 auto;
+        text-align: center;
+        color: #52638f;
+      }
+      .template-wrap .proforma-seller-company-en {
+        font-size: 9px;
+        font-weight: 700;
+      }
+      .template-wrap .proforma-seller-company-cn {
+        margin-top: 2px;
+        font-size: 11px;
+        font-family: "SimSun", "Songti SC", "Noto Serif CJK SC", serif;
+      }
+      .template-wrap .proforma-seller-signer {
+        margin-top: 8px;
+        font-size: 16px;
+        font-family: "Brush Script MT", "Segoe Script", cursive;
+      }
+      .template-wrap .proforma-seller-sign-line {
+        margin-top: 3px;
+        border-top: 1px dotted #52638f;
+      }
+      .template-wrap .proforma-seller-sign-note {
+        margin-top: 2px;
+        font-size: 7px;
+        font-style: italic;
+      }
+      .template-wrap .proforma-signature-labels {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        margin-top: 6px;
+      }
+      .template-wrap .proforma-signature-label {
+        flex: 1;
+        font-size: 9px;
+        font-weight: 700;
+      }
+      .template-wrap .proforma-bank-table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+        border-top: 1px solid #000;
+      }
+      .template-wrap .proforma-bank-table th,
+      .template-wrap .proforma-bank-table td {
+        padding: 2px 5px;
+        text-align: left;
+        vertical-align: top;
+        border: 0;
+      }
+      .template-wrap .proforma-bank-table th {
+        font-size: 8px;
+        font-weight: 700;
+      }
+      .template-wrap .proforma-bank-table td {
+        font-size: 8px;
+      }
+      .template-wrap .purchase-contract-template {
+        display: flex;
+        justify-content: center;
+        min-height: 100%;
+        padding: 24px 0;
+        background: #d9d9d9;
+      }
+      .template-wrap .purchase-contract-paper {
+        width: 796px;
+        height: 1248px;
+        background: #fff;
+        border: 1px solid #bfbfbf;
+        box-shadow: 0 2px 14px rgba(0, 0, 0, 0.2);
+      }
+      .template-wrap .purchase-contract-canvas {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+      .template-wrap .purchase-contract-grid {
+        width: 796px;
+        border-collapse: collapse;
+        table-layout: fixed;
+      }
+      .template-wrap .purchase-grid-cell {
+        border: 1px solid transparent;
+        padding: 2px 4px;
+        vertical-align: middle;
+        color: #000;
+        font-family: "SimSun", "Songti SC", "Noto Serif CJK SC", serif;
+        font-size: 13px;
+        line-height: 1.25;
+        white-space: nowrap;
+      }
+      .template-wrap .purchase-cell-bordered {
+        border-color: #111;
+      }
+      .template-wrap .purchase-cell-center {
+        text-align: center;
+      }
+      .template-wrap .purchase-cell-right {
+        text-align: right;
+      }
+      .template-wrap .purchase-cell-top {
+        vertical-align: top;
+      }
+      .template-wrap .purchase-cell-wrap {
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+      .template-wrap .purchase-cell-small {
+        font-size: 12px;
+      }
+      .template-wrap .purchase-cell-bold {
+        font-weight: 700;
+      }
+      .template-wrap .purchase-cell-company {
+        font-size: 21px;
+      }
+      .template-wrap .purchase-cell-title {
+        font-size: 34px;
+        letter-spacing: 1px;
+      }
+      .template-wrap .purchase-cell-seller-name {
+        font-size: 18px;
+      }
+      .template-wrap .purchase-cell-term-header {
+        font-size: 20px;
+        font-weight: 700;
+      }
+      .template-wrap .purchase-contract-logo,
+      .template-wrap .purchase-contract-stamp,
+      .template-wrap .purchase-contract-spec {
+        position: absolute;
+        user-select: none;
+        -webkit-user-drag: none;
+        pointer-events: none;
+      }
+      .template-wrap .purchase-contract-logo {
+        left: ${PURCHASE_CONTRACT_IMAGE_LAYOUT.logo.left}px;
+        top: ${PURCHASE_CONTRACT_IMAGE_LAYOUT.logo.top}px;
+        width: ${PURCHASE_CONTRACT_IMAGE_LAYOUT.logo.width}px;
+        height: ${PURCHASE_CONTRACT_IMAGE_LAYOUT.logo.height}px;
+        object-fit: contain;
+      }
+      .template-wrap .purchase-contract-stamp {
+        left: ${PURCHASE_CONTRACT_IMAGE_LAYOUT.stamp.left}px;
+        top: ${PURCHASE_CONTRACT_IMAGE_LAYOUT.stamp.top}px;
+        width: ${PURCHASE_CONTRACT_IMAGE_LAYOUT.stamp.width}px;
+        height: ${PURCHASE_CONTRACT_IMAGE_LAYOUT.stamp.height}px;
+        object-fit: contain;
+      }
+      .template-wrap .purchase-contract-spec {
+        left: ${PURCHASE_CONTRACT_IMAGE_LAYOUT.spec.left}px;
+        top: ${PURCHASE_CONTRACT_IMAGE_LAYOUT.spec.top}px;
+        width: ${PURCHASE_CONTRACT_IMAGE_LAYOUT.spec.width}px;
+        height: ${PURCHASE_CONTRACT_IMAGE_LAYOUT.spec.height}px;
+        object-fit: contain;
       }
       body.print-template-only .record-panel {
         display: none !important;
@@ -775,6 +2695,54 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
           height: 297mm !important;
           box-shadow: none !important;
         }
+        .template-wrap .proforma-template {
+          padding: 0 !important;
+          background: #fff !important;
+        }
+        .template-wrap .proforma-paper {
+          width: 210mm !important;
+          min-height: 297mm !important;
+          box-shadow: none !important;
+          padding: 3mm !important;
+        }
+        .template-wrap .purchase-contract-template {
+          padding: 0 !important;
+          background: #fff !important;
+        }
+        .template-wrap .purchase-contract-paper {
+          width: 210mm !important;
+          height: 297mm !important;
+          box-shadow: none !important;
+          border: 0 !important;
+        }
+        .template-wrap .purchase-contract-canvas {
+          transform-origin: left top;
+          transform: scale(0.899);
+        }
+        .template-wrap .proforma-header-company { font-size: 8.4pt !important; }
+        .template-wrap .proforma-header-address { font-size: 6.5pt !important; }
+        .template-wrap .proforma-header-phone { font-size: 6.3pt !important; }
+        .template-wrap .proforma-header-website { font-size: 6.4pt !important; }
+        .template-wrap .proforma-title { font-size: 7.1pt !important; }
+        .template-wrap .proforma-buyer-company { font-size: 6.4pt !important; }
+        .template-wrap .proforma-buyer-address { font-size: 5.8pt !important; }
+        .template-wrap .proforma-meta-table th,
+        .template-wrap .proforma-meta-table td,
+        .template-wrap .proforma-items-table th,
+        .template-wrap .proforma-items-table td,
+        .template-wrap .proforma-total-title-row td,
+        .template-wrap .proforma-total-words-row td,
+        .template-wrap .proforma-terms-table th,
+        .template-wrap .proforma-terms-table td,
+        .template-wrap .proforma-signature-label,
+        .template-wrap .proforma-bank-table th,
+        .template-wrap .proforma-bank-table td {
+          font-size: 5.8pt !important;
+        }
+        .template-wrap .proforma-seller-company-en { font-size: 5.4pt !important; }
+        .template-wrap .proforma-seller-company-cn { font-size: 6pt !important; }
+        .template-wrap .proforma-seller-signer { font-size: 8.6pt !important; }
+        .template-wrap .proforma-seller-sign-note { font-size: 4.6pt !important; }
       }
     </style>
   </head>
@@ -803,6 +2771,9 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
         var panelDisplayBeforePrint = null;
 
         var isBillingTemplate = Boolean(document.querySelector('.billing-info-template'));
+        var isProformaTemplate = Boolean(document.querySelector('.proforma-template'));
+        var isPurchaseTemplate = Boolean(document.querySelector('.purchase-contract-template'));
+        var isFieldSyncTemplate = isBillingTemplate || isProformaTemplate || isPurchaseTemplate;
 
         var toFieldKey = function (raw) {
           return String(raw || '')
@@ -846,7 +2817,7 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
           return fieldMap;
         };
 
-        var normalizeDate = function (raw) {
+        var normalizeDateCN = function (raw) {
           var text = String(raw || '').trim();
           if (!text) {
             return '';
@@ -885,15 +2856,111 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
           return text;
         };
 
-        var normalizeBillingFieldValue = function (fieldKey, value) {
+        var normalizeDateEN = function (raw) {
+          var text = String(raw || '').trim();
+          if (!text) {
+            return '';
+          }
+
+          var months = [
+            'January',
+            'February',
+            'March',
+            'April',
+            'May',
+            'June',
+            'July',
+            'August',
+            'September',
+            'October',
+            'November',
+            'December'
+          ];
+
+          if (/^\\d{10,13}$/.test(text)) {
+            var ts = Number(text);
+            if (!Number.isNaN(ts)) {
+              var millis = text.length === 10 ? ts * 1000 : ts;
+              var dateFromTs = new Date(millis);
+              if (!Number.isNaN(dateFromTs.getTime())) {
+                return (
+                  months[dateFromTs.getMonth()] +
+                  ' ' +
+                  String(dateFromTs.getDate()) +
+                  ', ' +
+                  String(dateFromTs.getFullYear())
+                );
+              }
+            }
+          }
+
+          var dateMatch = text.match(/^(\\d{4})[-\\/.](\\d{1,2})[-\\/.](\\d{1,2})$/);
+          if (dateMatch) {
+            var year = Number(dateMatch[1]);
+            var month = Number(dateMatch[2]);
+            var day = Number(dateMatch[3]);
+            if (month >= 1 && month <= 12) {
+              return months[month - 1] + ' ' + String(day) + ', ' + String(year);
+            }
+          }
+
+          var parsed = new Date(text);
+          if (!Number.isNaN(parsed.getTime())) {
+            return (
+              months[parsed.getMonth()] +
+              ' ' +
+              String(parsed.getDate()) +
+              ', ' +
+              String(parsed.getFullYear())
+            );
+          }
+
+          return text;
+        };
+
+        var normalizeDateSlash = function (raw) {
+          var text = String(raw || '').trim();
+          if (!text) {
+            return '';
+          }
+          var dateMatch = text.match(/^(\\d{4})[-\\/.](\\d{1,2})[-\\/.](\\d{1,2})$/);
+          if (dateMatch) {
+            return (
+              String(Number(dateMatch[1])) +
+              '/' +
+              String(Number(dateMatch[2])).padStart(2, '0') +
+              '/' +
+              String(Number(dateMatch[3])).padStart(2, '0')
+            );
+          }
+          var parsed = new Date(text);
+          if (!Number.isNaN(parsed.getTime())) {
+            return (
+              String(parsed.getFullYear()) +
+              '/' +
+              String(parsed.getMonth() + 1).padStart(2, '0') +
+              '/' +
+              String(parsed.getDate()).padStart(2, '0')
+            );
+          }
+          return text;
+        };
+
+        var normalizeTemplateFieldValue = function (fieldKey, value) {
+          if (fieldKey === 'signdate') {
+            return normalizeDateCN(value);
+          }
+          if (fieldKey === 'requireddeliverydate' || fieldKey === 'sellerconfirmdeliverydate') {
+            return normalizeDateSlash(value);
+          }
           if (fieldKey === 'date') {
-            return normalizeDate(value);
+            return isProformaTemplate ? normalizeDateEN(value) : normalizeDateCN(value);
           }
           return String(value || '').trim();
         };
 
         var syncPanelFieldToTemplate = function (fieldKey, normalizeValue) {
-          if (!isBillingTemplate) {
+          if (!isFieldSyncTemplate) {
             return;
           }
           var panelMap = collectPanelFieldMap();
@@ -903,7 +2970,7 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
             return;
           }
           var rawValue = getNodeText(cell);
-          var value = normalizeValue ? normalizeBillingFieldValue(fieldKey, rawValue) : rawValue;
+          var value = normalizeValue ? normalizeTemplateFieldValue(fieldKey, rawValue) : rawValue;
           if (normalizeValue && value !== rawValue) {
             cell.textContent = value;
           }
@@ -917,13 +2984,13 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
         };
 
         var syncTemplateFieldToPanel = function (fieldKey, sourceNode, normalizeValue) {
-          if (!isBillingTemplate) {
+          if (!isFieldSyncTemplate) {
             return;
           }
           var panelMap = collectPanelFieldMap();
           var templateMap = collectTemplateFieldMap();
           var rawValue = getNodeText(sourceNode);
-          var value = normalizeValue ? normalizeBillingFieldValue(fieldKey, rawValue) : rawValue;
+          var value = normalizeValue ? normalizeTemplateFieldValue(fieldKey, rawValue) : rawValue;
 
           if (normalizeValue && value !== rawValue) {
             sourceNode.textContent = value;
@@ -944,7 +3011,7 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
         };
 
         var syncAllBillingFieldsFromPanel = function () {
-          if (!isBillingTemplate) {
+          if (!isFieldSyncTemplate) {
             return;
           }
           var panelMap = collectPanelFieldMap();
@@ -954,7 +3021,7 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
         };
 
         var bindBillingSync = function () {
-          if (!isBillingTemplate) {
+          if (!isFieldSyncTemplate) {
             return;
           }
           var panelMap = collectPanelFieldMap();
@@ -1024,7 +3091,7 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
 export const openPrintWindow = async (templateKey, record = {}) => {
   const templateMeta = templateList.find((item) => item.key === templateKey)
   const title = templateMeta?.title || '打印模板'
-  const { source, templateHTML } = await fetchTemplateHTML(templateKey)
+  const { source, templateHTML } = await fetchTemplateHTML(templateKey, record)
   const recordPanelHTML = buildRecordPanelHTML(record, templateKey)
 
   const popup = window.open('', '_blank', 'width=1440,height=900')
@@ -1046,8 +3113,17 @@ export const openPrintWindow = async (templateKey, record = {}) => {
 }
 
 export const uploadTemplateFile = async (templateKey, file) => {
-  if (templateKey === 'billingInfo') {
-    throw new Error('开票信息模板为固定版式，不支持上传覆盖')
+  if (FIXED_LAYOUT_TEMPLATE_KEYS.has(templateKey)) {
+    if (templateKey === 'billingInfo') {
+      throw new Error('开票信息模板为固定版式，不支持上传覆盖')
+    }
+    if (templateKey === 'pi') {
+      throw new Error('外销形式发票模板为固定版式，不支持上传覆盖')
+    }
+    if (templateKey === 'purchase') {
+      throw new Error('采购合同模板为固定版式，不支持上传覆盖')
+    }
+    throw new Error('当前模板为固定版式，不支持上传覆盖')
   }
   const authToken = getToken(AUTH_SCOPE.ADMIN)
   if (!authToken) {
@@ -1073,4 +3149,6 @@ export const uploadTemplateFile = async (templateKey, file) => {
 export const __TEST_ONLY__ = {
   buildTemplateHTMLFromResponse,
   buildBillingInfoFields,
+  buildProformaInvoiceFields,
+  buildPurchaseContractFields,
 }
