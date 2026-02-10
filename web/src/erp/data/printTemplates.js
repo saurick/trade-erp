@@ -632,8 +632,12 @@ const DEFAULT_PROFORMA_INVOICE_ITEMS = [
   },
 ]
 
+const PROFORMA_PAGE_WIDTH = 1414
+const PROFORMA_PAGE_HEIGHT = 2000
 const PROFORMA_CANVAS_WIDTH = 1269
 const PROFORMA_CANVAS_HEIGHT = 1370
+const PROFORMA_CANVAS_OFFSET_LEFT = 70
+const PROFORMA_CANVAS_OFFSET_TOP = 64
 
 const buildBillingInfoFields = (record = {}) => {
   const { values, hasExplicit } = buildFieldsBySchema(record, BILLING_INFO_FIELD_SCHEMA)
@@ -1527,8 +1531,8 @@ const buildPurchaseContractFields = (record = {}) => {
 }
 
 const buildPurchaseStaticNodeHTML = (node) => {
-  const className = ['purchase-text', node.className].filter(Boolean).join(' ')
-  return `<div class="${className}" style="${buildPurchaseInlineStyle(node)}">${formatPurchaseNodeText(node.text)}</div>`
+  const className = ['purchase-text', 'purchase-editable', node.className].filter(Boolean).join(' ')
+  return `<div class="${className}" style="${buildPurchaseInlineStyle(node)}" contenteditable="true" spellcheck="false">${formatPurchaseNodeText(node.text)}</div>`
 }
 
 const buildPurchaseEditableNodeHTML = (fields, node) => {
@@ -2292,8 +2296,9 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
         padding: 0;
       }
       .template-wrap .proforma-paper {
-        width: ${PROFORMA_CANVAS_WIDTH}px;
-        min-height: ${PROFORMA_CANVAS_HEIGHT}px;
+        width: ${PROFORMA_PAGE_WIDTH}px;
+        height: ${PROFORMA_PAGE_HEIGHT}px;
+        position: relative;
         background: #fff;
         box-shadow: 0 2px 14px rgba(0, 0, 0, 0.2);
         font-family: Arial, Helvetica, sans-serif;
@@ -2306,8 +2311,12 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
         transform-origin: top center;
       }
       .template-wrap .proforma-sheet {
+        position: absolute;
+        left: ${PROFORMA_CANVAS_OFFSET_LEFT}px;
+        top: ${PROFORMA_CANVAS_OFFSET_TOP}px;
+        width: ${PROFORMA_CANVAS_WIDTH}px;
+        height: ${PROFORMA_CANVAS_HEIGHT}px;
         border: 2px solid #111;
-        min-height: 100%;
         background: #fff;
       }
       .template-wrap .proforma-editable {
@@ -2515,7 +2524,7 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
         border-left: 2px solid #000;
         border-right: 2px solid #000;
         padding: 16px 14px 8px;
-        height: 251px;
+        height: 249px;
       }
       .template-wrap .proforma-seller-signature {
         width: 43%;
@@ -2738,13 +2747,22 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
         }
         .template-wrap .proforma-paper {
           width: 210mm !important;
-          min-height: 297mm !important;
+          height: 297mm !important;
           box-shadow: none !important;
           padding: 0 !important;
-          position: static !important;
-          left: auto !important;
-          top: auto !important;
+          position: relative !important;
+          left: 0 !important;
+          top: 0 !important;
           transform: none !important;
+        }
+        .template-wrap .proforma-sheet {
+          position: absolute !important;
+          left: ${(PROFORMA_CANVAS_OFFSET_LEFT / PROFORMA_PAGE_WIDTH) * 100}% !important;
+          top: ${(PROFORMA_CANVAS_OFFSET_TOP / PROFORMA_PAGE_HEIGHT) * 100}% !important;
+          width: ${(PROFORMA_CANVAS_WIDTH / PROFORMA_PAGE_WIDTH) * 100}% !important;
+          height: ${(PROFORMA_CANVAS_HEIGHT / PROFORMA_PAGE_HEIGHT) * 100}% !important;
+          min-height: 0 !important;
+          border-width: 0.35mm !important;
         }
         .template-wrap .proforma-items-table thead tr,
         .template-wrap .proforma-item-row,
@@ -2830,8 +2848,8 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
         var isProformaTemplate = Boolean(document.querySelector('.proforma-template'));
         var isPurchaseTemplate = Boolean(document.querySelector('.purchase-contract-template'));
         var isFieldSyncTemplate = isBillingTemplate || isProformaTemplate || isPurchaseTemplate;
-        var PROFORMA_BASE_WIDTH = ${PROFORMA_CANVAS_WIDTH};
-        var PROFORMA_BASE_HEIGHT = ${PROFORMA_CANVAS_HEIGHT};
+        var PROFORMA_BASE_WIDTH = ${PROFORMA_PAGE_WIDTH};
+        var PROFORMA_BASE_HEIGHT = ${PROFORMA_CANVAS_OFFSET_TOP + PROFORMA_CANVAS_HEIGHT + 8};
         var proformaAutoFitRaf = 0;
 
         var toFieldKey = function (raw) {
@@ -2921,8 +2939,8 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
           var availableHeight = Math.max(wrapRect.height - 24, 320);
           var scale = Math.min(availableWidth / PROFORMA_BASE_WIDTH, availableHeight / PROFORMA_BASE_HEIGHT, 1);
           var roundedScale = Number(scale.toFixed(4));
-          var topPadding = 10;
-          var bottomPadding = 10;
+          var topPadding = 4;
+          var bottomPadding = 4;
           var scaledHeight = Math.round(PROFORMA_BASE_HEIGHT * roundedScale);
 
           templateWrap.classList.add('template-wrap-proforma-fit');
