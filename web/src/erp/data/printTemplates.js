@@ -1006,293 +1006,332 @@ const PURCHASE_CONTRACT_PANEL_FIELD_SCHEMA = [
   { key: 'otherRequirement', label: '其他要求' },
 ]
 
-const PURCHASE_CONTRACT_COLUMN_WIDTHS = [35, 58, 199, 53, 45, 72, 72, 72, 38, 38, 38, 38, 38]
-const PURCHASE_CONTRACT_ROW_HEIGHTS = [
-  26.1,
-  13.15,
-  13.15,
-  13.15,
-  37.05,
-  16.05,
-  20,
-  16.05,
-  16.05,
-  16.05,
-  11,
-  36,
-  77.65,
-  13.25,
-  13.25,
-  19.9,
-  19.9,
-  19.9,
-  19.9,
-  25.05,
-  26.1,
-  36,
-  19.15,
-  19.15,
-  34.25,
-  4.8,
-  16,
-  20.95,
-  50,
-  29,
-  36,
-  16,
-  16,
-  98.35,
-  16,
-  16,
-  16,
-  16,
-  16,
-  16,
-  16,
-  16,
-  16,
-  16,
-  16,
-  16,
-  16,
-  16,
-  16,
-]
-
-const PURCHASE_CONTRACT_MERGES = [
-  { startRow: 0, startCol: 0, endRow: 0, endCol: 2 },
-  { startRow: 0, startCol: 3, endRow: 0, endCol: 5 },
-  { startRow: 0, startCol: 6, endRow: 0, endCol: 7 },
-  { startRow: 1, startCol: 0, endRow: 1, endCol: 2 },
-  { startRow: 1, startCol: 3, endRow: 1, endCol: 5 },
-  { startRow: 1, startCol: 6, endRow: 1, endCol: 7 },
-  { startRow: 2, startCol: 0, endRow: 2, endCol: 2 },
-  { startRow: 2, startCol: 3, endRow: 2, endCol: 5 },
-  { startRow: 2, startCol: 6, endRow: 2, endCol: 7 },
-  { startRow: 3, startCol: 0, endRow: 3, endCol: 2 },
-  { startRow: 3, startCol: 5, endRow: 3, endCol: 7 },
-  { startRow: 4, startCol: 2, endRow: 4, endCol: 5 },
-  { startRow: 5, startCol: 0, endRow: 5, endCol: 3 },
-  { startRow: 6, startCol: 0, endRow: 6, endCol: 4 },
-  { startRow: 7, startCol: 0, endRow: 7, endCol: 3 },
-  { startRow: 7, startCol: 6, endRow: 7, endCol: 7 },
-  { startRow: 8, startCol: 0, endRow: 8, endCol: 3 },
-  { startRow: 9, startCol: 0, endRow: 9, endCol: 2 },
-  { startRow: 9, startCol: 6, endRow: 9, endCol: 7 },
-  { startRow: 11, startCol: 1, endRow: 11, endCol: 4 },
-  { startRow: 12, startCol: 1, endRow: 12, endCol: 4 },
-  { startRow: 13, startCol: 6, endRow: 14, endCol: 6 },
-  { startRow: 13, startCol: 7, endRow: 14, endCol: 7 },
-  { startRow: 15, startCol: 0, endRow: 18, endCol: 0 },
-  { startRow: 15, startCol: 1, endRow: 18, endCol: 1 },
-  { startRow: 15, startCol: 3, endRow: 18, endCol: 4 },
-  { startRow: 15, startCol: 5, endRow: 18, endCol: 7 },
-  { startRow: 19, startCol: 0, endRow: 19, endCol: 1 },
-  { startRow: 19, startCol: 3, endRow: 19, endCol: 4 },
-  { startRow: 19, startCol: 5, endRow: 19, endCol: 7 },
-  { startRow: 20, startCol: 0, endRow: 20, endCol: 1 },
-  { startRow: 20, startCol: 3, endRow: 20, endCol: 4 },
-  { startRow: 20, startCol: 5, endRow: 20, endCol: 7 },
-  { startRow: 21, startCol: 0, endRow: 21, endCol: 1 },
-  { startRow: 21, startCol: 3, endRow: 21, endCol: 4 },
-  { startRow: 21, startCol: 5, endRow: 21, endCol: 7 },
-  { startRow: 22, startCol: 0, endRow: 23, endCol: 1 },
-  { startRow: 22, startCol: 2, endRow: 23, endCol: 7 },
-  { startRow: 24, startCol: 0, endRow: 24, endCol: 1 },
-  { startRow: 24, startCol: 2, endRow: 24, endCol: 7 },
-  { startRow: 27, startCol: 0, endRow: 27, endCol: 7 },
-  { startRow: 28, startCol: 0, endRow: 28, endCol: 7 },
-  { startRow: 29, startCol: 0, endRow: 29, endCol: 7 },
-  { startRow: 30, startCol: 0, endRow: 30, endCol: 7 },
-]
-
-const PURCHASE_CONTRACT_BASE_CELL_VALUES = {
-  A1: '杭州科森磁材有限公司',
-  A2: '浙江省杭州市萧山区北干街道永久路288号万象汇B座912',
-  A3: '邮编: 311202',
-  A4: '电话: 0571 8679 0529',
-  F4: 'WWW.KSMAGNETIC.COM',
-  C5: '采购合同',
-  A6: '卖方:',
-  A7: '宁波星升磁性材料有限公司',
-  F7: '合同编号',
-  G7: 'KSMC20260104001',
-  A8: '浙江省余姚市河姆渡镇万洋(河姆渡镇)众创城27幢102',
-  F8: '签订日期',
-  G8: '2026年1月4日',
-  A9: '电话：0574-87475218',
-  F9: '价格条件',
-  G9: '含13%增值税及运费',
-  F10: '结算方式',
-  G10: '月结30天',
-  A12: '序号',
-  B12: '产品描述',
-  F12: '数量(个)',
-  G12: '单价',
-  H12: '金额',
-  A13: '1',
-  B13:
-    '如图，圆环沉孔磁钢，D9.525XD3.048X3.175-82°沉孔、深度约1mm，N42(不含管制元素钐、钆、镝、铽、镥、钪、钇)，镀镍铜镍，內圆公差+0.1/-0，厚度公差+0/-0.1，其余公差+/-0.1, 轴向充磁供货，沉孔面为N极。产品外观好，避免缺边掉角。',
-  F13: '100',
-  G13: '¥1.000',
-  H13: '¥100.00',
-  G14: '总计',
-  H14: '¥100.00',
-  A16: '唛头  格式',
-  B16: '内箱(小白盒)',
-  C16: 'SIZE: D9.525XD3.048X3.175',
-  D16: '纸箱(外箱)',
-  F16: '由我司提供',
-  C17: 'GRADE: N42',
-  C18: 'COATING: NICUNI',
-  C19: "Q'TY:",
-  A20: '要求交货日期',
-  C20: '2026/03/05',
-  D20: '卖方确认交货日期',
-  A21: '内包装',
-  C21: '八孔泡沫箱+真空包装',
-  D21: '外包装',
-  F21: '纸箱+防潮袋',
-  A22: '是否屏蔽',
-  C22: '否',
-  D22: '交货地点',
-  F22: '直接进仓',
-  A23: '随货单据',
-  C23:
-    '1.( √ )送货单 2.(  )检测报告(尺寸,磁通,退磁曲线) 3.( )毛坯测试样柱D10X10  4.( )盐雾试验报告 5.( )镀层厚度报告  6.( )材质成分报告',
-  A25: '其他要求',
-  A27: '其他条款:',
-  A28: '1. 双方本着平等, 自愿, 公平, 互惠互利和诚实守信的原则, 就零部件采购有关事宜协商一致订立本合同,以便共同遵守。',
-  A29:
-    '2. 包装要求: 防潮防碎,唛头清晰,适合长途运输,保证产品在运输过程中不受损。由于包装不当导致运输过程中货物的损坏，相应损失由乙方承担。',
-  A30:
-    '3.如乙方未能按照合同双方确定的期限交货，每延迟交付一日，应向甲方支付合同金额的1%作为违约金，若超过15天，甲方有权取消本合同，乙方需承担不低于合同金额20%的违约金。',
-  A31:
-    '4.若乙方交货的质量不符合合同的约定,则应向甲方赔偿因质量不符给甲方带来损失,包括但不限于预期利润损失、停工损失、对第三方的违约赔偿责任等等。',
-  A32: '5. 解决合同纠纷的方式：本合同若发生纠纷，双方应及时协商解决，协商不成时，按《民法典》执行。',
-  A33: '6. 本合同自双方签字之日起生效。',
-  A35: '买方签章:',
-  F35: '卖方签章:',
-}
-
-const PURCHASE_CONTRACT_CELL_FIELD_MAP = {
-  A1: 'buyerCompany',
-  A2: 'buyerAddress',
-  A3: 'buyerZip',
-  A4: 'buyerPhone',
-  F4: 'website',
-  A7: 'sellerName',
-  A8: 'sellerAddress',
-  A9: 'sellerPhone',
-  G7: 'contractNo',
-  G8: 'signDate',
-  G9: 'priceTerm',
-  G10: 'settlement',
-  A13: 'itemNo',
-  B13: 'itemDescription',
-  F13: 'quantity',
-  G13: 'unitPrice',
-  H13: 'amount',
-  H14: 'totalAmount',
-  C20: 'requiredDeliveryDate',
-  F20: 'sellerConfirmDeliveryDate',
-  C21: 'innerPackaging',
-  F21: 'outerPackaging',
-  C22: 'shield',
-  F22: 'deliveryAddress',
-  C23: 'shippingDocs',
-  C25: 'otherRequirement',
-}
+const PURCHASE_CONTRACT_CANVAS_WIDTH = 595.32
+const PURCHASE_CONTRACT_CANVAS_HEIGHT = 841.92
 
 const PURCHASE_CONTRACT_IMAGE_LAYOUT = {
   logo: {
-    left: 434.65,
-    top: 7.85,
-    width: 157.01,
-    height: 29.5,
+    left: 395.26,
+    top: 30.42,
+    width: 117.82,
+    height: 19.62,
   },
   stamp: {
-    left: 67.46,
-    top: 784.82,
-    width: 147.2,
-    height: 180.34,
+    left: 119.95,
+    top: 542.23,
+    width: 110.45,
+    height: 115.5,
   },
   spec: {
-    left: 35,
-    top: 1024.35,
-    width: 393.32,
-    height: 213.69,
+    left: 95.4,
+    top: 694.56,
+    width: 294.87,
+    height: 116.17,
   },
 }
 
-const PURCHASE_CONTRACT_BORDER_RANGES = [
-  { startRow: 11, endRow: 13, startCol: 0, endCol: 7 },
-  { startRow: 15, endRow: 24, startCol: 0, endCol: 7 },
+const PURCHASE_CONTRACT_GRID_LINE_LAYOUT = [
+  { left: 95.66, top: 157.1, width: 0.6, height: 74.76 },
+  { left: 361.99, top: 157.1, width: 0.6, height: 74.76 },
+  { left: 69.26, top: 155.79, width: 1.32, height: 252.26 },
+  { left: 95.66, top: 249.39, width: 0.6, height: 52.82 },
+  { left: 361.99, top: 249.39, width: 0.6, height: 110.42 },
+  { left: 416.11, top: 157.1, width: 0.6, height: 92.28 },
+  { left: 470.26, top: 157.1, width: 0.6, height: 92.28 },
+  { left: 524.02, top: 157.11, width: 1.32, height: 250.94 },
+  { left: 139.34, top: 249.39, width: 0.6, height: 157.34 },
+  { left: 288.77, top: 249.39, width: 0.6, height: 110.42 },
+  { left: 70.58, top: 155.78, width: 454.75, height: 1.32 },
+  { left: 70.58, top: 179.9, width: 453.43, height: 0.6 },
+  { left: 70.58, top: 231.26, width: 453.43, height: 0.6 },
+  { left: 70.58, top: 248.78, width: 453.43, height: 0.6 },
+  { left: 70.58, top: 301.61, width: 453.43, height: 0.6 },
+  { left: 70.58, top: 318.29, width: 453.43, height: 0.6 },
+  { left: 70.58, top: 335.45, width: 453.43, height: 0.6 },
+  { left: 70.58, top: 359.21, width: 453.43, height: 0.6 },
+  { left: 70.58, top: 384.41, width: 453.43, height: 0.6 },
+  { left: 70.58, top: 406.73, width: 454.75, height: 1.32 },
 ]
 
-const PURCHASE_CONTRACT_CENTER_CELL_SET = new Set([
-  'C5',
-  'A12',
-  'B12',
-  'F12',
-  'G12',
-  'H12',
-  'A13',
-  'F13',
-  'G13',
-  'H13',
-  'G14',
-  'H14',
-  'A16',
-  'B16',
-  'D16',
-  'F16',
-  'A20',
-  'D20',
-  'A21',
-  'D21',
-  'A22',
-  'D22',
-  'A23',
-  'A25',
-])
+const PURCHASE_CONTRACT_STATIC_TEXT_LAYOUT = [
+  { text: '采购合同', left: 0, top: 75.2, width: PURCHASE_CONTRACT_CANVAS_WIDTH, className: 'purchase-title purchase-center' },
+  { text: '卖方:', left: 71.54, top: 94.86, width: 25, className: 'purchase-no-wrap' },
+  { text: '合同编号', left: 363.91, top: 107.46, width: 36, className: 'purchase-no-wrap' },
+  { text: '签订日期', left: 363.91, top: 119.34, width: 36, className: 'purchase-no-wrap' },
+  { text: '价格条件', left: 363.91, top: 129.9, width: 36, className: 'purchase-no-wrap' },
+  { text: '结算方式', left: 363.91, top: 140.46, width: 36, className: 'purchase-no-wrap' },
+  { text: '序号', left: 74.9, top: 164.94, width: 16, className: 'purchase-no-wrap' },
+  { text: '产品描述', left: 213.05, top: 164.46, width: 35, className: 'purchase-no-wrap' },
+  { text: '数量(个)', left: 374.71, top: 164.7, width: 27, className: 'purchase-no-wrap' },
+  { text: '单价', left: 435.43, top: 164.94, width: 20, className: 'purchase-no-wrap' },
+  { text: '金额', left: 489.58, top: 164.94, width: 20, className: 'purchase-no-wrap' },
+  { text: '总计', left: 435.43, top: 236.46, width: 20, className: 'purchase-no-wrap' },
+  { text: '唛头\n格式', left: 71.54, top: 266.49, width: 24, className: 'purchase-center purchase-multiline' },
+  { text: '内箱(小白盒)', left: 97.58, top: 266.25, width: 44, className: 'purchase-no-wrap' },
+  { text: 'SIZE: D9.525XD3.048X3.175', left: 141.26, top: 251.33, width: 145, className: 'purchase-arial purchase-no-wrap' },
+  { text: 'GRADE: N42', left: 141.26, top: 264.56, width: 80, className: 'purchase-arial purchase-no-wrap' },
+  { text: 'COATING: NICUNI', left: 141.26, top: 277.76, width: 100, className: 'purchase-arial purchase-no-wrap' },
+  { text: "Q'TY:", left: 141.26, top: 290.96, width: 40, className: 'purchase-arial purchase-no-wrap' },
+  { text: '纸箱(外箱)', left: 290.69, top: 271.41, width: 37, className: 'purchase-no-wrap' },
+  { text: '由我司提供', left: 363.79, top: 271.65, width: 40, className: 'purchase-no-wrap' },
+  { text: '要求交货日期', left: 71.54, top: 306.45, width: 48, className: 'purchase-no-wrap' },
+  { text: '卖方确认交货日期', left: 290.69, top: 306.45, width: 65, className: 'purchase-no-wrap' },
+  { text: '内包装', left: 71.54, top: 323.37, width: 24, className: 'purchase-no-wrap' },
+  { text: '外包装', left: 290.69, top: 323.37, width: 24, className: 'purchase-no-wrap' },
+  { text: '是否屏蔽', left: 71.54, top: 343.77, width: 32, className: 'purchase-no-wrap' },
+  { text: '交货地点', left: 290.69, top: 343.77, width: 32, className: 'purchase-no-wrap' },
+  { text: '随货单据', left: 71.54, top: 368.25, width: 32, className: 'purchase-no-wrap' },
+  { text: '其他要求', left: 71.54, top: 392.25, width: 32, className: 'purchase-no-wrap' },
+  { text: '其他条款:', left: 71.54, top: 411.93, width: 34, className: 'purchase-no-wrap' },
+  {
+    text: '1. 双方本着平等, 自愿, 公平, 互惠互利和诚实守信的原则, 就零部件采购有关事宜协商一致订立本合同,以便共同遵守。',
+    left: 71.54,
+    top: 422.96,
+    width: 450.03,
+    className: 'purchase-multiline',
+  },
+  {
+    text: '2. 包装要求: 防潮防碎,唛头清晰,适合长途运输,保证产品在运输过程中不受损。由于包装不当导致运输过程中货物的损坏，相应损失由乙方承担。',
+    left: 71.54,
+    top: 436.42,
+    width: 450.03,
+    className: 'purchase-multiline',
+  },
+  {
+    text: '3.如乙方未能按照合同双方确定的期限交货，每延迟交付一日，应向甲方支付合同金额的1%作为违约金，若超过15天，甲方有权取消本合同，乙方需承担不低于合同金额20%的违约金。',
+    left: 71.54,
+    top: 467.5,
+    width: 450.03,
+    className: 'purchase-multiline',
+  },
+  {
+    text: '4.若乙方交货的质量不符合合同的约定,则应向甲方赔偿因质量不符给甲方带来损失,包括但不限于预期利润损失、停工损失、对第三方的违约赔偿责任等等。',
+    left: 71.54,
+    top: 489.22,
+    width: 450.03,
+    className: 'purchase-multiline',
+  },
+  {
+    text: '5. 解决合同纠纷的方式：本合同若发生纠纷，双方应及时协商解决，协商不成时，按《民法典》执行。',
+    left: 71.54,
+    top: 511.54,
+    width: 450.03,
+    className: 'purchase-multiline',
+  },
+  { text: '6. 本合同自双方签字之日起生效。', left: 71.54, top: 521.5, width: 260, className: 'purchase-no-wrap' },
+  { text: '买方签章:', left: 71.54, top: 596.99, width: 40, className: 'purchase-no-wrap' },
+  { text: '卖方签章:', left: 363.91, top: 596.99, width: 40, className: 'purchase-no-wrap' },
+  { text: '.375 in', left: 76.97, top: 741.56, width: 28, className: 'purchase-calibri purchase-no-wrap' },
+  {
+    text: '第 1 页，共 2 页',
+    left: 261.05,
+    top: 808.51,
+    width: 72.32,
+    className: 'purchase-center purchase-no-wrap',
+  },
+]
 
-const PURCHASE_CONTRACT_RIGHT_CELL_SET = new Set(['F4'])
+const PURCHASE_CONTRACT_EDITABLE_TEXT_LAYOUT = [
+  {
+    fieldKey: 'buyerCompany',
+    left: 72.02,
+    top: 28.92,
+    width: 240,
+    className: 'purchase-company purchase-no-wrap',
+  },
+  {
+    fieldKey: 'buyerAddress',
+    left: 71.3,
+    top: 44.01,
+    width: 260,
+    className: 'purchase-small purchase-multiline',
+    multiline: true,
+  },
+  {
+    fieldKey: 'buyerZip',
+    left: 71.3,
+    top: 52.65,
+    width: 120,
+    className: 'purchase-small purchase-no-wrap',
+  },
+  {
+    fieldKey: 'buyerPhone',
+    left: 71.3,
+    top: 61.29,
+    width: 150,
+    className: 'purchase-small purchase-no-wrap',
+  },
+  {
+    fieldKey: 'website',
+    left: 389.35,
+    top: 60.63,
+    width: 134,
+    className: 'purchase-small purchase-arial purchase-no-wrap',
+  },
+  {
+    fieldKey: 'sellerName',
+    left: 71.9,
+    top: 105.14,
+    width: 250,
+    className: 'purchase-seller-name purchase-no-wrap',
+  },
+  {
+    fieldKey: 'sellerAddress',
+    left: 71.54,
+    top: 118.62,
+    width: 286,
+    className: 'purchase-multiline',
+    multiline: true,
+  },
+  {
+    fieldKey: 'sellerPhone',
+    left: 71.54,
+    top: 129.18,
+    width: 180,
+    className: 'purchase-no-wrap',
+  },
+  {
+    fieldKey: 'contractNo',
+    left: 418.03,
+    top: 106.49,
+    width: 105,
+    className: 'purchase-no-wrap',
+  },
+  {
+    fieldKey: 'signDate',
+    left: 418.03,
+    top: 117.89,
+    width: 105,
+    className: 'purchase-no-wrap',
+  },
+  {
+    fieldKey: 'priceTerm',
+    left: 418.03,
+    top: 129.66,
+    width: 105,
+    className: 'purchase-no-wrap',
+  },
+  {
+    fieldKey: 'settlement',
+    left: 418.03,
+    top: 139.74,
+    width: 105,
+    className: 'purchase-no-wrap',
+  },
+  {
+    fieldKey: 'itemNo',
+    left: 72.02,
+    top: 201.53,
+    width: 22,
+    className: 'purchase-center purchase-no-wrap purchase-arial',
+  },
+  {
+    fieldKey: 'itemDescription',
+    left: 140.42,
+    top: 185.22,
+    width: 219,
+    className: 'purchase-multiline',
+    multiline: true,
+  },
+  {
+    fieldKey: 'quantity',
+    left: 374.71,
+    top: 201.53,
+    width: 27,
+    className: 'purchase-center purchase-no-wrap purchase-arial',
+  },
+  {
+    fieldKey: 'unitPrice',
+    left: 425.95,
+    top: 201.53,
+    width: 34,
+    className: 'purchase-center purchase-no-wrap purchase-arial',
+  },
+  {
+    fieldKey: 'amount',
+    left: 478.5,
+    top: 201.53,
+    width: 40,
+    className: 'purchase-center purchase-no-wrap purchase-arial',
+  },
+  {
+    fieldKey: 'totalAmount',
+    left: 478.5,
+    top: 235.61,
+    width: 40,
+    className: 'purchase-center purchase-no-wrap purchase-arial purchase-bold',
+  },
+  {
+    fieldKey: 'requiredDeliveryDate',
+    left: 141.26,
+    top: 305.96,
+    width: 80,
+    className: 'purchase-arial purchase-no-wrap',
+  },
+  {
+    fieldKey: 'sellerConfirmDeliveryDate',
+    left: 363.79,
+    top: 305.96,
+    width: 150,
+    className: 'purchase-arial purchase-no-wrap',
+  },
+  {
+    fieldKey: 'innerPackaging',
+    left: 141.14,
+    top: 323.85,
+    width: 145,
+    className: 'purchase-no-wrap',
+  },
+  {
+    fieldKey: 'outerPackaging',
+    left: 363.91,
+    top: 323.01,
+    width: 145,
+    className: 'purchase-no-wrap',
+  },
+  {
+    fieldKey: 'shield',
+    left: 141.14,
+    top: 344.25,
+    width: 80,
+    className: 'purchase-no-wrap',
+  },
+  {
+    fieldKey: 'deliveryAddress',
+    left: 363.79,
+    top: 343.77,
+    width: 145,
+    className: 'purchase-no-wrap',
+  },
+  {
+    fieldKey: 'shippingDocs',
+    left: 141.26,
+    top: 362.48,
+    width: 382,
+    className: 'purchase-multiline',
+    multiline: true,
+  },
+  {
+    fieldKey: 'otherRequirement',
+    left: 141.26,
+    top: 392.25,
+    width: 382,
+    className: 'purchase-no-wrap',
+  },
+]
 
-const PURCHASE_CONTRACT_TOP_CELL_SET = new Set([
-  'A2',
-  'A8',
-  'B13',
-  'C23',
-  'A28',
-  'A29',
-  'A30',
-  'A31',
-  'A32',
-  'A33',
-])
+const buildPurchaseInlineStyle = ({ left, top, width, height }) => {
+  const styleParts = [`left:${left}px`, `top:${top}px`]
+  if (width != null) {
+    styleParts.push(`width:${width}px`)
+  }
+  if (height != null) {
+    styleParts.push(`height:${height}px`)
+  }
+  return styleParts.join(';')
+}
 
-const PURCHASE_CONTRACT_WRAP_CELL_SET = new Set([
-  'A2',
-  'A8',
-  'B13',
-  'C23',
-  'A28',
-  'A29',
-  'A30',
-  'A31',
-  'A32',
-  'A33',
-])
-
-const PURCHASE_CONTRACT_SMALL_CELL_SET = new Set(['A2', 'A3', 'A4', 'F4', 'A8', 'A9', 'A28', 'A29', 'A30', 'A31', 'A32', 'A33'])
-
-const PURCHASE_CONTRACT_BOLD_CELL_SET = new Set(['A1', 'A7', 'C5', 'G14', 'H14'])
-
-const PURCHASE_CONTRACT_COMPANY_CELL_SET = new Set(['A1'])
-const PURCHASE_CONTRACT_TITLE_CELL_SET = new Set(['C5'])
-const PURCHASE_CONTRACT_SELLER_NAME_CELL_SET = new Set(['A7'])
-const PURCHASE_CONTRACT_TERM_HEADER_CELL_SET = new Set(['A27'])
+const formatPurchaseNodeText = (text = '') => escapeHTML(String(text || '')).replaceAll('\n', '<br />')
 
 const getChinaDateParts = (dateValue) => {
   if (!(dateValue instanceof Date) || Number.isNaN(dateValue.getTime())) {
@@ -1484,128 +1523,37 @@ const buildPurchaseContractFields = (record = {}) => {
   return values
 }
 
-const buildPurchaseContractCellValues = (record = {}) => {
-  const values = { ...PURCHASE_CONTRACT_BASE_CELL_VALUES }
-  const fields = buildPurchaseContractFields(record)
-  Object.entries(PURCHASE_CONTRACT_CELL_FIELD_MAP).forEach(([cellKey, fieldKey]) => {
-    const value = String(fields[fieldKey] || '').trim()
-    if (value !== '') {
-      values[cellKey] = value
-    }
-  })
-  return values
+const buildPurchaseStaticNodeHTML = (node) => {
+  const className = ['purchase-text', node.className].filter(Boolean).join(' ')
+  return `<div class="${className}" style="${buildPurchaseInlineStyle(node)}">${formatPurchaseNodeText(node.text)}</div>`
 }
 
-const isPurchaseBorderCell = (rowIndex, colIndex) =>
-  PURCHASE_CONTRACT_BORDER_RANGES.some(
-    (range) =>
-      rowIndex >= range.startRow &&
-      rowIndex <= range.endRow &&
-      colIndex >= range.startCol &&
-      colIndex <= range.endCol
-  )
-
-const buildPurchaseContractCellClassName = (cellRef, rowIndex, colIndex) => {
-  const classes = ['purchase-grid-cell']
-  if (isPurchaseBorderCell(rowIndex, colIndex)) {
-    classes.push('purchase-cell-bordered')
-  }
-  if (PURCHASE_CONTRACT_CENTER_CELL_SET.has(cellRef)) {
-    classes.push('purchase-cell-center')
-  }
-  if (PURCHASE_CONTRACT_RIGHT_CELL_SET.has(cellRef)) {
-    classes.push('purchase-cell-right')
-  }
-  if (PURCHASE_CONTRACT_TOP_CELL_SET.has(cellRef)) {
-    classes.push('purchase-cell-top')
-  }
-  if (PURCHASE_CONTRACT_WRAP_CELL_SET.has(cellRef)) {
-    classes.push('purchase-cell-wrap')
-  }
-  if (PURCHASE_CONTRACT_SMALL_CELL_SET.has(cellRef)) {
-    classes.push('purchase-cell-small')
-  }
-  if (PURCHASE_CONTRACT_BOLD_CELL_SET.has(cellRef)) {
-    classes.push('purchase-cell-bold')
-  }
-  if (PURCHASE_CONTRACT_COMPANY_CELL_SET.has(cellRef)) {
-    classes.push('purchase-cell-company')
-  }
-  if (PURCHASE_CONTRACT_TITLE_CELL_SET.has(cellRef)) {
-    classes.push('purchase-cell-title')
-  }
-  if (PURCHASE_CONTRACT_SELLER_NAME_CELL_SET.has(cellRef)) {
-    classes.push('purchase-cell-seller-name')
-  }
-  if (PURCHASE_CONTRACT_TERM_HEADER_CELL_SET.has(cellRef)) {
-    classes.push('purchase-cell-term-header')
-  }
-  return classes.join(' ')
+const buildPurchaseEditableNodeHTML = (fields, node) => {
+  const value = String(fields[node.fieldKey] || '')
+  const className = ['purchase-text', 'purchase-editable', node.className].filter(Boolean).join(' ')
+  const multilineAttr = node.multiline ? ' data-multiline="true"' : ''
+  return `<div class="${className}" style="${buildPurchaseInlineStyle(node)}" data-billing-field="${escapeHTML(node.fieldKey)}" data-default="${escapeHTML(value)}" contenteditable="true" spellcheck="false"${multilineAttr}>${formatPurchaseNodeText(value)}</div>`
 }
 
-const buildPurchaseContractGridHTML = (cellValues = {}) => {
-  const mergeMap = new Map()
-  const coveredCells = new Set()
-
-  PURCHASE_CONTRACT_MERGES.forEach((merge) => {
-    mergeMap.set(`${merge.startRow}:${merge.startCol}`, merge)
-    for (let row = merge.startRow; row <= merge.endRow; row += 1) {
-      for (let col = merge.startCol; col <= merge.endCol; col += 1) {
-        if (row === merge.startRow && col === merge.startCol) {
-          continue
-        }
-        coveredCells.add(`${row}:${col}`)
-      }
-    }
-  })
-
-  return PURCHASE_CONTRACT_ROW_HEIGHTS.map((rowHeight, rowIndex) => {
-    const rowCells = []
-    for (let colIndex = 0; colIndex < PURCHASE_CONTRACT_COLUMN_WIDTHS.length; colIndex += 1) {
-      const positionKey = `${rowIndex}:${colIndex}`
-      if (coveredCells.has(positionKey)) {
-        continue
-      }
-      const cellRef = XLSX.utils.encode_cell({ r: rowIndex, c: colIndex })
-      const cellValue = String(cellValues[cellRef] || '')
-      const merge = mergeMap.get(positionKey)
-      const rowSpan = merge ? merge.endRow - merge.startRow + 1 : 1
-      const colSpan = merge ? merge.endCol - merge.startCol + 1 : 1
-      const className = buildPurchaseContractCellClassName(cellRef, rowIndex, colIndex)
-      const fieldKey = PURCHASE_CONTRACT_CELL_FIELD_MAP[cellRef]
-
-      const attrs = [`class="${className}"`, `data-purchase-cell="${cellRef}"`]
-      if (rowSpan > 1) {
-        attrs.push(`rowspan="${rowSpan}"`)
-      }
-      if (colSpan > 1) {
-        attrs.push(`colspan="${colSpan}"`)
-      }
-      if (colIndex <= 7 || cellValue) {
-        attrs.push('contenteditable="true"', 'spellcheck="false"')
-      }
-      if (fieldKey) {
-        attrs.push(`data-billing-field="${escapeHTML(fieldKey)}"`, `data-default="${escapeHTML(cellValue)}"`)
-      }
-      rowCells.push(`<td ${attrs.join(' ')}>${escapeHTML(cellValue)}</td>`)
-    }
-    return `<tr style="height:${rowHeight}px">${rowCells.join('')}</tr>`
-  }).join('')
-}
+const buildPurchaseGridLineHTML = (line, index) =>
+  `<div class="purchase-grid-line" data-grid-line="${index}" style="${buildPurchaseInlineStyle(line)}"></div>`
 
 const buildPurchaseContractTemplateHTML = (record = {}) => {
-  const cellValues = buildPurchaseContractCellValues(record)
-  const gridRowsHTML = buildPurchaseContractGridHTML(cellValues)
-  const colgroupHTML = PURCHASE_CONTRACT_COLUMN_WIDTHS.map((width) => `<col style="width:${width}px" />`).join('')
+  const fields = buildPurchaseContractFields(record)
+  const staticNodesHTML = PURCHASE_CONTRACT_STATIC_TEXT_LAYOUT.map(buildPurchaseStaticNodeHTML).join('')
+  const editableNodesHTML = PURCHASE_CONTRACT_EDITABLE_TEXT_LAYOUT.map((node) =>
+    buildPurchaseEditableNodeHTML(fields, node)
+  ).join('')
+  const gridLinesHTML = PURCHASE_CONTRACT_GRID_LINE_LAYOUT.map(buildPurchaseGridLineHTML).join('')
 
   return `
     <section class="purchase-contract-template">
       <article class="purchase-contract-paper">
         <div class="purchase-contract-canvas" role="img" aria-label="采购合同模板">
-          <table class="purchase-contract-grid">
-            <colgroup>${colgroupHTML}</colgroup>
-            <tbody>${gridRowsHTML}</tbody>
-          </table>
+          <div class="purchase-contract-grid">${gridLinesHTML}</div>
+          <div class="purchase-red-mark" style="left:111.64px;top:736.86px;width:28px;"></div>
+          ${staticNodesHTML}
+          ${editableNodesHTML}
           <img class="purchase-contract-logo" src="/templates/purchase-contract-logo.png" alt="KS MAGNETICS" draggable="false" />
           <img class="purchase-contract-stamp" src="/templates/purchase-contract-stamp.png" alt="合同专用章" draggable="false" />
           <img class="purchase-contract-spec" src="/templates/purchase-contract-spec.png" alt="产品尺寸示意图" draggable="false" />
@@ -2588,8 +2536,9 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
         background: #d9d9d9;
       }
       .template-wrap .purchase-contract-paper {
-        width: 796px;
-        height: 1248px;
+        width: ${PURCHASE_CONTRACT_CANVAS_WIDTH}px;
+        height: ${PURCHASE_CONTRACT_CANVAS_HEIGHT}px;
+        position: relative;
         background: #fff;
         border: 1px solid #bfbfbf;
         box-shadow: 0 2px 14px rgba(0, 0, 0, 0.2);
@@ -2601,55 +2550,74 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
         overflow: hidden;
       }
       .template-wrap .purchase-contract-grid {
-        width: 796px;
-        border-collapse: collapse;
-        table-layout: fixed;
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
       }
-      .template-wrap .purchase-grid-cell {
-        border: 1px solid transparent;
-        padding: 2px 4px;
-        vertical-align: middle;
+      .template-wrap .purchase-grid-line {
+        position: absolute;
+        background: #111;
+      }
+      .template-wrap .purchase-red-mark {
+        position: absolute;
+        border-top: 0.99px solid #ff0000;
+        transform-origin: left top;
+        transform: rotate(41.86deg);
+        pointer-events: none;
+      }
+      .template-wrap .purchase-text {
+        position: absolute;
         color: #000;
         font-family: "SimSun", "Songti SC", "Noto Serif CJK SC", serif;
-        font-size: 13px;
+        font-size: 7.92px;
         line-height: 1.25;
         white-space: nowrap;
       }
-      .template-wrap .purchase-cell-bordered {
-        border-color: #111;
+      .template-wrap .purchase-editable {
+        outline: 1px dashed transparent;
+        border-radius: 2px;
       }
-      .template-wrap .purchase-cell-center {
+      .template-wrap .purchase-editable:focus {
+        outline-color: #1f7a3f;
+        background: rgba(31, 122, 63, 0.08);
+      }
+      .template-wrap .purchase-center {
         text-align: center;
       }
-      .template-wrap .purchase-cell-right {
+      .template-wrap .purchase-right {
         text-align: right;
       }
-      .template-wrap .purchase-cell-top {
-        vertical-align: top;
+      .template-wrap .purchase-bold {
+        font-weight: 700;
       }
-      .template-wrap .purchase-cell-wrap {
+      .template-wrap .purchase-multiline {
         white-space: pre-wrap;
         word-break: break-word;
       }
-      .template-wrap .purchase-cell-small {
-        font-size: 12px;
+      .template-wrap .purchase-no-wrap {
+        white-space: nowrap;
       }
-      .template-wrap .purchase-cell-bold {
+      .template-wrap .purchase-arial {
+        font-family: Arial, Helvetica, sans-serif;
+      }
+      .template-wrap .purchase-calibri {
+        font-family: Calibri, Arial, Helvetica, sans-serif;
+      }
+      .template-wrap .purchase-small {
+        font-size: 6.6px;
+      }
+      .template-wrap .purchase-company {
+        font-size: 11.88px;
         font-weight: 700;
       }
-      .template-wrap .purchase-cell-company {
-        font-size: 21px;
-      }
-      .template-wrap .purchase-cell-title {
-        font-size: 34px;
-        letter-spacing: 1px;
-      }
-      .template-wrap .purchase-cell-seller-name {
-        font-size: 18px;
-      }
-      .template-wrap .purchase-cell-term-header {
-        font-size: 20px;
+      .template-wrap .purchase-seller-name {
+        font-size: 11.88px;
         font-weight: 700;
+      }
+      .template-wrap .purchase-title {
+        font-size: 13.2px;
+        font-weight: 700;
+        line-height: 1;
       }
       .template-wrap .purchase-contract-logo,
       .template-wrap .purchase-contract-stamp,
@@ -2736,8 +2704,7 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
           border: 0 !important;
         }
         .template-wrap .purchase-contract-canvas {
-          transform-origin: left top;
-          transform: scale(0.899);
+          transform: none !important;
         }
         .template-wrap .proforma-header-company { font-size: 8.4pt !important; }
         .template-wrap .proforma-header-address { font-size: 6.5pt !important; }
