@@ -103,7 +103,7 @@ body {
 
 .erp-login-card {
   width: 100%;
-  max-width: 560px;
+  max-width: 620px;
   position: relative;
   border: 1px solid #dbe7ef;
   border-radius: 16px;
@@ -111,9 +111,11 @@ body {
 }
 
 .erp-login-logo {
-  width: 100%;
+  width: 538px;
+  max-width: 100%;
   height: auto;
   display: block;
+  margin: 0 auto;
   object-fit: contain;
 }
 

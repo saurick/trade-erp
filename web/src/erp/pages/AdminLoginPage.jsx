@@ -3,7 +3,6 @@ import { Alert, Button, Card, Form, Input, Space, Typography } from 'antd'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { JsonRpc } from '@/common/utils/jsonRpc'
 import { AUTH_SCOPE, persistAuth } from '@/common/auth/auth'
-import ksLogo from '@/assets/logos/ks-magnetics.svg'
 
 const { Title } = Typography
 
@@ -43,7 +42,7 @@ const AdminLoginPage = () => {
       <div className="erp-login-page__bg" />
       <Card bordered={false} className="erp-login-card">
         <Space direction="vertical" size={16} style={{ width: '100%' }}>
-          <img src={ksLogo} alt="KS Magnetics" className="erp-login-logo" />
+          <img src="/templates/billing-info-logo.png" alt="KS Magnetics" className="erp-login-logo" />
           <div>
             <Title level={3} style={{ marginBottom: 6 }}>
               外销 ERP 管理后台
