@@ -150,6 +150,14 @@ const formatUSDMoney = (raw, fractionDigits = 2) => {
   return `US$${numeric.toFixed(fractionDigits)}`
 }
 
+const formatDollarMoney = (raw, fractionDigits = 4) => {
+  const numeric = parseNumericValue(raw)
+  if (Number.isNaN(numeric)) {
+    return ''
+  }
+  return `$${numeric.toFixed(fractionDigits)}`
+}
+
 const SMALL_NUMBER_WORDS = [
   'ZERO',
   'ONE',
@@ -475,7 +483,7 @@ const PROFORMA_INVOICE_FIELD_SCHEMA = [
     aliases: ['item1_desc', 'line1_desc'],
   },
   { key: 'item1Qty', label: '条目1-数量', defaultValue: '1', aliases: ['item1_qty', 'line1_qty'] },
-  { key: 'item1NetPrice', label: '条目1-单价', defaultValue: 'US$1.0000', aliases: ['item1_net_price', 'line1_net_price'] },
+  { key: 'item1NetPrice', label: '条目1-单价', defaultValue: '$1.0000', aliases: ['item1_net_price', 'line1_net_price'] },
   { key: 'item1NetValue', label: '条目1-金额', defaultValue: 'US$1.00', aliases: ['item1_net_value', 'line1_net_value'] },
   { key: 'item2No', label: '条目2-序号', defaultValue: '2', aliases: ['item2_no', 'line2_no'] },
   { key: 'item2Ref', label: '条目2-Ref', defaultValue: 'I1002I', aliases: ['item2_ref', 'line2_ref'] },
@@ -486,7 +494,7 @@ const PROFORMA_INVOICE_FIELD_SCHEMA = [
     aliases: ['item2_desc', 'line2_desc'],
   },
   { key: 'item2Qty', label: '条目2-数量', defaultValue: '1', aliases: ['item2_qty', 'line2_qty'] },
-  { key: 'item2NetPrice', label: '条目2-单价', defaultValue: 'US$1.0000', aliases: ['item2_net_price', 'line2_net_price'] },
+  { key: 'item2NetPrice', label: '条目2-单价', defaultValue: '$1.0000', aliases: ['item2_net_price', 'line2_net_price'] },
   { key: 'item2NetValue', label: '条目2-金额', defaultValue: 'US$1.00', aliases: ['item2_net_value', 'line2_net_value'] },
   {
     key: 'totalNetValue',
@@ -758,10 +766,20 @@ const buildProformaInvoiceFields = (record = {}) => {
       values[`item${index}Qty`] = String(row.quantity)
     }
     if (!hasExplicit[`item${index}NetPrice`]) {
-      values[`item${index}NetPrice`] = formatUSDMoney(row.netPrice, 4)
+      values[`item${index}NetPrice`] = formatDollarMoney(row.netPrice, 4)
+    } else {
+      const normalizedNetPrice = parseNumericValue(values[`item${index}NetPrice`])
+      if (!Number.isNaN(normalizedNetPrice)) {
+        values[`item${index}NetPrice`] = formatDollarMoney(normalizedNetPrice, 4)
+      }
     }
     if (!hasExplicit[`item${index}NetValue`]) {
       values[`item${index}NetValue`] = formatUSDMoney(row.netValue, 2)
+    } else {
+      const normalizedNetValue = parseNumericValue(values[`item${index}NetValue`])
+      if (!Number.isNaN(normalizedNetValue)) {
+        values[`item${index}NetValue`] = formatUSDMoney(normalizedNetValue, 2)
+      }
     }
   }
 
@@ -1894,11 +1912,10 @@ const buildProformaInvoiceTemplateHTML = (record = {}) => {
               </tr>
               <tr class="proforma-total-title-row">
                 <td colspan="5"><strong>Total Net Value:</strong></td>
-                <td>${buildEditableNode('totalNetValue', 'proforma-cell-right proforma-cell-strong')}</td>
+                <td class="proforma-total-value-cell" rowspan="2">${buildEditableNode('totalNetValue', 'proforma-cell-right proforma-cell-strong')}</td>
               </tr>
               <tr class="proforma-total-words-row">
                 <td colspan="5">${buildEditableNode('amountInWords', 'proforma-amount-words')}</td>
-                <td>${buildEditableNode('totalNetValue', 'proforma-cell-right proforma-cell-strong')}</td>
               </tr>
             </tbody>
           </table>
@@ -2321,7 +2338,7 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
         color: #111;
       }
       .template-wrap .proforma-sheet {
-        border: 1px solid #000;
+        border: 0;
         min-height: 100%;
       }
       .template-wrap .proforma-editable {
@@ -2385,7 +2402,7 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
         width: 100%;
       }
       .template-wrap .proforma-divider {
-        border-top: 1px solid #000;
+        border-top: 2px solid #000;
       }
       .template-wrap .proforma-title-wrap {
         padding: 8px 0 0;
@@ -2471,6 +2488,9 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
         min-height: 26px;
         font-size: 8.8px;
         font-weight: 700;
+      }
+      .template-wrap .proforma-total-value-cell {
+        vertical-align: middle !important;
       }
       .template-wrap .proforma-amount-words {
         white-space: normal;
