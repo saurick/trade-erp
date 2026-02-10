@@ -2113,6 +2113,9 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
         overflow: auto;
         max-height: calc(100vh - 100px);
       }
+      .template-wrap.template-wrap-proforma-fit {
+        overflow: hidden;
+      }
       .template-wrap td[contenteditable="true"],
       .template-wrap th[contenteditable="true"] {
         outline: 1px dashed transparent;
@@ -2282,6 +2285,12 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
         padding: 24px 0;
         background: #d9d9d9;
       }
+      .template-wrap.template-wrap-proforma-fit .proforma-template {
+        position: relative;
+        align-items: flex-start;
+        min-height: 0;
+        padding: 0;
+      }
       .template-wrap .proforma-paper {
         width: ${PROFORMA_CANVAS_WIDTH}px;
         min-height: ${PROFORMA_CANVAS_HEIGHT}px;
@@ -2289,6 +2298,12 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
         box-shadow: 0 2px 14px rgba(0, 0, 0, 0.2);
         font-family: Arial, Helvetica, sans-serif;
         color: #111;
+      }
+      .template-wrap.template-wrap-proforma-fit .proforma-paper {
+        position: absolute;
+        left: 50%;
+        top: 0;
+        transform-origin: top center;
       }
       .template-wrap .proforma-sheet {
         border: 2px solid #111;
@@ -2726,6 +2741,10 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
           min-height: 297mm !important;
           box-shadow: none !important;
           padding: 0 !important;
+          position: static !important;
+          left: auto !important;
+          top: auto !important;
+          transform: none !important;
         }
         .template-wrap .proforma-items-table thead tr,
         .template-wrap .proforma-item-row,
@@ -2802,12 +2821,18 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
         var printBtn = document.getElementById('print-btn');
         var toggleGridBtn = document.getElementById('toggle-grid-btn');
         var panel = document.querySelector('.record-panel');
+        var templateWrap = document.querySelector('.template-wrap');
+        var proformaTemplate = document.querySelector('.proforma-template');
+        var proformaPaper = document.querySelector('.proforma-paper');
         var panelDisplayBeforePrint = null;
 
         var isBillingTemplate = Boolean(document.querySelector('.billing-info-template'));
         var isProformaTemplate = Boolean(document.querySelector('.proforma-template'));
         var isPurchaseTemplate = Boolean(document.querySelector('.purchase-contract-template'));
         var isFieldSyncTemplate = isBillingTemplate || isProformaTemplate || isPurchaseTemplate;
+        var PROFORMA_BASE_WIDTH = ${PROFORMA_CANVAS_WIDTH};
+        var PROFORMA_BASE_HEIGHT = ${PROFORMA_CANVAS_HEIGHT};
+        var proformaAutoFitRaf = 0;
 
         var toFieldKey = function (raw) {
           return String(raw || '')
@@ -2884,6 +2909,39 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
             node.addEventListener('blur', function () {
               sanitizeEditableNode(node);
             });
+          });
+        };
+
+        var applyProformaAutoFit = function () {
+          if (!isProformaTemplate || !templateWrap || !proformaTemplate || !proformaPaper) {
+            return;
+          }
+          var wrapRect = templateWrap.getBoundingClientRect();
+          var availableWidth = Math.max(wrapRect.width - 24, 320);
+          var availableHeight = Math.max(wrapRect.height - 24, 320);
+          var scale = Math.min(availableWidth / PROFORMA_BASE_WIDTH, availableHeight / PROFORMA_BASE_HEIGHT, 1);
+          var roundedScale = Number(scale.toFixed(4));
+          var topPadding = 10;
+          var bottomPadding = 10;
+          var scaledHeight = Math.round(PROFORMA_BASE_HEIGHT * roundedScale);
+
+          templateWrap.classList.add('template-wrap-proforma-fit');
+          proformaPaper.style.transform = 'translateX(-50%) scale(' + roundedScale + ')';
+          proformaTemplate.style.paddingTop = String(topPadding) + 'px';
+          proformaTemplate.style.paddingBottom = String(bottomPadding) + 'px';
+          proformaTemplate.style.height = String(scaledHeight + topPadding + bottomPadding) + 'px';
+        };
+
+        var scheduleProformaAutoFit = function () {
+          if (!isProformaTemplate) {
+            return;
+          }
+          if (proformaAutoFitRaf) {
+            window.cancelAnimationFrame(proformaAutoFitRaf);
+          }
+          proformaAutoFitRaf = window.requestAnimationFrame(function () {
+            proformaAutoFitRaf = 0;
+            applyProformaAutoFit();
           });
         };
 
@@ -3164,9 +3222,11 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
             panel.style.display = panelDisplayBeforePrint;
             panelDisplayBeforePrint = null;
           }
+          scheduleProformaAutoFit();
         };
 
         window.addEventListener('afterprint', restorePrintLayout);
+        window.addEventListener('resize', scheduleProformaAutoFit);
 
         if (printBtn) {
           printBtn.addEventListener('click', function () {
@@ -3179,10 +3239,12 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
         if (toggleGridBtn && panel) {
           toggleGridBtn.addEventListener('click', function () {
             panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+            scheduleProformaAutoFit();
           });
         }
         bindEditableSanitizer();
         bindBillingSync();
+        scheduleProformaAutoFit();
       })();
     </script>
   </body>
