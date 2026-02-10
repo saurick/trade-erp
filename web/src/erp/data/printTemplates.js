@@ -1104,6 +1104,8 @@ const PURCHASE_CONTRACT_MERGES = [
   { startRow: 28, startCol: 0, endRow: 28, endCol: 7 },
   { startRow: 29, startCol: 0, endRow: 29, endCol: 7 },
   { startRow: 30, startCol: 0, endRow: 30, endCol: 7 },
+  { startRow: 31, startCol: 0, endRow: 31, endCol: 7 },
+  { startRow: 32, startCol: 0, endRow: 32, endCol: 7 },
 ]
 
 const PURCHASE_CONTRACT_BASE_CELL_VALUES = {
@@ -1138,7 +1140,7 @@ const PURCHASE_CONTRACT_BASE_CELL_VALUES = {
   H13: '¥100.00',
   G14: '总计',
   H14: '¥100.00',
-  A16: '唛头  格式',
+  A16: '唛头\n格式',
   B16: '内箱(小白盒)',
   C16: 'SIZE: D9.525XD3.048X3.175',
   D16: '纸箱(外箱)',
@@ -1275,6 +1277,7 @@ const PURCHASE_CONTRACT_TOP_CELL_SET = new Set([
 const PURCHASE_CONTRACT_WRAP_CELL_SET = new Set([
   'A2',
   'A8',
+  'A16',
   'B13',
   'C23',
   'A28',
@@ -1285,7 +1288,21 @@ const PURCHASE_CONTRACT_WRAP_CELL_SET = new Set([
   'A33',
 ])
 
-const PURCHASE_CONTRACT_SMALL_CELL_SET = new Set(['A2', 'A3', 'A4', 'F4', 'A8', 'A9', 'A28', 'A29', 'A30', 'A31', 'A32', 'A33'])
+const PURCHASE_CONTRACT_SMALL_CELL_SET = new Set([
+  'A2',
+  'A3',
+  'A4',
+  'F4',
+  'A8',
+  'A9',
+  'A16',
+  'A28',
+  'A29',
+  'A30',
+  'A31',
+  'A32',
+  'A33',
+])
 
 const PURCHASE_CONTRACT_BOLD_CELL_SET = new Set(['A1', 'A7', 'C5', 'G14', 'H14'])
 
@@ -2610,9 +2627,9 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
         padding: 2px 4px;
         vertical-align: middle;
         color: #000;
-        font-family: "SimSun", "Songti SC", "Noto Serif CJK SC", serif;
-        font-size: 13px;
-        line-height: 1.25;
+        font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans SC", sans-serif;
+        font-size: 12px;
+        line-height: 1.2;
         white-space: nowrap;
       }
       .template-wrap .purchase-cell-bordered {
@@ -2629,26 +2646,27 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
       }
       .template-wrap .purchase-cell-wrap {
         white-space: pre-wrap;
-        word-break: break-word;
+        word-break: normal;
       }
       .template-wrap .purchase-cell-small {
-        font-size: 12px;
+        font-size: 10px;
       }
       .template-wrap .purchase-cell-bold {
         font-weight: 700;
       }
       .template-wrap .purchase-cell-company {
-        font-size: 21px;
+        font-size: 17px;
       }
       .template-wrap .purchase-cell-title {
-        font-size: 34px;
-        letter-spacing: 1px;
+        font-size: 23px;
+        letter-spacing: 0.5px;
+        font-family: "SimHei", "Microsoft YaHei", sans-serif;
       }
       .template-wrap .purchase-cell-seller-name {
-        font-size: 18px;
+        font-size: 15px;
       }
       .template-wrap .purchase-cell-term-header {
-        font-size: 20px;
+        font-size: 17px;
         font-weight: 700;
       }
       .template-wrap .purchase-contract-logo,
