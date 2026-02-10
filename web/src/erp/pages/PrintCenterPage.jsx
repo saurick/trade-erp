@@ -34,6 +34,7 @@ const PrintCenterPage = () => {
     () => templateList.find((item) => item.key === activeKey),
     [activeKey]
   )
+  const uploadDisabled = activeKey === 'billingInfo'
 
   const handleOpenEditablePrint = async () => {
     try {
@@ -68,7 +69,7 @@ const PrintCenterPage = () => {
           打印模板中心
         </Title>
         <Paragraph type="secondary" style={{ marginBottom: 0, marginTop: 8 }}>
-          打印会加载原始模板，模板区所有单元格可编辑后再打印。已接入：外销形式发票模版、采购合同模版、杭州科森磁材开票信息模板。
+          打印会加载原始模板。Excel 模板单元格支持编辑后再打印；开票信息模板为固定版式 1:1 打印，左侧字段修改会实时同步到模板。已接入：外销形式发票模版、采购合同模版、杭州科森磁材开票信息模板。
         </Paragraph>
       </Card>
 
@@ -108,9 +109,9 @@ const PrintCenterPage = () => {
                     accept=".xls,.xlsx"
                     showUploadList={false}
                     customRequest={handleUploadTemplate}
-                    disabled={uploading}
+                    disabled={uploading || uploadDisabled}
                   >
-                    <Button icon={<UploadOutlined />} loading={uploading}>
+                    <Button icon={<UploadOutlined />} loading={uploading} disabled={uploadDisabled}>
                       上传当前模板（覆盖）
                     </Button>
                   </Upload>
@@ -118,8 +119,11 @@ const PrintCenterPage = () => {
 
                 <Paragraph style={{ marginBottom: 0 }}>
                   模板提示：采购合同默认使用 `purchase-contract-template.xls`；发票相关默认使用
-                  `export-invoice-template.xls`；开票信息默认使用 `billing-info-template.html`（来源于开票信息文件整理）。
+                  `export-invoice-template.xls`；开票信息默认使用 `billing-info-template.html`（固定版式，来源于开票信息原始文件）。
                 </Paragraph>
+                {uploadDisabled ? (
+                  <Text type="secondary">开票信息模板已锁定为 1:1 固定版式，不支持上传覆盖。</Text>
+                ) : null}
 
                 <div>
                   <Text strong>当前记录字段预览（前 10 项）：</Text>

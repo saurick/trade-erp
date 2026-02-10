@@ -168,6 +168,10 @@ const fetchBinaryWithMeta = async (url, options = {}) => {
 }
 
 const fetchTemplateHTML = async (templateKey) => {
+  if (templateKey === 'billingInfo') {
+    return { source: 'default', templateHTML: DEFAULT_BILLING_INFO_TEMPLATE_HTML }
+  }
+
   const authToken = getToken(AUTH_SCOPE.ADMIN)
   const serverHeaders = authToken ? { Authorization: `Bearer ${authToken}` } : {}
 
@@ -201,45 +205,76 @@ const fetchTemplateHTML = async (templateKey) => {
 }
 
 const DEFAULT_BILLING_INFO_TEMPLATE_HTML = `
-  <table style="border-collapse: collapse; width: 100%; max-width: 980px; margin: 16px auto; font-size: 14px;">
-    <thead>
-      <tr>
-        <th colspan="2" style="border: 1px solid #222; padding: 10px; font-size: 20px;">杭州科森磁材开票信息</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td style="border: 1px solid #222; padding: 10px; width: 28%;">单位名称</td>
-        <td style="border: 1px solid #222; padding: 10px;">杭州科森磁材有限公司</td>
-      </tr>
-      <tr>
-        <td style="border: 1px solid #222; padding: 10px;">税号</td>
-        <td style="border: 1px solid #222; padding: 10px;">91330109MA7N1W9P5Y</td>
-      </tr>
-      <tr>
-        <td style="border: 1px solid #222; padding: 10px;">地址、电话</td>
-        <td style="border: 1px solid #222; padding: 10px;">浙江省杭州市萧山区北干街道永久路288号912室 0571-86790529</td>
-      </tr>
-      <tr>
-        <td style="border: 1px solid #222; padding: 10px;">开户行及账号</td>
-        <td style="border: 1px solid #222; padding: 10px;">中国农业银行杭州金城路支行 19085201040039051</td>
-      </tr>
-      <tr>
-        <td style="border: 1px solid #222; padding: 10px;">备注</td>
-        <td style="border: 1px solid #222; padding: 10px;">所有字段均可直接编辑后打印。</td>
-      </tr>
-    </tbody>
-  </table>
+  <section class="billing-info-template">
+    <article class="billing-info-paper">
+      <svg
+        class="billing-info-svg"
+        width="595"
+        height="842"
+        viewBox="0 0 595 842"
+        xmlns="http://www.w3.org/2000/svg"
+        role="img"
+        aria-label="杭州科森磁材开票信息模板"
+      >
+        <rect x="0" y="0" width="595" height="842" fill="#fff" />
+        <image href="/templates/billing-info-logo.png" x="412.5" y="56.1" width="128.04" height="19.14" />
+        <rect x="61.38" y="99" width="481.8" height="1.32" fill="#000" />
+
+        <g fill="#000">
+          <text x="64.02" y="64.68" font-family="Arial, Helvetica, sans-serif" font-size="10.56" font-weight="700">HANGZHOU KESEN MAGNETICS CO., LTD.</text>
+          <text x="63.36" y="73.26" font-family="Arial, Helvetica, sans-serif" font-size="6.6">288 YONGJIU ROAD,HANGZHOU</text>
+          <text x="63.36" y="81.18" font-family="Arial, Helvetica, sans-serif" font-size="6.6">ZHEJIANG 311202</text>
+          <text x="63.36" y="89.1" font-family="Arial, Helvetica, sans-serif" font-size="6.6">CHINA</text>
+          <text x="63.36" y="97.68" font-family="Arial, Helvetica, sans-serif" font-size="6.6">PHONE: +86 571 8679 0529</text>
+          <text x="411.84" y="97.68" font-family="Arial, Helvetica, sans-serif" font-size="6.6">WWW.KSMAGNETIC.COM</text>
+        </g>
+
+        <g fill="#000" font-family="'SimSun', 'Songti SC', 'Noto Serif CJK SC', serif">
+          <text x="217.8" y="144.22" font-size="15.84" font-weight="700">杭州科森磁材有限公司</text>
+          <text x="265.32" y="169.3" font-size="15.84" font-weight="700">开票资料</text>
+
+          <text x="64.02" y="199.32" font-size="14.52">单位名称：</text>
+          <text x="169.62" y="199.32" font-size="14.52" data-billing-field="companyName" data-default="杭州科森磁材有限公司">杭州科森磁材有限公司</text>
+
+          <text x="64.02" y="240.24" font-size="14.52">纳税人识别号：</text>
+          <text x="169.62" y="239.58" font-size="14.52" font-family="Arial, Helvetica, sans-serif" data-billing-field="taxNo" data-default="91330109MA7N1W9P5Y">91330109MA7N1W9P5Y</text>
+
+          <text x="64.02" y="281.16" font-size="14.52">地址：</text>
+          <text x="169.62" y="281.16" font-size="14.52" data-billing-field="address" data-default="浙江省杭州市萧山区北干街道永久路288号912室">浙江省杭州市萧山区北干街道永久路288号912室</text>
+
+          <text x="64.02" y="322.08" font-size="14.52">电话：</text>
+          <text x="169.62" y="321.42" font-size="14.52" font-family="Arial, Helvetica, sans-serif" data-billing-field="phone" data-default="0571-86790529">0571-86790529</text>
+
+          <text x="64.02" y="363" font-size="14.52">开户行：</text>
+          <text x="169.62" y="363" font-size="14.52" data-billing-field="bankName" data-default="中国农业银行杭州金城路支行">中国农业银行杭州金城路支行</text>
+
+          <text x="64.02" y="403.92" font-size="14.52">账号：</text>
+          <text x="169.62" y="403.26" font-size="14.52" font-family="Arial, Helvetica, sans-serif" data-billing-field="bankAccount" data-default="19085201040039051">19085201040039051</text>
+        </g>
+
+        <image href="/templates/billing-info-stamp.png" x="386.1" y="421.74" width="131.34" height="120.12" />
+
+        <g fill="#000" font-family="'SimSun', 'Songti SC', 'Noto Serif CJK SC', serif" font-size="14.52">
+          <text x="379.5" y="557.04" data-billing-field="companyName" data-default="杭州科森磁材有限公司">杭州科森磁材有限公司</text>
+          <text x="396" y="590.7" data-billing-field="date" data-default="2022年5月8日">2022年5月8日</text>
+        </g>
+      </svg>
+    </article>
+  </section>
 `
 
-const buildRecordPanelHTML = (record) => {
+const buildRecordPanelHTML = (record, templateKey) => {
   const fields = flattenRecord(record)
+  const panelTip =
+    templateKey === 'billingInfo'
+      ? '提示：左侧字段可直接编辑，右侧开票模板会实时同步，打印时仅输出右侧模板。'
+      : '提示：模板区每个单元格都可直接编辑，字段区用于复制参考值。'
   const rows = Object.entries(fields)
     .map(
       ([key, value]) => `
         <tr>
           <td class="field-key">${escapeHTML(key)}</td>
-          <td class="field-value" contenteditable="true">${escapeHTML(value)}</td>
+          <td class="field-value" data-field-key="${escapeHTML(String(key).toLowerCase())}" contenteditable="true">${escapeHTML(value)}</td>
         </tr>
       `
     )
@@ -248,7 +283,7 @@ const buildRecordPanelHTML = (record) => {
   return `
     <section class="record-panel">
       <h3>当前记录字段（可编辑）</h3>
-      <p>提示：模板区每个单元格都可直接编辑，字段区用于复制参考值。</p>
+      <p>${panelTip}</p>
       <table class="record-table">
         <thead>
           <tr>
@@ -370,21 +405,65 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
         outline-color: #1f7a3f;
         background: #f6ffed;
       }
+      .template-wrap .billing-info-template {
+        display: flex;
+        justify-content: center;
+        min-height: 100%;
+        padding: 24px 0;
+        background: #d9d9d9;
+      }
+      .template-wrap .billing-info-paper {
+        width: 595px;
+        height: 842px;
+        background: #fff;
+        box-shadow: 0 2px 14px rgba(0, 0, 0, 0.2);
+      }
+      .template-wrap .billing-info-paper img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        user-select: none;
+        -webkit-user-drag: none;
+      }
+      .template-wrap .billing-info-paper .billing-info-svg {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+      body.print-template-only .record-panel {
+        display: none !important;
+      }
       @media print {
         @page {
+          size: A4;
           margin: 0;
         }
-        body { background: #fff; }
-        .toolbar, .record-panel { display: none; }
+        body {
+          background: #fff;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+        .toolbar, .record-panel { display: none !important; }
         .content {
-          display: block;
-          padding: 0;
+          display: block !important;
+          padding: 0 !important;
         }
         .template-wrap {
-          border: 0;
-          border-radius: 0;
-          padding: 0;
-          max-height: none;
+          display: block !important;
+          overflow: visible !important;
+          border: 0 !important;
+          border-radius: 0 !important;
+          padding: 0 !important;
+          max-height: none !important;
+        }
+        .template-wrap .billing-info-template {
+          padding: 0 !important;
+          background: #fff !important;
+        }
+        .template-wrap .billing-info-paper {
+          width: 210mm !important;
+          height: 297mm !important;
+          box-shadow: none !important;
         }
       }
     </style>
@@ -411,9 +490,156 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
         var printBtn = document.getElementById('print-btn');
         var toggleGridBtn = document.getElementById('toggle-grid-btn');
         var panel = document.querySelector('.record-panel');
+        var panelDisplayBeforePrint = null;
+
+        var collectPanelFieldMap = function () {
+          var cells = Array.prototype.slice.call(
+            document.querySelectorAll('.field-value[data-field-key]')
+          );
+          var fieldMap = {};
+          cells.forEach(function (cell) {
+            var key = String(cell.getAttribute('data-field-key') || '')
+              .trim()
+              .toLowerCase();
+            if (key) {
+              fieldMap[key] = cell;
+            }
+          });
+          return fieldMap;
+        };
+
+        var getFieldValue = function (fieldMap, aliases) {
+          var index;
+          for (index = 0; index < aliases.length; index += 1) {
+            var key = aliases[index];
+            var cell = fieldMap[key];
+            if (!cell) {
+              continue;
+            }
+            var text = String(cell.innerText || cell.textContent || '')
+              .replaceAll('\\n', ' ')
+              .trim();
+            if (text) {
+              return text;
+            }
+          }
+          return '';
+        };
+
+        var normalizeDate = function (raw) {
+          var text = String(raw || '').trim();
+          if (!text) {
+            return '';
+          }
+
+          if (/^\\d{10,13}$/.test(text)) {
+            var ts = Number(text);
+            if (!Number.isNaN(ts)) {
+              var millis = text.length === 10 ? ts * 1000 : ts;
+              var dateFromTs = new Date(millis);
+              if (!Number.isNaN(dateFromTs.getTime())) {
+                return (
+                  String(dateFromTs.getFullYear()) +
+                  '年' +
+                  String(dateFromTs.getMonth() + 1) +
+                  '月' +
+                  String(dateFromTs.getDate()) +
+                  '日'
+                );
+              }
+            }
+          }
+
+          var dateMatch = text.match(/^(\\d{4})[-\\/.](\\d{1,2})[-\\/.](\\d{1,2})$/);
+          if (dateMatch) {
+            return (
+              String(Number(dateMatch[1])) +
+              '年' +
+              String(Number(dateMatch[2])) +
+              '月' +
+              String(Number(dateMatch[3])) +
+              '日'
+            );
+          }
+
+          return text;
+        };
+
+        var syncBillingTemplate = function () {
+          if (!document.querySelector('.billing-info-template')) {
+            return;
+          }
+
+          var fieldMap = collectPanelFieldMap();
+          var bindings = [
+            {
+              field: 'companyName',
+              aliases: ['name', 'companyname', 'company_name', 'partnername', '单位名称'],
+            },
+            { field: 'taxNo', aliases: ['taxno', 'tax_no', 'taxnumber', 'taxid', '纳税人识别号'] },
+            { field: 'address', aliases: ['address', 'addr', '注册地址', '地址'] },
+            {
+              field: 'phone',
+              aliases: ['contactphone', 'phone', 'tel', 'telephone', 'mobile', '电话'],
+            },
+            { field: 'bankName', aliases: ['bankname', 'bank_name', '开户行', 'bank'] },
+            { field: 'bankAccount', aliases: ['bankaccount', 'bank_account', 'account', '账号'] },
+            { field: 'date', aliases: ['date', 'invoicedate', 'invoice_date', '开票日期'] },
+          ];
+
+          bindings.forEach(function (binding) {
+            var value = getFieldValue(fieldMap, binding.aliases);
+            if (binding.field === 'date') {
+              value = normalizeDate(value);
+            }
+            var nodes = Array.prototype.slice.call(
+              document.querySelectorAll('[data-billing-field="' + binding.field + '"]')
+            );
+            nodes.forEach(function (node) {
+              var defaultValue = String(node.getAttribute('data-default') || '');
+              node.textContent = value || defaultValue;
+            });
+          });
+        };
+
+        var bindBillingSync = function () {
+          if (!document.querySelector('.billing-info-template')) {
+            return;
+          }
+          var editableCells = Array.prototype.slice.call(
+            document.querySelectorAll('.field-value[data-field-key]')
+          );
+          editableCells.forEach(function (cell) {
+            cell.addEventListener('input', syncBillingTemplate);
+            cell.addEventListener('blur', syncBillingTemplate);
+          });
+          syncBillingTemplate();
+        };
+
+        var enableTemplateOnlyPrint = function () {
+          document.body.classList.add('print-template-only');
+          if (panel) {
+            panelDisplayBeforePrint = panel.style.display;
+            panel.style.display = 'none';
+          }
+        };
+
+        var restorePrintLayout = function () {
+          document.body.classList.remove('print-template-only');
+          if (panel && panelDisplayBeforePrint !== null) {
+            panel.style.display = panelDisplayBeforePrint;
+            panelDisplayBeforePrint = null;
+          }
+        };
+
+        window.addEventListener('afterprint', restorePrintLayout);
+
         if (printBtn) {
           printBtn.addEventListener('click', function () {
+            syncBillingTemplate();
+            enableTemplateOnlyPrint();
             window.print();
+            setTimeout(restorePrintLayout, 0);
           });
         }
         if (toggleGridBtn && panel) {
@@ -421,6 +647,7 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
             panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
           });
         }
+        bindBillingSync();
       })();
     </script>
   </body>
@@ -431,7 +658,7 @@ export const openPrintWindow = async (templateKey, record = {}) => {
   const templateMeta = templateList.find((item) => item.key === templateKey)
   const title = templateMeta?.title || '打印模板'
   const { source, templateHTML } = await fetchTemplateHTML(templateKey)
-  const recordPanelHTML = buildRecordPanelHTML(record)
+  const recordPanelHTML = buildRecordPanelHTML(record, templateKey)
 
   const popup = window.open('', '_blank', 'width=1440,height=900')
   if (!popup) {
@@ -452,6 +679,9 @@ export const openPrintWindow = async (templateKey, record = {}) => {
 }
 
 export const uploadTemplateFile = async (templateKey, file) => {
+  if (templateKey === 'billingInfo') {
+    throw new Error('开票信息模板为固定版式，不支持上传覆盖')
+  }
   const authToken = getToken(AUTH_SCOPE.ADMIN)
   if (!authToken) {
     throw new Error('请先登录管理员账号')
@@ -471,4 +701,8 @@ export const uploadTemplateFile = async (templateKey, file) => {
     throw new Error(payload?.message || '模板上传失败')
   }
   return payload?.data || {}
+}
+
+export const __TEST_ONLY__ = {
+  buildTemplateHTMLFromResponse,
 }
