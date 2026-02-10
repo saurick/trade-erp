@@ -69,7 +69,7 @@ const PrintCenterPage = () => {
           打印模板中心
         </Title>
         <Paragraph type="secondary" style={{ marginBottom: 0, marginTop: 8 }}>
-          打印会加载原始模板。Excel 模板单元格支持编辑后再打印；开票信息模板为固定版式 1:1 打印，左侧字段修改会实时同步到模板。已接入：外销形式发票模版、采购合同模版、杭州科森磁材开票信息模板。
+          打印会加载原始模板。Excel 模板单元格支持编辑后再打印；开票信息模板左右字段双向同步，右侧文字均可编辑（logo/水印除外）。已接入：外销形式发票模版、采购合同模版、杭州科森磁材开票信息模板。
         </Paragraph>
       </Card>
 

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { __TEST_ONLY__, uploadTemplateFile } from './printTemplates'
 
-const { buildTemplateHTMLFromResponse } = __TEST_ONLY__
+const { buildTemplateHTMLFromResponse, buildBillingInfoFields } = __TEST_ONLY__
 
 const toArrayBuffer = (text) => new TextEncoder().encode(text).buffer
 
@@ -10,7 +10,7 @@ describe('printTemplates', () => {
     const pdfHeader = Uint8Array.from([0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e, 0x33]).buffer
     const html = buildTemplateHTMLFromResponse('billingInfo', pdfHeader, 'application/pdf')
     expect(html).toContain('billing-info-template')
-    expect(html).toContain('<svg')
+    expect(html).toContain('billing-info-canvas')
     expect(html).toContain('/templates/billing-info-logo.png')
     expect(html).toContain('/templates/billing-info-stamp.png')
   })
@@ -32,5 +32,21 @@ describe('printTemplates', () => {
     await expect(uploadTemplateFile('billingInfo', new Blob(['test']))).rejects.toThrow(
       '开票信息模板为固定版式，不支持上传覆盖'
     )
+  })
+
+  it('billingInfo 字段会从记录里映射并格式化日期', () => {
+    const fields = buildBillingInfoFields({
+      name: '杭州科森磁材有限公司11',
+      taxNo: '91330109MA7N1W9P5Y111',
+      address: '浙江省杭州市萧山区北干街道永久路288号912室',
+      contactPhone: '18058808575',
+      created_at: '1770714077',
+    })
+    expect(fields.companyName).toBe('杭州科森磁材有限公司11')
+    expect(fields.taxNo).toBe('91330109MA7N1W9P5Y111')
+    expect(fields.phone).toBe('18058808575')
+    expect(fields.titleCompanyCn).toBe('杭州科森磁材有限公司11')
+    expect(fields.footerCompanyName).toBe('杭州科森磁材有限公司11')
+    expect(fields.date).toMatch(/^\d{4}年\d{1,2}月\d{1,2}日$/)
   })
 })
