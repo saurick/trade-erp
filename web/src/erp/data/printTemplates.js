@@ -632,6 +632,9 @@ const DEFAULT_PROFORMA_INVOICE_ITEMS = [
   },
 ]
 
+const PROFORMA_CANVAS_WIDTH = 1269
+const PROFORMA_CANVAS_HEIGHT = 1370
+
 const buildBillingInfoFields = (record = {}) => {
   const { values, hasExplicit } = buildFieldsBySchema(record, BILLING_INFO_FIELD_SCHEMA)
 
@@ -1842,7 +1845,7 @@ const buildProformaInvoiceTemplateHTML = (record = {}) => {
               </tr>
             </thead>
             <tbody>
-              <tr>
+              <tr class="proforma-item-row">
                 <td>${buildEditableNode('item1No', 'proforma-cell-center')}</td>
                 <td>${buildEditableNode('item1Ref', 'proforma-cell-center')}</td>
                 <td>${buildEditableNode('item1Desc', 'proforma-cell-left', true)}</td>
@@ -1850,7 +1853,7 @@ const buildProformaInvoiceTemplateHTML = (record = {}) => {
                 <td>${buildEditableNode('item1NetPrice', 'proforma-cell-right')}</td>
                 <td>${buildEditableNode('item1NetValue', 'proforma-cell-right')}</td>
               </tr>
-              <tr>
+              <tr class="proforma-item-row">
                 <td>${buildEditableNode('item2No', 'proforma-cell-center')}</td>
                 <td>${buildEditableNode('item2Ref', 'proforma-cell-center')}</td>
                 <td>${buildEditableNode('item2Desc', 'proforma-cell-left', true)}</td>
@@ -1870,19 +1873,22 @@ const buildProformaInvoiceTemplateHTML = (record = {}) => {
 
           <table class="proforma-terms-table">
             <tbody>
-              <tr>
+              <tr class="proforma-terms-spacer-row">
+                <td colspan="4"></td>
+              </tr>
+              <tr class="proforma-terms-main-row">
                 <th>Incoterms:</th>
                 <td>${buildEditableNode('incoterms')}</td>
                 <th>Delivery Method:</th>
                 <td>${buildEditableNode('deliveryMethod')}</td>
               </tr>
-              <tr>
+              <tr class="proforma-terms-main-row proforma-terms-lead-row">
                 <th>Lead-time:</th>
                 <td>${buildEditableNode('leadTime')}</td>
                 <th>Payment Terms:</th>
                 <td>${buildEditableNode('paymentTerms', '', true)}</td>
               </tr>
-              <tr>
+              <tr class="proforma-terms-notes-row">
                 <th>Notes:</th>
                 <td colspan="3">${buildEditableNode('notes', '', true)}</td>
               </tr>
@@ -2277,23 +2283,26 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
         background: #d9d9d9;
       }
       .template-wrap .proforma-paper {
-        width: 842px;
-        min-height: 760px;
+        width: ${PROFORMA_CANVAS_WIDTH}px;
+        min-height: ${PROFORMA_CANVAS_HEIGHT}px;
         background: #fff;
         box-shadow: 0 2px 14px rgba(0, 0, 0, 0.2);
-        padding: 10px 12px;
         font-family: Arial, Helvetica, sans-serif;
         color: #111;
       }
       .template-wrap .proforma-sheet {
-        border: 0;
+        border: 2px solid #111;
         min-height: 100%;
+        background: #fff;
       }
       .template-wrap .proforma-editable {
+        display: block;
+        position: relative;
+        z-index: 1;
         outline: 1px dashed transparent;
         border-radius: 2px;
-        min-height: 14px;
-        line-height: 1.2;
+        min-height: 20px;
+        line-height: 1.18;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -2310,108 +2319,118 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
       .template-wrap .proforma-header {
         display: flex;
         justify-content: space-between;
-        gap: 12px;
-        padding: 8px 10px 2px;
+        gap: 18px;
+        padding: 16px 8px 2px;
+        min-height: 104px;
       }
       .template-wrap .proforma-header-left {
         flex: 1;
+        min-width: 0;
       }
       .template-wrap .proforma-header-company {
-        font-size: 14px;
+        font-size: 21px;
         font-weight: 700;
-        letter-spacing: 0.1px;
+        letter-spacing: 0.2px;
       }
       .template-wrap .proforma-header-address {
-        margin-top: 2px;
-        font-size: 9px;
+        margin-top: 4px;
+        font-size: 13.5px;
       }
       .template-wrap .proforma-header-phone {
-        margin-top: 2px;
-        font-size: 9px;
+        margin-top: 5px;
+        font-size: 13.5px;
       }
       .template-wrap .proforma-header-right {
-        width: 252px;
-        text-align: center;
+        width: 382px;
+        text-align: right;
         display: flex;
         flex-direction: column;
         align-items: flex-end;
       }
       .template-wrap .proforma-logo {
-        width: 252px;
+        width: 365px;
         max-width: 100%;
-        margin-top: 2px;
+        margin-top: 0;
         user-select: none;
         -webkit-user-drag: none;
       }
       .template-wrap .proforma-header-website {
-        margin-top: 3px;
-        font-size: 9px;
-        text-align: right;
+        margin-top: 6px;
+        font-size: 13.3px;
+        text-align: center;
         width: 100%;
+        padding-right: 10px;
       }
       .template-wrap .proforma-divider {
-        border-top: 2px solid #000;
+        border-top: 4px solid #000;
       }
       .template-wrap .proforma-title-wrap {
-        padding: 8px 0 0;
+        padding: 14px 0 8px;
         text-align: center;
       }
       .template-wrap .proforma-title {
-        font-size: 17px;
+        font-size: 26px;
         font-weight: 700;
-        letter-spacing: 0.2px;
+        letter-spacing: 0.3px;
       }
       .template-wrap .proforma-meta {
         display: flex;
         justify-content: space-between;
-        gap: 10px;
-        padding: 8px 10px 8px;
+        gap: 16px;
+        padding: 12px 10px 12px;
+        min-height: 208px;
       }
       .template-wrap .proforma-buyer {
         flex: 1;
-        min-height: 86px;
+        min-height: 100%;
       }
       .template-wrap .proforma-buyer-company {
-        font-size: 12px;
+        font-size: 17px;
         font-weight: 700;
       }
       .template-wrap .proforma-buyer-address {
-        margin-top: 2px;
-        font-size: 8px;
+        margin-top: 6px;
+        font-size: 13.5px;
       }
       .template-wrap .proforma-meta-table {
-        width: 43%;
+        width: 42%;
         border-collapse: collapse;
         table-layout: fixed;
       }
       .template-wrap .proforma-meta-table th,
       .template-wrap .proforma-meta-table td {
         border: 0;
-        padding: 1px 3px;
+        padding: 3px 5px;
         vertical-align: top;
       }
       .template-wrap .proforma-meta-table th {
-        width: 34%;
+        width: 35%;
         text-align: left;
         white-space: nowrap;
-        font-size: 8px;
+        font-size: 12.7px;
         font-weight: 700;
       }
       .template-wrap .proforma-meta-table td {
-        font-size: 8px;
+        font-size: 12.7px;
       }
       .template-wrap .proforma-items-table {
         width: 100%;
         border-collapse: collapse;
         table-layout: fixed;
-        border-top: 1px solid #000;
+        border-top: 2px solid #000;
       }
       .template-wrap .proforma-items-table th,
       .template-wrap .proforma-items-table td {
-        border: 1px solid #000;
-        padding: 3px 4px;
-        font-size: 8.5px;
+        border: 2px solid #000;
+        padding: 4px 8px;
+        font-size: 13px;
         vertical-align: middle;
+      }
+      .template-wrap .proforma-items-table thead tr {
+        height: 76px;
+      }
+      .template-wrap .proforma-item-row {
+        height: 101px;
       }
       .template-wrap .proforma-items-table th {
         text-align: center;
@@ -2430,11 +2449,13 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
         font-weight: 700;
       }
       .template-wrap .proforma-total-title-row td {
-        font-size: 8.8px;
+        height: 49px;
+        font-size: 13.3px;
+        font-weight: 700;
       }
       .template-wrap .proforma-total-words-row td {
-        min-height: 26px;
-        font-size: 8.8px;
+        height: 64px;
+        font-size: 13.3px;
         font-weight: 700;
       }
       .template-wrap .proforma-total-value-cell {
@@ -2450,10 +2471,22 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
       }
       .template-wrap .proforma-terms-table th,
       .template-wrap .proforma-terms-table td {
-        border: 1px solid #000;
-        padding: 3px 4px;
+        border: 2px solid #000;
+        padding: 4px 6px;
         vertical-align: middle;
-        font-size: 8.5px;
+        font-size: 13px;
+      }
+      .template-wrap .proforma-terms-spacer-row {
+        height: 30px;
+      }
+      .template-wrap .proforma-terms-main-row {
+        height: 58px;
+      }
+      .template-wrap .proforma-terms-lead-row {
+        height: 71px;
+      }
+      .template-wrap .proforma-terms-notes-row {
+        height: 61px;
       }
       .template-wrap .proforma-terms-table th {
         width: 18%;
@@ -2464,69 +2497,70 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
         width: 32%;
       }
       .template-wrap .proforma-signature-zone {
-        border-left: 1px solid #000;
-        border-right: 1px solid #000;
-        padding: 8px 10px 6px;
+        border-left: 2px solid #000;
+        border-right: 2px solid #000;
+        padding: 16px 14px 8px;
+        height: 251px;
       }
       .template-wrap .proforma-seller-signature {
-        width: 48%;
+        width: 43%;
         margin: 0 auto;
         text-align: center;
         color: #52638f;
       }
       .template-wrap .proforma-seller-company-en {
-        font-size: 9px;
+        font-size: 13px;
         font-weight: 700;
       }
       .template-wrap .proforma-seller-company-cn {
-        margin-top: 2px;
-        font-size: 11px;
+        margin-top: 3px;
+        font-size: 16px;
         font-family: "SimSun", "Songti SC", "Noto Serif CJK SC", serif;
       }
       .template-wrap .proforma-seller-signer {
-        margin-top: 8px;
-        font-size: 16px;
+        margin-top: 10px;
+        font-size: 22px;
         font-family: "Brush Script MT", "Segoe Script", cursive;
       }
       .template-wrap .proforma-seller-sign-line {
-        margin-top: 3px;
-        border-top: 1px dotted #52638f;
+        margin-top: 6px;
+        border-top: 2px dotted #52638f;
       }
       .template-wrap .proforma-seller-sign-note {
-        margin-top: 2px;
-        font-size: 7px;
+        margin-top: 4px;
+        font-size: 10px;
         font-style: italic;
       }
       .template-wrap .proforma-signature-labels {
         display: flex;
         justify-content: space-between;
         gap: 16px;
-        margin-top: 6px;
+        margin-top: 14px;
       }
       .template-wrap .proforma-signature-label {
         flex: 1;
-        font-size: 9px;
+        font-size: 13.5px;
         font-weight: 700;
       }
       .template-wrap .proforma-bank-table {
         width: 100%;
         border-collapse: collapse;
         table-layout: fixed;
-        border-top: 1px solid #000;
+        border-top: 2px solid #000;
       }
       .template-wrap .proforma-bank-table th,
       .template-wrap .proforma-bank-table td {
-        padding: 2px 5px;
+        padding: 3px 6px;
         text-align: left;
         vertical-align: top;
         border: 0;
       }
       .template-wrap .proforma-bank-table th {
-        font-size: 8px;
+        font-size: 13px;
         font-weight: 700;
       }
       .template-wrap .proforma-bank-table td {
-        font-size: 8px;
+        font-size: 13px;
       }
       .template-wrap .purchase-contract-template {
         display: flex;
@@ -2691,7 +2725,20 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
           width: 210mm !important;
           min-height: 297mm !important;
           box-shadow: none !important;
-          padding: 3mm !important;
+          padding: 0 !important;
+        }
+        .template-wrap .proforma-items-table thead tr,
+        .template-wrap .proforma-item-row,
+        .template-wrap .proforma-total-title-row td,
+        .template-wrap .proforma-total-words-row td,
+        .template-wrap .proforma-terms-spacer-row,
+        .template-wrap .proforma-terms-main-row,
+        .template-wrap .proforma-terms-lead-row,
+        .template-wrap .proforma-terms-notes-row {
+          height: auto !important;
+        }
+        .template-wrap .proforma-signature-zone {
+          height: auto !important;
         }
         .template-wrap .purchase-contract-template {
           padding: 0 !important;
@@ -2768,10 +2815,76 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
             .toLowerCase();
         };
 
-        var getNodeText = function (node) {
-          return String(node?.innerText || node?.textContent || '')
+        var isMultilineFieldNode = function (node) {
+          return String(node?.getAttribute?.('data-multiline') || '').toLowerCase() === 'true';
+        };
+
+        var normalizeNodeText = function (raw, multiline) {
+          var text = String(raw || '')
+            .replaceAll('\\u00a0', ' ')
+            .replaceAll('\\r', '');
+          if (multiline) {
+            return text
+              .split('\\n')
+              .map(function (line) {
+                return line.trimEnd();
+              })
+              .join('\\n')
+              .trim();
+          }
+          return text
             .replaceAll('\\n', ' ')
+            .replace(/\\s+/g, ' ')
             .trim();
+        };
+
+        var getNodeText = function (node, multiline) {
+          return normalizeNodeText(String(node?.innerText || node?.textContent || ''), multiline);
+        };
+
+        var sanitizeEditableNode = function (node) {
+          if (!node || node.getAttribute('contenteditable') !== 'true') {
+            return;
+          }
+          var text = getNodeText(node, isMultilineFieldNode(node));
+          node.textContent = text;
+        };
+
+        var insertPlainTextAtCursor = function (node, text) {
+          var plain = String(text || '').replaceAll('\\r', '');
+          node.focus();
+          if (document.queryCommandSupported && document.queryCommandSupported('insertText')) {
+            document.execCommand('insertText', false, plain);
+            return;
+          }
+          var selection = window.getSelection();
+          if (!selection || selection.rangeCount === 0) {
+            node.textContent = String(node.textContent || '') + plain;
+            return;
+          }
+          var range = selection.getRangeAt(0);
+          range.deleteContents();
+          range.insertNode(document.createTextNode(plain));
+          range.collapse(false);
+          selection.removeAllRanges();
+          selection.addRange(range);
+        };
+
+        var bindEditableSanitizer = function () {
+          var editableNodes = Array.prototype.slice.call(document.querySelectorAll('[contenteditable="true"]'));
+          editableNodes.forEach(function (node) {
+            sanitizeEditableNode(node);
+            node.addEventListener('paste', function (event) {
+              event.preventDefault();
+              var clipboardText =
+                event.clipboardData?.getData('text/plain') || window.clipboardData?.getData('Text') || '';
+              insertPlainTextAtCursor(node, clipboardText);
+              sanitizeEditableNode(node);
+            });
+            node.addEventListener('blur', function () {
+              sanitizeEditableNode(node);
+            });
+          });
         };
 
         var collectPanelFieldMap = function () {
@@ -2956,7 +3069,7 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
           if (!cell) {
             return;
           }
-          var rawValue = getNodeText(cell);
+          var rawValue = getNodeText(cell, false);
           var value = normalizeValue ? normalizeTemplateFieldValue(fieldKey, rawValue) : rawValue;
           if (normalizeValue && value !== rawValue) {
             cell.textContent = value;
@@ -2976,7 +3089,7 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
           }
           var panelMap = collectPanelFieldMap();
           var templateMap = collectTemplateFieldMap();
-          var rawValue = getNodeText(sourceNode);
+          var rawValue = getNodeText(sourceNode, isMultilineFieldNode(sourceNode));
           var value = normalizeValue ? normalizeTemplateFieldValue(fieldKey, rawValue) : rawValue;
 
           if (normalizeValue && value !== rawValue) {
@@ -3068,6 +3181,7 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
             panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
           });
         }
+        bindEditableSanitizer();
         bindBillingSync();
       })();
     </script>
