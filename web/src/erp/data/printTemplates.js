@@ -2,24 +2,16 @@ import * as XLSX from 'xlsx'
 import { AUTH_SCOPE, getToken } from '@/common/auth/auth'
 
 export const templateList = [
-  { key: 'quotation', title: '报价单' },
   { key: 'pi', title: '形式发票 PI' },
   { key: 'purchase', title: '采购合同' },
-  { key: 'invoice', title: '商业发票 Commercial Invoice' },
-  { key: 'packing', title: '装箱单 Packing List' },
-  { key: 'delivery', title: '送货单' },
-  { key: 'production', title: '生产加工申请单' },
   { key: 'billingInfo', title: '开票信息' },
 ]
 
+const ENABLED_TEMPLATE_KEYS = new Set(templateList.map((item) => item.key))
+
 const DEFAULT_TEMPLATE_ASSET_MAP = {
-  quotation: '/templates/export-invoice-template.xls',
   pi: '/templates/export-invoice-template.xls',
   purchase: '/templates/purchase-contract-template.xls',
-  invoice: '/templates/export-invoice-template.xls',
-  packing: '/templates/export-invoice-template.xls',
-  delivery: '/templates/export-invoice-template.xls',
-  production: '/templates/export-invoice-template.xls',
   billingInfo: '/templates/billing-info-template.html',
 }
 
@@ -27,6 +19,12 @@ const EXCEL_XLS_MAGIC = [0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1]
 const EXCEL_XLSX_MAGIC = [0x50, 0x4b, 0x03, 0x04]
 const PDF_MAGIC = [0x25, 0x50, 0x44, 0x46]
 const FIXED_LAYOUT_TEMPLATE_KEYS = new Set(['billingInfo', 'pi', 'purchase'])
+
+const ensureTemplateEnabled = (templateKey) => {
+  if (!ENABLED_TEMPLATE_KEYS.has(templateKey)) {
+    throw new Error('当前仅保留 PI、采购合同、开票信息模板')
+  }
+}
 
 const escapeHTML = (raw) =>
   String(raw ?? '')
@@ -1015,6 +1013,15 @@ const PURCHASE_CONTRACT_PANEL_FIELD_SCHEMA = [
 
 const PURCHASE_CONTRACT_CANVAS_WIDTH = 595.32
 const PURCHASE_CONTRACT_CANVAS_HEIGHT = 841.92
+const PURCHASE_CONTRACT_TERMS_TEXT = [
+  '其他条款:',
+  '1. 双方本着平等, 自愿, 公平, 互惠互利和诚实守信的原则, 就零部件采购有关事宜协商一致订立本合同,以便共同遵守。',
+  '2. 包装要求: 防潮防碎,唛头清晰,适合长途运输,保证产品在运输过程中不受损。由于包装不当导致运输过程中货物的损坏，相应损失由乙方承担。',
+  '3.如乙方未能按照合同双方确定的期限交货，每延迟交付一日，应向甲方支付合同金额的1%作为违约金，若超过15天，甲方有权取消本合同，乙方需承担不低于合同金额20%的违约金。',
+  '4.若乙方交货的质量不符合合同的约定,则应向甲方赔偿因质量不符给甲方带来损失,包括但不限于预期利润损失、停工损失、对第三方的违约赔偿责任等等。',
+  '5. 解决合同纠纷的方式：本合同若发生纠纷，双方应及时协商解决，协商不成时，按《民法典》执行。',
+  '6. 本合同自双方签字之日起生效。',
+].join('\n')
 
 const PURCHASE_CONTRACT_IMAGE_LAYOUT = {
   logo: {
@@ -1089,43 +1096,7 @@ const PURCHASE_CONTRACT_STATIC_TEXT_LAYOUT = [
   { text: '交货地点', left: 290.69, top: 343.77, width: 32, className: 'purchase-no-wrap' },
   { text: '随货单据', left: 71.54, top: 368.25, width: 32, className: 'purchase-no-wrap' },
   { text: '其他要求', left: 71.54, top: 392.25, width: 32, className: 'purchase-no-wrap' },
-  { text: '其他条款:', left: 71.54, top: 411.93, width: 34, className: 'purchase-no-wrap' },
-  {
-    text: '1. 双方本着平等, 自愿, 公平, 互惠互利和诚实守信的原则, 就零部件采购有关事宜协商一致订立本合同,以便共同遵守。',
-    left: 71.54,
-    top: 422.96,
-    width: 450.03,
-    className: 'purchase-multiline',
-  },
-  {
-    text: '2. 包装要求: 防潮防碎,唛头清晰,适合长途运输,保证产品在运输过程中不受损。由于包装不当导致运输过程中货物的损坏，相应损失由乙方承担。',
-    left: 71.54,
-    top: 436.42,
-    width: 450.03,
-    className: 'purchase-multiline',
-  },
-  {
-    text: '3.如乙方未能按照合同双方确定的期限交货，每延迟交付一日，应向甲方支付合同金额的1%作为违约金，若超过15天，甲方有权取消本合同，乙方需承担不低于合同金额20%的违约金。',
-    left: 71.54,
-    top: 467.5,
-    width: 450.03,
-    className: 'purchase-multiline',
-  },
-  {
-    text: '4.若乙方交货的质量不符合合同的约定,则应向甲方赔偿因质量不符给甲方带来损失,包括但不限于预期利润损失、停工损失、对第三方的违约赔偿责任等等。',
-    left: 71.54,
-    top: 489.22,
-    width: 450.03,
-    className: 'purchase-multiline',
-  },
-  {
-    text: '5. 解决合同纠纷的方式：本合同若发生纠纷，双方应及时协商解决，协商不成时，按《民法典》执行。',
-    left: 71.54,
-    top: 511.54,
-    width: 450.03,
-    className: 'purchase-multiline',
-  },
-  { text: '6. 本合同自双方签字之日起生效。', left: 71.54, top: 521.5, width: 260, className: 'purchase-no-wrap' },
+  { text: PURCHASE_CONTRACT_TERMS_TEXT, left: 71.54, top: 411.93, width: 450.03, className: 'purchase-multiline purchase-terms' },
   { text: '买方签章:', left: 71.54, top: 596.99, width: 40, className: 'purchase-no-wrap' },
   { text: '卖方签章:', left: 363.91, top: 596.99, width: 40, className: 'purchase-no-wrap' },
   { text: '.375 in', left: 76.97, top: 741.56, width: 28, className: 'purchase-calibri purchase-no-wrap' },
@@ -1531,8 +1502,14 @@ const buildPurchaseContractFields = (record = {}) => {
 }
 
 const buildPurchaseStaticNodeHTML = (node) => {
+  const isMultiline =
+    Boolean(node?.multiline) ||
+    String(node?.className || '')
+      .split(/\s+/)
+      .includes('purchase-multiline')
+  const multilineAttr = isMultiline ? ' data-multiline="true"' : ''
   const className = ['purchase-text', 'purchase-editable', node.className].filter(Boolean).join(' ')
-  return `<div class="${className}" style="${buildPurchaseInlineStyle(node)}" contenteditable="true" spellcheck="false">${formatPurchaseNodeText(node.text)}</div>`
+  return `<div class="${className}" style="${buildPurchaseInlineStyle(node)}" contenteditable="true" spellcheck="false"${multilineAttr}>${formatPurchaseNodeText(node.text)}</div>`
 }
 
 const buildPurchaseEditableNodeHTML = (fields, node) => {
@@ -1689,6 +1666,7 @@ const fetchBinaryWithMeta = async (url, options = {}) => {
 }
 
 const fetchTemplateHTML = async (templateKey, record = {}) => {
+  ensureTemplateEnabled(templateKey)
   const fixedTemplateHTML = getFixedTemplateHTML(templateKey, record)
   if (fixedTemplateHTML) {
     return { source: 'default', templateHTML: fixedTemplateHTML }
@@ -1714,7 +1692,10 @@ const fetchTemplateHTML = async (templateKey, record = {}) => {
     // 服务端不可达或内容非法时自动回退默认模板。
   }
 
-  const fallbackAsset = DEFAULT_TEMPLATE_ASSET_MAP[templateKey] || DEFAULT_TEMPLATE_ASSET_MAP.invoice
+  const fallbackAsset = DEFAULT_TEMPLATE_ASSET_MAP[templateKey]
+  if (!fallbackAsset) {
+    throw new Error(`模板加载失败：${templateKey}`)
+  }
   const fallbackResp = await fetchBinaryWithMeta(fallbackAsset)
   if (!fallbackResp.ok) {
     throw new Error(`模板加载失败：${templateKey}`)
@@ -2316,7 +2297,7 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
         top: ${PROFORMA_CANVAS_OFFSET_TOP}px;
         width: ${PROFORMA_CANVAS_WIDTH}px;
         height: ${PROFORMA_CANVAS_HEIGHT}px;
-        border: 2px solid #111;
+        border: 1.6px solid #111;
         background: #fff;
       }
       .template-wrap .proforma-editable {
@@ -2386,14 +2367,14 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
         padding-right: 10px;
       }
       .template-wrap .proforma-divider {
-        border-top: 4px solid #000;
+        border-top: 2.6px solid #000;
       }
       .template-wrap .proforma-title-wrap {
-        padding: 14px 0 8px;
+        padding: 9px 0 4px;
         text-align: center;
       }
       .template-wrap .proforma-title {
-        font-size: 26px;
+        font-size: 23.5px;
         font-weight: 700;
         letter-spacing: 0.3px;
       }
@@ -2401,8 +2382,8 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
         display: flex;
         justify-content: space-between;
         gap: 16px;
-        padding: 12px 10px 12px;
-        min-height: 208px;
+        padding: 4px 10px 4px;
+        min-height: 145px;
       }
       .template-wrap .proforma-buyer {
         flex: 1;
@@ -2441,11 +2422,11 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
         width: 100%;
         border-collapse: collapse;
         table-layout: fixed;
-        border-top: 2px solid #000;
+        border-top: 1.6px solid #000;
       }
       .template-wrap .proforma-items-table th,
       .template-wrap .proforma-items-table td {
-        border: 2px solid #000;
+        border: 1.6px solid #000;
         padding: 4px 8px;
         font-size: 13px;
         vertical-align: middle;
@@ -2476,11 +2457,13 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
         height: 49px;
         font-size: 13.3px;
         font-weight: 700;
+        border-bottom: 0;
       }
       .template-wrap .proforma-total-words-row td {
         height: 64px;
         font-size: 13.3px;
         font-weight: 700;
+        border-top: 0;
       }
       .template-wrap .proforma-total-value-cell {
         vertical-align: middle !important;
@@ -2495,7 +2478,7 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
       }
       .template-wrap .proforma-terms-table th,
       .template-wrap .proforma-terms-table td {
-        border: 2px solid #000;
+        border: 1.6px solid #000;
         padding: 4px 6px;
         vertical-align: middle;
         font-size: 13px;
@@ -2521,8 +2504,8 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
         width: 32%;
       }
       .template-wrap .proforma-signature-zone {
-        border-left: 2px solid #000;
-        border-right: 2px solid #000;
+        border-left: 1.6px solid #000;
+        border-right: 1.6px solid #000;
         padding: 16px 14px 8px;
         height: 249px;
       }
@@ -2570,7 +2553,7 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
         width: 100%;
         border-collapse: collapse;
         table-layout: fixed;
-        border-top: 2px solid #000;
+        border-top: 1.6px solid #000;
       }
       .template-wrap .proforma-bank-table th,
       .template-wrap .proforma-bank-table td {
@@ -2651,6 +2634,9 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
       .template-wrap .purchase-multiline {
         white-space: pre-wrap;
         word-break: break-word;
+      }
+      .template-wrap .purchase-terms {
+        line-height: 1.32;
       }
       .template-wrap .purchase-no-wrap {
         white-space: nowrap;
@@ -3270,6 +3256,7 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
 `
 
 export const openPrintWindow = async (templateKey, record = {}) => {
+  ensureTemplateEnabled(templateKey)
   const templateMeta = templateList.find((item) => item.key === templateKey)
   const title = templateMeta?.title || '打印模板'
   const { source, templateHTML } = await fetchTemplateHTML(templateKey, record)
@@ -3294,6 +3281,7 @@ export const openPrintWindow = async (templateKey, record = {}) => {
 }
 
 export const uploadTemplateFile = async (templateKey, file) => {
+  ensureTemplateEnabled(templateKey)
   if (FIXED_LAYOUT_TEMPLATE_KEYS.has(templateKey)) {
     if (templateKey === 'billingInfo') {
       throw new Error('开票信息模板为固定版式，不支持上传覆盖')

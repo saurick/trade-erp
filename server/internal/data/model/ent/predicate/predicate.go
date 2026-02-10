@@ -9,8 +9,89 @@ import (
 // AdminUser is the predicate function for adminuser builders.
 type AdminUser func(*sql.Selector)
 
+// ERPAttachment is the predicate function for erpattachment builders.
+type ERPAttachment func(*sql.Selector)
+
+// ERPBankReceipt is the predicate function for erpbankreceipt builders.
+type ERPBankReceipt func(*sql.Selector)
+
+// ERPBankReceiptClaim is the predicate function for erpbankreceiptclaim builders.
+type ERPBankReceiptClaim func(*sql.Selector)
+
+// ERPDocLink is the predicate function for erpdoclink builders.
+type ERPDocLink func(*sql.Selector)
+
+// ERPExportSale is the predicate function for erpexportsale builders.
+type ERPExportSale func(*sql.Selector)
+
+// ERPExportSaleItem is the predicate function for erpexportsaleitem builders.
+type ERPExportSaleItem func(*sql.Selector)
+
+// ERPInboundNotice is the predicate function for erpinboundnotice builders.
+type ERPInboundNotice func(*sql.Selector)
+
+// ERPInboundNoticeItem is the predicate function for erpinboundnoticeitem builders.
+type ERPInboundNoticeItem func(*sql.Selector)
+
+// ERPLocation is the predicate function for erplocation builders.
+type ERPLocation func(*sql.Selector)
+
 // ERPModuleRecord is the predicate function for erpmodulerecord builders.
 type ERPModuleRecord func(*sql.Selector)
+
+// ERPOutboundOrder is the predicate function for erpoutboundorder builders.
+type ERPOutboundOrder func(*sql.Selector)
+
+// ERPOutboundOrderItem is the predicate function for erpoutboundorderitem builders.
+type ERPOutboundOrderItem func(*sql.Selector)
+
+// ERPPartner is the predicate function for erppartner builders.
+type ERPPartner func(*sql.Selector)
+
+// ERPProduct is the predicate function for erpproduct builders.
+type ERPProduct func(*sql.Selector)
+
+// ERPPurchaseContract is the predicate function for erppurchasecontract builders.
+type ERPPurchaseContract func(*sql.Selector)
+
+// ERPPurchaseContractItem is the predicate function for erppurchasecontractitem builders.
+type ERPPurchaseContractItem func(*sql.Selector)
+
+// ERPQuotation is the predicate function for erpquotation builders.
+type ERPQuotation func(*sql.Selector)
+
+// ERPQuotationItem is the predicate function for erpquotationitem builders.
+type ERPQuotationItem func(*sql.Selector)
+
+// ERPSequence is the predicate function for erpsequence builders.
+type ERPSequence func(*sql.Selector)
+
+// ERPSettlement is the predicate function for erpsettlement builders.
+type ERPSettlement func(*sql.Selector)
+
+// ERPShipmentDetail is the predicate function for erpshipmentdetail builders.
+type ERPShipmentDetail func(*sql.Selector)
+
+// ERPShipmentDetailItem is the predicate function for erpshipmentdetailitem builders.
+type ERPShipmentDetailItem func(*sql.Selector)
+
+// ERPStockBalance is the predicate function for erpstockbalance builders.
+type ERPStockBalance func(*sql.Selector)
+
+// ERPStockTransaction is the predicate function for erpstocktransaction builders.
+type ERPStockTransaction func(*sql.Selector)
+
+// ERPWarehouse is the predicate function for erpwarehouse builders.
+type ERPWarehouse func(*sql.Selector)
+
+// ERPWorkflowActionLog is the predicate function for erpworkflowactionlog builders.
+type ERPWorkflowActionLog func(*sql.Selector)
+
+// ERPWorkflowInstance is the predicate function for erpworkflowinstance builders.
+type ERPWorkflowInstance func(*sql.Selector)
+
+// ERPWorkflowTask is the predicate function for erpworkflowtask builders.
+type ERPWorkflowTask func(*sql.Selector)
 
 // User is the predicate function for user builders.
 type User func(*sql.Selector)

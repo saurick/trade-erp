@@ -12,7 +12,34 @@ import (
 	"server/internal/data/model/ent/migrate"
 
 	"server/internal/data/model/ent/adminuser"
+	"server/internal/data/model/ent/erpattachment"
+	"server/internal/data/model/ent/erpbankreceipt"
+	"server/internal/data/model/ent/erpbankreceiptclaim"
+	"server/internal/data/model/ent/erpdoclink"
+	"server/internal/data/model/ent/erpexportsale"
+	"server/internal/data/model/ent/erpexportsaleitem"
+	"server/internal/data/model/ent/erpinboundnotice"
+	"server/internal/data/model/ent/erpinboundnoticeitem"
+	"server/internal/data/model/ent/erplocation"
 	"server/internal/data/model/ent/erpmodulerecord"
+	"server/internal/data/model/ent/erpoutboundorder"
+	"server/internal/data/model/ent/erpoutboundorderitem"
+	"server/internal/data/model/ent/erppartner"
+	"server/internal/data/model/ent/erpproduct"
+	"server/internal/data/model/ent/erppurchasecontract"
+	"server/internal/data/model/ent/erppurchasecontractitem"
+	"server/internal/data/model/ent/erpquotation"
+	"server/internal/data/model/ent/erpquotationitem"
+	"server/internal/data/model/ent/erpsequence"
+	"server/internal/data/model/ent/erpsettlement"
+	"server/internal/data/model/ent/erpshipmentdetail"
+	"server/internal/data/model/ent/erpshipmentdetailitem"
+	"server/internal/data/model/ent/erpstockbalance"
+	"server/internal/data/model/ent/erpstocktransaction"
+	"server/internal/data/model/ent/erpwarehouse"
+	"server/internal/data/model/ent/erpworkflowactionlog"
+	"server/internal/data/model/ent/erpworkflowinstance"
+	"server/internal/data/model/ent/erpworkflowtask"
 	"server/internal/data/model/ent/user"
 
 	"entgo.io/ent"
@@ -27,8 +54,62 @@ type Client struct {
 	Schema *migrate.Schema
 	// AdminUser is the client for interacting with the AdminUser builders.
 	AdminUser *AdminUserClient
+	// ERPAttachment is the client for interacting with the ERPAttachment builders.
+	ERPAttachment *ERPAttachmentClient
+	// ERPBankReceipt is the client for interacting with the ERPBankReceipt builders.
+	ERPBankReceipt *ERPBankReceiptClient
+	// ERPBankReceiptClaim is the client for interacting with the ERPBankReceiptClaim builders.
+	ERPBankReceiptClaim *ERPBankReceiptClaimClient
+	// ERPDocLink is the client for interacting with the ERPDocLink builders.
+	ERPDocLink *ERPDocLinkClient
+	// ERPExportSale is the client for interacting with the ERPExportSale builders.
+	ERPExportSale *ERPExportSaleClient
+	// ERPExportSaleItem is the client for interacting with the ERPExportSaleItem builders.
+	ERPExportSaleItem *ERPExportSaleItemClient
+	// ERPInboundNotice is the client for interacting with the ERPInboundNotice builders.
+	ERPInboundNotice *ERPInboundNoticeClient
+	// ERPInboundNoticeItem is the client for interacting with the ERPInboundNoticeItem builders.
+	ERPInboundNoticeItem *ERPInboundNoticeItemClient
+	// ERPLocation is the client for interacting with the ERPLocation builders.
+	ERPLocation *ERPLocationClient
 	// ERPModuleRecord is the client for interacting with the ERPModuleRecord builders.
 	ERPModuleRecord *ERPModuleRecordClient
+	// ERPOutboundOrder is the client for interacting with the ERPOutboundOrder builders.
+	ERPOutboundOrder *ERPOutboundOrderClient
+	// ERPOutboundOrderItem is the client for interacting with the ERPOutboundOrderItem builders.
+	ERPOutboundOrderItem *ERPOutboundOrderItemClient
+	// ERPPartner is the client for interacting with the ERPPartner builders.
+	ERPPartner *ERPPartnerClient
+	// ERPProduct is the client for interacting with the ERPProduct builders.
+	ERPProduct *ERPProductClient
+	// ERPPurchaseContract is the client for interacting with the ERPPurchaseContract builders.
+	ERPPurchaseContract *ERPPurchaseContractClient
+	// ERPPurchaseContractItem is the client for interacting with the ERPPurchaseContractItem builders.
+	ERPPurchaseContractItem *ERPPurchaseContractItemClient
+	// ERPQuotation is the client for interacting with the ERPQuotation builders.
+	ERPQuotation *ERPQuotationClient
+	// ERPQuotationItem is the client for interacting with the ERPQuotationItem builders.
+	ERPQuotationItem *ERPQuotationItemClient
+	// ERPSequence is the client for interacting with the ERPSequence builders.
+	ERPSequence *ERPSequenceClient
+	// ERPSettlement is the client for interacting with the ERPSettlement builders.
+	ERPSettlement *ERPSettlementClient
+	// ERPShipmentDetail is the client for interacting with the ERPShipmentDetail builders.
+	ERPShipmentDetail *ERPShipmentDetailClient
+	// ERPShipmentDetailItem is the client for interacting with the ERPShipmentDetailItem builders.
+	ERPShipmentDetailItem *ERPShipmentDetailItemClient
+	// ERPStockBalance is the client for interacting with the ERPStockBalance builders.
+	ERPStockBalance *ERPStockBalanceClient
+	// ERPStockTransaction is the client for interacting with the ERPStockTransaction builders.
+	ERPStockTransaction *ERPStockTransactionClient
+	// ERPWarehouse is the client for interacting with the ERPWarehouse builders.
+	ERPWarehouse *ERPWarehouseClient
+	// ERPWorkflowActionLog is the client for interacting with the ERPWorkflowActionLog builders.
+	ERPWorkflowActionLog *ERPWorkflowActionLogClient
+	// ERPWorkflowInstance is the client for interacting with the ERPWorkflowInstance builders.
+	ERPWorkflowInstance *ERPWorkflowInstanceClient
+	// ERPWorkflowTask is the client for interacting with the ERPWorkflowTask builders.
+	ERPWorkflowTask *ERPWorkflowTaskClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 }
@@ -43,7 +124,34 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.AdminUser = NewAdminUserClient(c.config)
+	c.ERPAttachment = NewERPAttachmentClient(c.config)
+	c.ERPBankReceipt = NewERPBankReceiptClient(c.config)
+	c.ERPBankReceiptClaim = NewERPBankReceiptClaimClient(c.config)
+	c.ERPDocLink = NewERPDocLinkClient(c.config)
+	c.ERPExportSale = NewERPExportSaleClient(c.config)
+	c.ERPExportSaleItem = NewERPExportSaleItemClient(c.config)
+	c.ERPInboundNotice = NewERPInboundNoticeClient(c.config)
+	c.ERPInboundNoticeItem = NewERPInboundNoticeItemClient(c.config)
+	c.ERPLocation = NewERPLocationClient(c.config)
 	c.ERPModuleRecord = NewERPModuleRecordClient(c.config)
+	c.ERPOutboundOrder = NewERPOutboundOrderClient(c.config)
+	c.ERPOutboundOrderItem = NewERPOutboundOrderItemClient(c.config)
+	c.ERPPartner = NewERPPartnerClient(c.config)
+	c.ERPProduct = NewERPProductClient(c.config)
+	c.ERPPurchaseContract = NewERPPurchaseContractClient(c.config)
+	c.ERPPurchaseContractItem = NewERPPurchaseContractItemClient(c.config)
+	c.ERPQuotation = NewERPQuotationClient(c.config)
+	c.ERPQuotationItem = NewERPQuotationItemClient(c.config)
+	c.ERPSequence = NewERPSequenceClient(c.config)
+	c.ERPSettlement = NewERPSettlementClient(c.config)
+	c.ERPShipmentDetail = NewERPShipmentDetailClient(c.config)
+	c.ERPShipmentDetailItem = NewERPShipmentDetailItemClient(c.config)
+	c.ERPStockBalance = NewERPStockBalanceClient(c.config)
+	c.ERPStockTransaction = NewERPStockTransactionClient(c.config)
+	c.ERPWarehouse = NewERPWarehouseClient(c.config)
+	c.ERPWorkflowActionLog = NewERPWorkflowActionLogClient(c.config)
+	c.ERPWorkflowInstance = NewERPWorkflowInstanceClient(c.config)
+	c.ERPWorkflowTask = NewERPWorkflowTaskClient(c.config)
 	c.User = NewUserClient(c.config)
 }
 
@@ -135,11 +243,38 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:             ctx,
-		config:          cfg,
-		AdminUser:       NewAdminUserClient(cfg),
-		ERPModuleRecord: NewERPModuleRecordClient(cfg),
-		User:            NewUserClient(cfg),
+		ctx:                     ctx,
+		config:                  cfg,
+		AdminUser:               NewAdminUserClient(cfg),
+		ERPAttachment:           NewERPAttachmentClient(cfg),
+		ERPBankReceipt:          NewERPBankReceiptClient(cfg),
+		ERPBankReceiptClaim:     NewERPBankReceiptClaimClient(cfg),
+		ERPDocLink:              NewERPDocLinkClient(cfg),
+		ERPExportSale:           NewERPExportSaleClient(cfg),
+		ERPExportSaleItem:       NewERPExportSaleItemClient(cfg),
+		ERPInboundNotice:        NewERPInboundNoticeClient(cfg),
+		ERPInboundNoticeItem:    NewERPInboundNoticeItemClient(cfg),
+		ERPLocation:             NewERPLocationClient(cfg),
+		ERPModuleRecord:         NewERPModuleRecordClient(cfg),
+		ERPOutboundOrder:        NewERPOutboundOrderClient(cfg),
+		ERPOutboundOrderItem:    NewERPOutboundOrderItemClient(cfg),
+		ERPPartner:              NewERPPartnerClient(cfg),
+		ERPProduct:              NewERPProductClient(cfg),
+		ERPPurchaseContract:     NewERPPurchaseContractClient(cfg),
+		ERPPurchaseContractItem: NewERPPurchaseContractItemClient(cfg),
+		ERPQuotation:            NewERPQuotationClient(cfg),
+		ERPQuotationItem:        NewERPQuotationItemClient(cfg),
+		ERPSequence:             NewERPSequenceClient(cfg),
+		ERPSettlement:           NewERPSettlementClient(cfg),
+		ERPShipmentDetail:       NewERPShipmentDetailClient(cfg),
+		ERPShipmentDetailItem:   NewERPShipmentDetailItemClient(cfg),
+		ERPStockBalance:         NewERPStockBalanceClient(cfg),
+		ERPStockTransaction:     NewERPStockTransactionClient(cfg),
+		ERPWarehouse:            NewERPWarehouseClient(cfg),
+		ERPWorkflowActionLog:    NewERPWorkflowActionLogClient(cfg),
+		ERPWorkflowInstance:     NewERPWorkflowInstanceClient(cfg),
+		ERPWorkflowTask:         NewERPWorkflowTaskClient(cfg),
+		User:                    NewUserClient(cfg),
 	}, nil
 }
 
@@ -157,11 +292,38 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:             ctx,
-		config:          cfg,
-		AdminUser:       NewAdminUserClient(cfg),
-		ERPModuleRecord: NewERPModuleRecordClient(cfg),
-		User:            NewUserClient(cfg),
+		ctx:                     ctx,
+		config:                  cfg,
+		AdminUser:               NewAdminUserClient(cfg),
+		ERPAttachment:           NewERPAttachmentClient(cfg),
+		ERPBankReceipt:          NewERPBankReceiptClient(cfg),
+		ERPBankReceiptClaim:     NewERPBankReceiptClaimClient(cfg),
+		ERPDocLink:              NewERPDocLinkClient(cfg),
+		ERPExportSale:           NewERPExportSaleClient(cfg),
+		ERPExportSaleItem:       NewERPExportSaleItemClient(cfg),
+		ERPInboundNotice:        NewERPInboundNoticeClient(cfg),
+		ERPInboundNoticeItem:    NewERPInboundNoticeItemClient(cfg),
+		ERPLocation:             NewERPLocationClient(cfg),
+		ERPModuleRecord:         NewERPModuleRecordClient(cfg),
+		ERPOutboundOrder:        NewERPOutboundOrderClient(cfg),
+		ERPOutboundOrderItem:    NewERPOutboundOrderItemClient(cfg),
+		ERPPartner:              NewERPPartnerClient(cfg),
+		ERPProduct:              NewERPProductClient(cfg),
+		ERPPurchaseContract:     NewERPPurchaseContractClient(cfg),
+		ERPPurchaseContractItem: NewERPPurchaseContractItemClient(cfg),
+		ERPQuotation:            NewERPQuotationClient(cfg),
+		ERPQuotationItem:        NewERPQuotationItemClient(cfg),
+		ERPSequence:             NewERPSequenceClient(cfg),
+		ERPSettlement:           NewERPSettlementClient(cfg),
+		ERPShipmentDetail:       NewERPShipmentDetailClient(cfg),
+		ERPShipmentDetailItem:   NewERPShipmentDetailItemClient(cfg),
+		ERPStockBalance:         NewERPStockBalanceClient(cfg),
+		ERPStockTransaction:     NewERPStockTransactionClient(cfg),
+		ERPWarehouse:            NewERPWarehouseClient(cfg),
+		ERPWorkflowActionLog:    NewERPWorkflowActionLogClient(cfg),
+		ERPWorkflowInstance:     NewERPWorkflowInstanceClient(cfg),
+		ERPWorkflowTask:         NewERPWorkflowTaskClient(cfg),
+		User:                    NewUserClient(cfg),
 	}, nil
 }
 
@@ -190,17 +352,35 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.AdminUser.Use(hooks...)
-	c.ERPModuleRecord.Use(hooks...)
-	c.User.Use(hooks...)
+	for _, n := range []interface{ Use(...Hook) }{
+		c.AdminUser, c.ERPAttachment, c.ERPBankReceipt, c.ERPBankReceiptClaim,
+		c.ERPDocLink, c.ERPExportSale, c.ERPExportSaleItem, c.ERPInboundNotice,
+		c.ERPInboundNoticeItem, c.ERPLocation, c.ERPModuleRecord, c.ERPOutboundOrder,
+		c.ERPOutboundOrderItem, c.ERPPartner, c.ERPProduct, c.ERPPurchaseContract,
+		c.ERPPurchaseContractItem, c.ERPQuotation, c.ERPQuotationItem, c.ERPSequence,
+		c.ERPSettlement, c.ERPShipmentDetail, c.ERPShipmentDetailItem,
+		c.ERPStockBalance, c.ERPStockTransaction, c.ERPWarehouse,
+		c.ERPWorkflowActionLog, c.ERPWorkflowInstance, c.ERPWorkflowTask, c.User,
+	} {
+		n.Use(hooks...)
+	}
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
-	c.AdminUser.Intercept(interceptors...)
-	c.ERPModuleRecord.Intercept(interceptors...)
-	c.User.Intercept(interceptors...)
+	for _, n := range []interface{ Intercept(...Interceptor) }{
+		c.AdminUser, c.ERPAttachment, c.ERPBankReceipt, c.ERPBankReceiptClaim,
+		c.ERPDocLink, c.ERPExportSale, c.ERPExportSaleItem, c.ERPInboundNotice,
+		c.ERPInboundNoticeItem, c.ERPLocation, c.ERPModuleRecord, c.ERPOutboundOrder,
+		c.ERPOutboundOrderItem, c.ERPPartner, c.ERPProduct, c.ERPPurchaseContract,
+		c.ERPPurchaseContractItem, c.ERPQuotation, c.ERPQuotationItem, c.ERPSequence,
+		c.ERPSettlement, c.ERPShipmentDetail, c.ERPShipmentDetailItem,
+		c.ERPStockBalance, c.ERPStockTransaction, c.ERPWarehouse,
+		c.ERPWorkflowActionLog, c.ERPWorkflowInstance, c.ERPWorkflowTask, c.User,
+	} {
+		n.Intercept(interceptors...)
+	}
 }
 
 // Mutate implements the ent.Mutator interface.
@@ -208,8 +388,62 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *AdminUserMutation:
 		return c.AdminUser.mutate(ctx, m)
+	case *ERPAttachmentMutation:
+		return c.ERPAttachment.mutate(ctx, m)
+	case *ERPBankReceiptMutation:
+		return c.ERPBankReceipt.mutate(ctx, m)
+	case *ERPBankReceiptClaimMutation:
+		return c.ERPBankReceiptClaim.mutate(ctx, m)
+	case *ERPDocLinkMutation:
+		return c.ERPDocLink.mutate(ctx, m)
+	case *ERPExportSaleMutation:
+		return c.ERPExportSale.mutate(ctx, m)
+	case *ERPExportSaleItemMutation:
+		return c.ERPExportSaleItem.mutate(ctx, m)
+	case *ERPInboundNoticeMutation:
+		return c.ERPInboundNotice.mutate(ctx, m)
+	case *ERPInboundNoticeItemMutation:
+		return c.ERPInboundNoticeItem.mutate(ctx, m)
+	case *ERPLocationMutation:
+		return c.ERPLocation.mutate(ctx, m)
 	case *ERPModuleRecordMutation:
 		return c.ERPModuleRecord.mutate(ctx, m)
+	case *ERPOutboundOrderMutation:
+		return c.ERPOutboundOrder.mutate(ctx, m)
+	case *ERPOutboundOrderItemMutation:
+		return c.ERPOutboundOrderItem.mutate(ctx, m)
+	case *ERPPartnerMutation:
+		return c.ERPPartner.mutate(ctx, m)
+	case *ERPProductMutation:
+		return c.ERPProduct.mutate(ctx, m)
+	case *ERPPurchaseContractMutation:
+		return c.ERPPurchaseContract.mutate(ctx, m)
+	case *ERPPurchaseContractItemMutation:
+		return c.ERPPurchaseContractItem.mutate(ctx, m)
+	case *ERPQuotationMutation:
+		return c.ERPQuotation.mutate(ctx, m)
+	case *ERPQuotationItemMutation:
+		return c.ERPQuotationItem.mutate(ctx, m)
+	case *ERPSequenceMutation:
+		return c.ERPSequence.mutate(ctx, m)
+	case *ERPSettlementMutation:
+		return c.ERPSettlement.mutate(ctx, m)
+	case *ERPShipmentDetailMutation:
+		return c.ERPShipmentDetail.mutate(ctx, m)
+	case *ERPShipmentDetailItemMutation:
+		return c.ERPShipmentDetailItem.mutate(ctx, m)
+	case *ERPStockBalanceMutation:
+		return c.ERPStockBalance.mutate(ctx, m)
+	case *ERPStockTransactionMutation:
+		return c.ERPStockTransaction.mutate(ctx, m)
+	case *ERPWarehouseMutation:
+		return c.ERPWarehouse.mutate(ctx, m)
+	case *ERPWorkflowActionLogMutation:
+		return c.ERPWorkflowActionLog.mutate(ctx, m)
+	case *ERPWorkflowInstanceMutation:
+		return c.ERPWorkflowInstance.mutate(ctx, m)
+	case *ERPWorkflowTaskMutation:
+		return c.ERPWorkflowTask.mutate(ctx, m)
 	case *UserMutation:
 		return c.User.mutate(ctx, m)
 	default:
@@ -350,6 +584,1203 @@ func (c *AdminUserClient) mutate(ctx context.Context, m *AdminUserMutation) (Val
 	}
 }
 
+// ERPAttachmentClient is a client for the ERPAttachment schema.
+type ERPAttachmentClient struct {
+	config
+}
+
+// NewERPAttachmentClient returns a client for the ERPAttachment from the given config.
+func NewERPAttachmentClient(c config) *ERPAttachmentClient {
+	return &ERPAttachmentClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `erpattachment.Hooks(f(g(h())))`.
+func (c *ERPAttachmentClient) Use(hooks ...Hook) {
+	c.hooks.ERPAttachment = append(c.hooks.ERPAttachment, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `erpattachment.Intercept(f(g(h())))`.
+func (c *ERPAttachmentClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ERPAttachment = append(c.inters.ERPAttachment, interceptors...)
+}
+
+// Create returns a builder for creating a ERPAttachment entity.
+func (c *ERPAttachmentClient) Create() *ERPAttachmentCreate {
+	mutation := newERPAttachmentMutation(c.config, OpCreate)
+	return &ERPAttachmentCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ERPAttachment entities.
+func (c *ERPAttachmentClient) CreateBulk(builders ...*ERPAttachmentCreate) *ERPAttachmentCreateBulk {
+	return &ERPAttachmentCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ERPAttachmentClient) MapCreateBulk(slice any, setFunc func(*ERPAttachmentCreate, int)) *ERPAttachmentCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ERPAttachmentCreateBulk{err: fmt.Errorf("calling to ERPAttachmentClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ERPAttachmentCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ERPAttachmentCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ERPAttachment.
+func (c *ERPAttachmentClient) Update() *ERPAttachmentUpdate {
+	mutation := newERPAttachmentMutation(c.config, OpUpdate)
+	return &ERPAttachmentUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ERPAttachmentClient) UpdateOne(_m *ERPAttachment) *ERPAttachmentUpdateOne {
+	mutation := newERPAttachmentMutation(c.config, OpUpdateOne, withERPAttachment(_m))
+	return &ERPAttachmentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ERPAttachmentClient) UpdateOneID(id int) *ERPAttachmentUpdateOne {
+	mutation := newERPAttachmentMutation(c.config, OpUpdateOne, withERPAttachmentID(id))
+	return &ERPAttachmentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ERPAttachment.
+func (c *ERPAttachmentClient) Delete() *ERPAttachmentDelete {
+	mutation := newERPAttachmentMutation(c.config, OpDelete)
+	return &ERPAttachmentDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ERPAttachmentClient) DeleteOne(_m *ERPAttachment) *ERPAttachmentDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ERPAttachmentClient) DeleteOneID(id int) *ERPAttachmentDeleteOne {
+	builder := c.Delete().Where(erpattachment.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ERPAttachmentDeleteOne{builder}
+}
+
+// Query returns a query builder for ERPAttachment.
+func (c *ERPAttachmentClient) Query() *ERPAttachmentQuery {
+	return &ERPAttachmentQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeERPAttachment},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ERPAttachment entity by its id.
+func (c *ERPAttachmentClient) Get(ctx context.Context, id int) (*ERPAttachment, error) {
+	return c.Query().Where(erpattachment.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ERPAttachmentClient) GetX(ctx context.Context, id int) *ERPAttachment {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ERPAttachmentClient) Hooks() []Hook {
+	return c.hooks.ERPAttachment
+}
+
+// Interceptors returns the client interceptors.
+func (c *ERPAttachmentClient) Interceptors() []Interceptor {
+	return c.inters.ERPAttachment
+}
+
+func (c *ERPAttachmentClient) mutate(ctx context.Context, m *ERPAttachmentMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ERPAttachmentCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ERPAttachmentUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ERPAttachmentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ERPAttachmentDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ERPAttachment mutation op: %q", m.Op())
+	}
+}
+
+// ERPBankReceiptClient is a client for the ERPBankReceipt schema.
+type ERPBankReceiptClient struct {
+	config
+}
+
+// NewERPBankReceiptClient returns a client for the ERPBankReceipt from the given config.
+func NewERPBankReceiptClient(c config) *ERPBankReceiptClient {
+	return &ERPBankReceiptClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `erpbankreceipt.Hooks(f(g(h())))`.
+func (c *ERPBankReceiptClient) Use(hooks ...Hook) {
+	c.hooks.ERPBankReceipt = append(c.hooks.ERPBankReceipt, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `erpbankreceipt.Intercept(f(g(h())))`.
+func (c *ERPBankReceiptClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ERPBankReceipt = append(c.inters.ERPBankReceipt, interceptors...)
+}
+
+// Create returns a builder for creating a ERPBankReceipt entity.
+func (c *ERPBankReceiptClient) Create() *ERPBankReceiptCreate {
+	mutation := newERPBankReceiptMutation(c.config, OpCreate)
+	return &ERPBankReceiptCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ERPBankReceipt entities.
+func (c *ERPBankReceiptClient) CreateBulk(builders ...*ERPBankReceiptCreate) *ERPBankReceiptCreateBulk {
+	return &ERPBankReceiptCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ERPBankReceiptClient) MapCreateBulk(slice any, setFunc func(*ERPBankReceiptCreate, int)) *ERPBankReceiptCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ERPBankReceiptCreateBulk{err: fmt.Errorf("calling to ERPBankReceiptClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ERPBankReceiptCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ERPBankReceiptCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ERPBankReceipt.
+func (c *ERPBankReceiptClient) Update() *ERPBankReceiptUpdate {
+	mutation := newERPBankReceiptMutation(c.config, OpUpdate)
+	return &ERPBankReceiptUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ERPBankReceiptClient) UpdateOne(_m *ERPBankReceipt) *ERPBankReceiptUpdateOne {
+	mutation := newERPBankReceiptMutation(c.config, OpUpdateOne, withERPBankReceipt(_m))
+	return &ERPBankReceiptUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ERPBankReceiptClient) UpdateOneID(id int) *ERPBankReceiptUpdateOne {
+	mutation := newERPBankReceiptMutation(c.config, OpUpdateOne, withERPBankReceiptID(id))
+	return &ERPBankReceiptUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ERPBankReceipt.
+func (c *ERPBankReceiptClient) Delete() *ERPBankReceiptDelete {
+	mutation := newERPBankReceiptMutation(c.config, OpDelete)
+	return &ERPBankReceiptDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ERPBankReceiptClient) DeleteOne(_m *ERPBankReceipt) *ERPBankReceiptDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ERPBankReceiptClient) DeleteOneID(id int) *ERPBankReceiptDeleteOne {
+	builder := c.Delete().Where(erpbankreceipt.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ERPBankReceiptDeleteOne{builder}
+}
+
+// Query returns a query builder for ERPBankReceipt.
+func (c *ERPBankReceiptClient) Query() *ERPBankReceiptQuery {
+	return &ERPBankReceiptQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeERPBankReceipt},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ERPBankReceipt entity by its id.
+func (c *ERPBankReceiptClient) Get(ctx context.Context, id int) (*ERPBankReceipt, error) {
+	return c.Query().Where(erpbankreceipt.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ERPBankReceiptClient) GetX(ctx context.Context, id int) *ERPBankReceipt {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ERPBankReceiptClient) Hooks() []Hook {
+	return c.hooks.ERPBankReceipt
+}
+
+// Interceptors returns the client interceptors.
+func (c *ERPBankReceiptClient) Interceptors() []Interceptor {
+	return c.inters.ERPBankReceipt
+}
+
+func (c *ERPBankReceiptClient) mutate(ctx context.Context, m *ERPBankReceiptMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ERPBankReceiptCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ERPBankReceiptUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ERPBankReceiptUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ERPBankReceiptDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ERPBankReceipt mutation op: %q", m.Op())
+	}
+}
+
+// ERPBankReceiptClaimClient is a client for the ERPBankReceiptClaim schema.
+type ERPBankReceiptClaimClient struct {
+	config
+}
+
+// NewERPBankReceiptClaimClient returns a client for the ERPBankReceiptClaim from the given config.
+func NewERPBankReceiptClaimClient(c config) *ERPBankReceiptClaimClient {
+	return &ERPBankReceiptClaimClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `erpbankreceiptclaim.Hooks(f(g(h())))`.
+func (c *ERPBankReceiptClaimClient) Use(hooks ...Hook) {
+	c.hooks.ERPBankReceiptClaim = append(c.hooks.ERPBankReceiptClaim, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `erpbankreceiptclaim.Intercept(f(g(h())))`.
+func (c *ERPBankReceiptClaimClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ERPBankReceiptClaim = append(c.inters.ERPBankReceiptClaim, interceptors...)
+}
+
+// Create returns a builder for creating a ERPBankReceiptClaim entity.
+func (c *ERPBankReceiptClaimClient) Create() *ERPBankReceiptClaimCreate {
+	mutation := newERPBankReceiptClaimMutation(c.config, OpCreate)
+	return &ERPBankReceiptClaimCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ERPBankReceiptClaim entities.
+func (c *ERPBankReceiptClaimClient) CreateBulk(builders ...*ERPBankReceiptClaimCreate) *ERPBankReceiptClaimCreateBulk {
+	return &ERPBankReceiptClaimCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ERPBankReceiptClaimClient) MapCreateBulk(slice any, setFunc func(*ERPBankReceiptClaimCreate, int)) *ERPBankReceiptClaimCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ERPBankReceiptClaimCreateBulk{err: fmt.Errorf("calling to ERPBankReceiptClaimClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ERPBankReceiptClaimCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ERPBankReceiptClaimCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ERPBankReceiptClaim.
+func (c *ERPBankReceiptClaimClient) Update() *ERPBankReceiptClaimUpdate {
+	mutation := newERPBankReceiptClaimMutation(c.config, OpUpdate)
+	return &ERPBankReceiptClaimUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ERPBankReceiptClaimClient) UpdateOne(_m *ERPBankReceiptClaim) *ERPBankReceiptClaimUpdateOne {
+	mutation := newERPBankReceiptClaimMutation(c.config, OpUpdateOne, withERPBankReceiptClaim(_m))
+	return &ERPBankReceiptClaimUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ERPBankReceiptClaimClient) UpdateOneID(id int) *ERPBankReceiptClaimUpdateOne {
+	mutation := newERPBankReceiptClaimMutation(c.config, OpUpdateOne, withERPBankReceiptClaimID(id))
+	return &ERPBankReceiptClaimUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ERPBankReceiptClaim.
+func (c *ERPBankReceiptClaimClient) Delete() *ERPBankReceiptClaimDelete {
+	mutation := newERPBankReceiptClaimMutation(c.config, OpDelete)
+	return &ERPBankReceiptClaimDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ERPBankReceiptClaimClient) DeleteOne(_m *ERPBankReceiptClaim) *ERPBankReceiptClaimDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ERPBankReceiptClaimClient) DeleteOneID(id int) *ERPBankReceiptClaimDeleteOne {
+	builder := c.Delete().Where(erpbankreceiptclaim.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ERPBankReceiptClaimDeleteOne{builder}
+}
+
+// Query returns a query builder for ERPBankReceiptClaim.
+func (c *ERPBankReceiptClaimClient) Query() *ERPBankReceiptClaimQuery {
+	return &ERPBankReceiptClaimQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeERPBankReceiptClaim},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ERPBankReceiptClaim entity by its id.
+func (c *ERPBankReceiptClaimClient) Get(ctx context.Context, id int) (*ERPBankReceiptClaim, error) {
+	return c.Query().Where(erpbankreceiptclaim.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ERPBankReceiptClaimClient) GetX(ctx context.Context, id int) *ERPBankReceiptClaim {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ERPBankReceiptClaimClient) Hooks() []Hook {
+	return c.hooks.ERPBankReceiptClaim
+}
+
+// Interceptors returns the client interceptors.
+func (c *ERPBankReceiptClaimClient) Interceptors() []Interceptor {
+	return c.inters.ERPBankReceiptClaim
+}
+
+func (c *ERPBankReceiptClaimClient) mutate(ctx context.Context, m *ERPBankReceiptClaimMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ERPBankReceiptClaimCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ERPBankReceiptClaimUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ERPBankReceiptClaimUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ERPBankReceiptClaimDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ERPBankReceiptClaim mutation op: %q", m.Op())
+	}
+}
+
+// ERPDocLinkClient is a client for the ERPDocLink schema.
+type ERPDocLinkClient struct {
+	config
+}
+
+// NewERPDocLinkClient returns a client for the ERPDocLink from the given config.
+func NewERPDocLinkClient(c config) *ERPDocLinkClient {
+	return &ERPDocLinkClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `erpdoclink.Hooks(f(g(h())))`.
+func (c *ERPDocLinkClient) Use(hooks ...Hook) {
+	c.hooks.ERPDocLink = append(c.hooks.ERPDocLink, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `erpdoclink.Intercept(f(g(h())))`.
+func (c *ERPDocLinkClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ERPDocLink = append(c.inters.ERPDocLink, interceptors...)
+}
+
+// Create returns a builder for creating a ERPDocLink entity.
+func (c *ERPDocLinkClient) Create() *ERPDocLinkCreate {
+	mutation := newERPDocLinkMutation(c.config, OpCreate)
+	return &ERPDocLinkCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ERPDocLink entities.
+func (c *ERPDocLinkClient) CreateBulk(builders ...*ERPDocLinkCreate) *ERPDocLinkCreateBulk {
+	return &ERPDocLinkCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ERPDocLinkClient) MapCreateBulk(slice any, setFunc func(*ERPDocLinkCreate, int)) *ERPDocLinkCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ERPDocLinkCreateBulk{err: fmt.Errorf("calling to ERPDocLinkClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ERPDocLinkCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ERPDocLinkCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ERPDocLink.
+func (c *ERPDocLinkClient) Update() *ERPDocLinkUpdate {
+	mutation := newERPDocLinkMutation(c.config, OpUpdate)
+	return &ERPDocLinkUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ERPDocLinkClient) UpdateOne(_m *ERPDocLink) *ERPDocLinkUpdateOne {
+	mutation := newERPDocLinkMutation(c.config, OpUpdateOne, withERPDocLink(_m))
+	return &ERPDocLinkUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ERPDocLinkClient) UpdateOneID(id int) *ERPDocLinkUpdateOne {
+	mutation := newERPDocLinkMutation(c.config, OpUpdateOne, withERPDocLinkID(id))
+	return &ERPDocLinkUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ERPDocLink.
+func (c *ERPDocLinkClient) Delete() *ERPDocLinkDelete {
+	mutation := newERPDocLinkMutation(c.config, OpDelete)
+	return &ERPDocLinkDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ERPDocLinkClient) DeleteOne(_m *ERPDocLink) *ERPDocLinkDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ERPDocLinkClient) DeleteOneID(id int) *ERPDocLinkDeleteOne {
+	builder := c.Delete().Where(erpdoclink.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ERPDocLinkDeleteOne{builder}
+}
+
+// Query returns a query builder for ERPDocLink.
+func (c *ERPDocLinkClient) Query() *ERPDocLinkQuery {
+	return &ERPDocLinkQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeERPDocLink},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ERPDocLink entity by its id.
+func (c *ERPDocLinkClient) Get(ctx context.Context, id int) (*ERPDocLink, error) {
+	return c.Query().Where(erpdoclink.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ERPDocLinkClient) GetX(ctx context.Context, id int) *ERPDocLink {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ERPDocLinkClient) Hooks() []Hook {
+	return c.hooks.ERPDocLink
+}
+
+// Interceptors returns the client interceptors.
+func (c *ERPDocLinkClient) Interceptors() []Interceptor {
+	return c.inters.ERPDocLink
+}
+
+func (c *ERPDocLinkClient) mutate(ctx context.Context, m *ERPDocLinkMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ERPDocLinkCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ERPDocLinkUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ERPDocLinkUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ERPDocLinkDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ERPDocLink mutation op: %q", m.Op())
+	}
+}
+
+// ERPExportSaleClient is a client for the ERPExportSale schema.
+type ERPExportSaleClient struct {
+	config
+}
+
+// NewERPExportSaleClient returns a client for the ERPExportSale from the given config.
+func NewERPExportSaleClient(c config) *ERPExportSaleClient {
+	return &ERPExportSaleClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `erpexportsale.Hooks(f(g(h())))`.
+func (c *ERPExportSaleClient) Use(hooks ...Hook) {
+	c.hooks.ERPExportSale = append(c.hooks.ERPExportSale, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `erpexportsale.Intercept(f(g(h())))`.
+func (c *ERPExportSaleClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ERPExportSale = append(c.inters.ERPExportSale, interceptors...)
+}
+
+// Create returns a builder for creating a ERPExportSale entity.
+func (c *ERPExportSaleClient) Create() *ERPExportSaleCreate {
+	mutation := newERPExportSaleMutation(c.config, OpCreate)
+	return &ERPExportSaleCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ERPExportSale entities.
+func (c *ERPExportSaleClient) CreateBulk(builders ...*ERPExportSaleCreate) *ERPExportSaleCreateBulk {
+	return &ERPExportSaleCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ERPExportSaleClient) MapCreateBulk(slice any, setFunc func(*ERPExportSaleCreate, int)) *ERPExportSaleCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ERPExportSaleCreateBulk{err: fmt.Errorf("calling to ERPExportSaleClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ERPExportSaleCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ERPExportSaleCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ERPExportSale.
+func (c *ERPExportSaleClient) Update() *ERPExportSaleUpdate {
+	mutation := newERPExportSaleMutation(c.config, OpUpdate)
+	return &ERPExportSaleUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ERPExportSaleClient) UpdateOne(_m *ERPExportSale) *ERPExportSaleUpdateOne {
+	mutation := newERPExportSaleMutation(c.config, OpUpdateOne, withERPExportSale(_m))
+	return &ERPExportSaleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ERPExportSaleClient) UpdateOneID(id int) *ERPExportSaleUpdateOne {
+	mutation := newERPExportSaleMutation(c.config, OpUpdateOne, withERPExportSaleID(id))
+	return &ERPExportSaleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ERPExportSale.
+func (c *ERPExportSaleClient) Delete() *ERPExportSaleDelete {
+	mutation := newERPExportSaleMutation(c.config, OpDelete)
+	return &ERPExportSaleDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ERPExportSaleClient) DeleteOne(_m *ERPExportSale) *ERPExportSaleDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ERPExportSaleClient) DeleteOneID(id int) *ERPExportSaleDeleteOne {
+	builder := c.Delete().Where(erpexportsale.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ERPExportSaleDeleteOne{builder}
+}
+
+// Query returns a query builder for ERPExportSale.
+func (c *ERPExportSaleClient) Query() *ERPExportSaleQuery {
+	return &ERPExportSaleQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeERPExportSale},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ERPExportSale entity by its id.
+func (c *ERPExportSaleClient) Get(ctx context.Context, id int) (*ERPExportSale, error) {
+	return c.Query().Where(erpexportsale.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ERPExportSaleClient) GetX(ctx context.Context, id int) *ERPExportSale {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ERPExportSaleClient) Hooks() []Hook {
+	return c.hooks.ERPExportSale
+}
+
+// Interceptors returns the client interceptors.
+func (c *ERPExportSaleClient) Interceptors() []Interceptor {
+	return c.inters.ERPExportSale
+}
+
+func (c *ERPExportSaleClient) mutate(ctx context.Context, m *ERPExportSaleMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ERPExportSaleCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ERPExportSaleUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ERPExportSaleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ERPExportSaleDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ERPExportSale mutation op: %q", m.Op())
+	}
+}
+
+// ERPExportSaleItemClient is a client for the ERPExportSaleItem schema.
+type ERPExportSaleItemClient struct {
+	config
+}
+
+// NewERPExportSaleItemClient returns a client for the ERPExportSaleItem from the given config.
+func NewERPExportSaleItemClient(c config) *ERPExportSaleItemClient {
+	return &ERPExportSaleItemClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `erpexportsaleitem.Hooks(f(g(h())))`.
+func (c *ERPExportSaleItemClient) Use(hooks ...Hook) {
+	c.hooks.ERPExportSaleItem = append(c.hooks.ERPExportSaleItem, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `erpexportsaleitem.Intercept(f(g(h())))`.
+func (c *ERPExportSaleItemClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ERPExportSaleItem = append(c.inters.ERPExportSaleItem, interceptors...)
+}
+
+// Create returns a builder for creating a ERPExportSaleItem entity.
+func (c *ERPExportSaleItemClient) Create() *ERPExportSaleItemCreate {
+	mutation := newERPExportSaleItemMutation(c.config, OpCreate)
+	return &ERPExportSaleItemCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ERPExportSaleItem entities.
+func (c *ERPExportSaleItemClient) CreateBulk(builders ...*ERPExportSaleItemCreate) *ERPExportSaleItemCreateBulk {
+	return &ERPExportSaleItemCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ERPExportSaleItemClient) MapCreateBulk(slice any, setFunc func(*ERPExportSaleItemCreate, int)) *ERPExportSaleItemCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ERPExportSaleItemCreateBulk{err: fmt.Errorf("calling to ERPExportSaleItemClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ERPExportSaleItemCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ERPExportSaleItemCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ERPExportSaleItem.
+func (c *ERPExportSaleItemClient) Update() *ERPExportSaleItemUpdate {
+	mutation := newERPExportSaleItemMutation(c.config, OpUpdate)
+	return &ERPExportSaleItemUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ERPExportSaleItemClient) UpdateOne(_m *ERPExportSaleItem) *ERPExportSaleItemUpdateOne {
+	mutation := newERPExportSaleItemMutation(c.config, OpUpdateOne, withERPExportSaleItem(_m))
+	return &ERPExportSaleItemUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ERPExportSaleItemClient) UpdateOneID(id int) *ERPExportSaleItemUpdateOne {
+	mutation := newERPExportSaleItemMutation(c.config, OpUpdateOne, withERPExportSaleItemID(id))
+	return &ERPExportSaleItemUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ERPExportSaleItem.
+func (c *ERPExportSaleItemClient) Delete() *ERPExportSaleItemDelete {
+	mutation := newERPExportSaleItemMutation(c.config, OpDelete)
+	return &ERPExportSaleItemDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ERPExportSaleItemClient) DeleteOne(_m *ERPExportSaleItem) *ERPExportSaleItemDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ERPExportSaleItemClient) DeleteOneID(id int) *ERPExportSaleItemDeleteOne {
+	builder := c.Delete().Where(erpexportsaleitem.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ERPExportSaleItemDeleteOne{builder}
+}
+
+// Query returns a query builder for ERPExportSaleItem.
+func (c *ERPExportSaleItemClient) Query() *ERPExportSaleItemQuery {
+	return &ERPExportSaleItemQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeERPExportSaleItem},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ERPExportSaleItem entity by its id.
+func (c *ERPExportSaleItemClient) Get(ctx context.Context, id int) (*ERPExportSaleItem, error) {
+	return c.Query().Where(erpexportsaleitem.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ERPExportSaleItemClient) GetX(ctx context.Context, id int) *ERPExportSaleItem {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ERPExportSaleItemClient) Hooks() []Hook {
+	return c.hooks.ERPExportSaleItem
+}
+
+// Interceptors returns the client interceptors.
+func (c *ERPExportSaleItemClient) Interceptors() []Interceptor {
+	return c.inters.ERPExportSaleItem
+}
+
+func (c *ERPExportSaleItemClient) mutate(ctx context.Context, m *ERPExportSaleItemMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ERPExportSaleItemCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ERPExportSaleItemUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ERPExportSaleItemUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ERPExportSaleItemDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ERPExportSaleItem mutation op: %q", m.Op())
+	}
+}
+
+// ERPInboundNoticeClient is a client for the ERPInboundNotice schema.
+type ERPInboundNoticeClient struct {
+	config
+}
+
+// NewERPInboundNoticeClient returns a client for the ERPInboundNotice from the given config.
+func NewERPInboundNoticeClient(c config) *ERPInboundNoticeClient {
+	return &ERPInboundNoticeClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `erpinboundnotice.Hooks(f(g(h())))`.
+func (c *ERPInboundNoticeClient) Use(hooks ...Hook) {
+	c.hooks.ERPInboundNotice = append(c.hooks.ERPInboundNotice, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `erpinboundnotice.Intercept(f(g(h())))`.
+func (c *ERPInboundNoticeClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ERPInboundNotice = append(c.inters.ERPInboundNotice, interceptors...)
+}
+
+// Create returns a builder for creating a ERPInboundNotice entity.
+func (c *ERPInboundNoticeClient) Create() *ERPInboundNoticeCreate {
+	mutation := newERPInboundNoticeMutation(c.config, OpCreate)
+	return &ERPInboundNoticeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ERPInboundNotice entities.
+func (c *ERPInboundNoticeClient) CreateBulk(builders ...*ERPInboundNoticeCreate) *ERPInboundNoticeCreateBulk {
+	return &ERPInboundNoticeCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ERPInboundNoticeClient) MapCreateBulk(slice any, setFunc func(*ERPInboundNoticeCreate, int)) *ERPInboundNoticeCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ERPInboundNoticeCreateBulk{err: fmt.Errorf("calling to ERPInboundNoticeClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ERPInboundNoticeCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ERPInboundNoticeCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ERPInboundNotice.
+func (c *ERPInboundNoticeClient) Update() *ERPInboundNoticeUpdate {
+	mutation := newERPInboundNoticeMutation(c.config, OpUpdate)
+	return &ERPInboundNoticeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ERPInboundNoticeClient) UpdateOne(_m *ERPInboundNotice) *ERPInboundNoticeUpdateOne {
+	mutation := newERPInboundNoticeMutation(c.config, OpUpdateOne, withERPInboundNotice(_m))
+	return &ERPInboundNoticeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ERPInboundNoticeClient) UpdateOneID(id int) *ERPInboundNoticeUpdateOne {
+	mutation := newERPInboundNoticeMutation(c.config, OpUpdateOne, withERPInboundNoticeID(id))
+	return &ERPInboundNoticeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ERPInboundNotice.
+func (c *ERPInboundNoticeClient) Delete() *ERPInboundNoticeDelete {
+	mutation := newERPInboundNoticeMutation(c.config, OpDelete)
+	return &ERPInboundNoticeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ERPInboundNoticeClient) DeleteOne(_m *ERPInboundNotice) *ERPInboundNoticeDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ERPInboundNoticeClient) DeleteOneID(id int) *ERPInboundNoticeDeleteOne {
+	builder := c.Delete().Where(erpinboundnotice.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ERPInboundNoticeDeleteOne{builder}
+}
+
+// Query returns a query builder for ERPInboundNotice.
+func (c *ERPInboundNoticeClient) Query() *ERPInboundNoticeQuery {
+	return &ERPInboundNoticeQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeERPInboundNotice},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ERPInboundNotice entity by its id.
+func (c *ERPInboundNoticeClient) Get(ctx context.Context, id int) (*ERPInboundNotice, error) {
+	return c.Query().Where(erpinboundnotice.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ERPInboundNoticeClient) GetX(ctx context.Context, id int) *ERPInboundNotice {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ERPInboundNoticeClient) Hooks() []Hook {
+	return c.hooks.ERPInboundNotice
+}
+
+// Interceptors returns the client interceptors.
+func (c *ERPInboundNoticeClient) Interceptors() []Interceptor {
+	return c.inters.ERPInboundNotice
+}
+
+func (c *ERPInboundNoticeClient) mutate(ctx context.Context, m *ERPInboundNoticeMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ERPInboundNoticeCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ERPInboundNoticeUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ERPInboundNoticeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ERPInboundNoticeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ERPInboundNotice mutation op: %q", m.Op())
+	}
+}
+
+// ERPInboundNoticeItemClient is a client for the ERPInboundNoticeItem schema.
+type ERPInboundNoticeItemClient struct {
+	config
+}
+
+// NewERPInboundNoticeItemClient returns a client for the ERPInboundNoticeItem from the given config.
+func NewERPInboundNoticeItemClient(c config) *ERPInboundNoticeItemClient {
+	return &ERPInboundNoticeItemClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `erpinboundnoticeitem.Hooks(f(g(h())))`.
+func (c *ERPInboundNoticeItemClient) Use(hooks ...Hook) {
+	c.hooks.ERPInboundNoticeItem = append(c.hooks.ERPInboundNoticeItem, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `erpinboundnoticeitem.Intercept(f(g(h())))`.
+func (c *ERPInboundNoticeItemClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ERPInboundNoticeItem = append(c.inters.ERPInboundNoticeItem, interceptors...)
+}
+
+// Create returns a builder for creating a ERPInboundNoticeItem entity.
+func (c *ERPInboundNoticeItemClient) Create() *ERPInboundNoticeItemCreate {
+	mutation := newERPInboundNoticeItemMutation(c.config, OpCreate)
+	return &ERPInboundNoticeItemCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ERPInboundNoticeItem entities.
+func (c *ERPInboundNoticeItemClient) CreateBulk(builders ...*ERPInboundNoticeItemCreate) *ERPInboundNoticeItemCreateBulk {
+	return &ERPInboundNoticeItemCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ERPInboundNoticeItemClient) MapCreateBulk(slice any, setFunc func(*ERPInboundNoticeItemCreate, int)) *ERPInboundNoticeItemCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ERPInboundNoticeItemCreateBulk{err: fmt.Errorf("calling to ERPInboundNoticeItemClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ERPInboundNoticeItemCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ERPInboundNoticeItemCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ERPInboundNoticeItem.
+func (c *ERPInboundNoticeItemClient) Update() *ERPInboundNoticeItemUpdate {
+	mutation := newERPInboundNoticeItemMutation(c.config, OpUpdate)
+	return &ERPInboundNoticeItemUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ERPInboundNoticeItemClient) UpdateOne(_m *ERPInboundNoticeItem) *ERPInboundNoticeItemUpdateOne {
+	mutation := newERPInboundNoticeItemMutation(c.config, OpUpdateOne, withERPInboundNoticeItem(_m))
+	return &ERPInboundNoticeItemUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ERPInboundNoticeItemClient) UpdateOneID(id int) *ERPInboundNoticeItemUpdateOne {
+	mutation := newERPInboundNoticeItemMutation(c.config, OpUpdateOne, withERPInboundNoticeItemID(id))
+	return &ERPInboundNoticeItemUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ERPInboundNoticeItem.
+func (c *ERPInboundNoticeItemClient) Delete() *ERPInboundNoticeItemDelete {
+	mutation := newERPInboundNoticeItemMutation(c.config, OpDelete)
+	return &ERPInboundNoticeItemDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ERPInboundNoticeItemClient) DeleteOne(_m *ERPInboundNoticeItem) *ERPInboundNoticeItemDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ERPInboundNoticeItemClient) DeleteOneID(id int) *ERPInboundNoticeItemDeleteOne {
+	builder := c.Delete().Where(erpinboundnoticeitem.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ERPInboundNoticeItemDeleteOne{builder}
+}
+
+// Query returns a query builder for ERPInboundNoticeItem.
+func (c *ERPInboundNoticeItemClient) Query() *ERPInboundNoticeItemQuery {
+	return &ERPInboundNoticeItemQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeERPInboundNoticeItem},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ERPInboundNoticeItem entity by its id.
+func (c *ERPInboundNoticeItemClient) Get(ctx context.Context, id int) (*ERPInboundNoticeItem, error) {
+	return c.Query().Where(erpinboundnoticeitem.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ERPInboundNoticeItemClient) GetX(ctx context.Context, id int) *ERPInboundNoticeItem {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ERPInboundNoticeItemClient) Hooks() []Hook {
+	return c.hooks.ERPInboundNoticeItem
+}
+
+// Interceptors returns the client interceptors.
+func (c *ERPInboundNoticeItemClient) Interceptors() []Interceptor {
+	return c.inters.ERPInboundNoticeItem
+}
+
+func (c *ERPInboundNoticeItemClient) mutate(ctx context.Context, m *ERPInboundNoticeItemMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ERPInboundNoticeItemCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ERPInboundNoticeItemUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ERPInboundNoticeItemUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ERPInboundNoticeItemDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ERPInboundNoticeItem mutation op: %q", m.Op())
+	}
+}
+
+// ERPLocationClient is a client for the ERPLocation schema.
+type ERPLocationClient struct {
+	config
+}
+
+// NewERPLocationClient returns a client for the ERPLocation from the given config.
+func NewERPLocationClient(c config) *ERPLocationClient {
+	return &ERPLocationClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `erplocation.Hooks(f(g(h())))`.
+func (c *ERPLocationClient) Use(hooks ...Hook) {
+	c.hooks.ERPLocation = append(c.hooks.ERPLocation, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `erplocation.Intercept(f(g(h())))`.
+func (c *ERPLocationClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ERPLocation = append(c.inters.ERPLocation, interceptors...)
+}
+
+// Create returns a builder for creating a ERPLocation entity.
+func (c *ERPLocationClient) Create() *ERPLocationCreate {
+	mutation := newERPLocationMutation(c.config, OpCreate)
+	return &ERPLocationCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ERPLocation entities.
+func (c *ERPLocationClient) CreateBulk(builders ...*ERPLocationCreate) *ERPLocationCreateBulk {
+	return &ERPLocationCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ERPLocationClient) MapCreateBulk(slice any, setFunc func(*ERPLocationCreate, int)) *ERPLocationCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ERPLocationCreateBulk{err: fmt.Errorf("calling to ERPLocationClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ERPLocationCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ERPLocationCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ERPLocation.
+func (c *ERPLocationClient) Update() *ERPLocationUpdate {
+	mutation := newERPLocationMutation(c.config, OpUpdate)
+	return &ERPLocationUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ERPLocationClient) UpdateOne(_m *ERPLocation) *ERPLocationUpdateOne {
+	mutation := newERPLocationMutation(c.config, OpUpdateOne, withERPLocation(_m))
+	return &ERPLocationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ERPLocationClient) UpdateOneID(id int) *ERPLocationUpdateOne {
+	mutation := newERPLocationMutation(c.config, OpUpdateOne, withERPLocationID(id))
+	return &ERPLocationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ERPLocation.
+func (c *ERPLocationClient) Delete() *ERPLocationDelete {
+	mutation := newERPLocationMutation(c.config, OpDelete)
+	return &ERPLocationDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ERPLocationClient) DeleteOne(_m *ERPLocation) *ERPLocationDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ERPLocationClient) DeleteOneID(id int) *ERPLocationDeleteOne {
+	builder := c.Delete().Where(erplocation.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ERPLocationDeleteOne{builder}
+}
+
+// Query returns a query builder for ERPLocation.
+func (c *ERPLocationClient) Query() *ERPLocationQuery {
+	return &ERPLocationQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeERPLocation},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ERPLocation entity by its id.
+func (c *ERPLocationClient) Get(ctx context.Context, id int) (*ERPLocation, error) {
+	return c.Query().Where(erplocation.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ERPLocationClient) GetX(ctx context.Context, id int) *ERPLocation {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ERPLocationClient) Hooks() []Hook {
+	return c.hooks.ERPLocation
+}
+
+// Interceptors returns the client interceptors.
+func (c *ERPLocationClient) Interceptors() []Interceptor {
+	return c.inters.ERPLocation
+}
+
+func (c *ERPLocationClient) mutate(ctx context.Context, m *ERPLocationMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ERPLocationCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ERPLocationUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ERPLocationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ERPLocationDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ERPLocation mutation op: %q", m.Op())
+	}
+}
+
 // ERPModuleRecordClient is a client for the ERPModuleRecord schema.
 type ERPModuleRecordClient struct {
 	config
@@ -480,6 +1911,2400 @@ func (c *ERPModuleRecordClient) mutate(ctx context.Context, m *ERPModuleRecordMu
 		return (&ERPModuleRecordDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown ERPModuleRecord mutation op: %q", m.Op())
+	}
+}
+
+// ERPOutboundOrderClient is a client for the ERPOutboundOrder schema.
+type ERPOutboundOrderClient struct {
+	config
+}
+
+// NewERPOutboundOrderClient returns a client for the ERPOutboundOrder from the given config.
+func NewERPOutboundOrderClient(c config) *ERPOutboundOrderClient {
+	return &ERPOutboundOrderClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `erpoutboundorder.Hooks(f(g(h())))`.
+func (c *ERPOutboundOrderClient) Use(hooks ...Hook) {
+	c.hooks.ERPOutboundOrder = append(c.hooks.ERPOutboundOrder, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `erpoutboundorder.Intercept(f(g(h())))`.
+func (c *ERPOutboundOrderClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ERPOutboundOrder = append(c.inters.ERPOutboundOrder, interceptors...)
+}
+
+// Create returns a builder for creating a ERPOutboundOrder entity.
+func (c *ERPOutboundOrderClient) Create() *ERPOutboundOrderCreate {
+	mutation := newERPOutboundOrderMutation(c.config, OpCreate)
+	return &ERPOutboundOrderCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ERPOutboundOrder entities.
+func (c *ERPOutboundOrderClient) CreateBulk(builders ...*ERPOutboundOrderCreate) *ERPOutboundOrderCreateBulk {
+	return &ERPOutboundOrderCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ERPOutboundOrderClient) MapCreateBulk(slice any, setFunc func(*ERPOutboundOrderCreate, int)) *ERPOutboundOrderCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ERPOutboundOrderCreateBulk{err: fmt.Errorf("calling to ERPOutboundOrderClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ERPOutboundOrderCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ERPOutboundOrderCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ERPOutboundOrder.
+func (c *ERPOutboundOrderClient) Update() *ERPOutboundOrderUpdate {
+	mutation := newERPOutboundOrderMutation(c.config, OpUpdate)
+	return &ERPOutboundOrderUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ERPOutboundOrderClient) UpdateOne(_m *ERPOutboundOrder) *ERPOutboundOrderUpdateOne {
+	mutation := newERPOutboundOrderMutation(c.config, OpUpdateOne, withERPOutboundOrder(_m))
+	return &ERPOutboundOrderUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ERPOutboundOrderClient) UpdateOneID(id int) *ERPOutboundOrderUpdateOne {
+	mutation := newERPOutboundOrderMutation(c.config, OpUpdateOne, withERPOutboundOrderID(id))
+	return &ERPOutboundOrderUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ERPOutboundOrder.
+func (c *ERPOutboundOrderClient) Delete() *ERPOutboundOrderDelete {
+	mutation := newERPOutboundOrderMutation(c.config, OpDelete)
+	return &ERPOutboundOrderDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ERPOutboundOrderClient) DeleteOne(_m *ERPOutboundOrder) *ERPOutboundOrderDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ERPOutboundOrderClient) DeleteOneID(id int) *ERPOutboundOrderDeleteOne {
+	builder := c.Delete().Where(erpoutboundorder.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ERPOutboundOrderDeleteOne{builder}
+}
+
+// Query returns a query builder for ERPOutboundOrder.
+func (c *ERPOutboundOrderClient) Query() *ERPOutboundOrderQuery {
+	return &ERPOutboundOrderQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeERPOutboundOrder},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ERPOutboundOrder entity by its id.
+func (c *ERPOutboundOrderClient) Get(ctx context.Context, id int) (*ERPOutboundOrder, error) {
+	return c.Query().Where(erpoutboundorder.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ERPOutboundOrderClient) GetX(ctx context.Context, id int) *ERPOutboundOrder {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ERPOutboundOrderClient) Hooks() []Hook {
+	return c.hooks.ERPOutboundOrder
+}
+
+// Interceptors returns the client interceptors.
+func (c *ERPOutboundOrderClient) Interceptors() []Interceptor {
+	return c.inters.ERPOutboundOrder
+}
+
+func (c *ERPOutboundOrderClient) mutate(ctx context.Context, m *ERPOutboundOrderMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ERPOutboundOrderCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ERPOutboundOrderUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ERPOutboundOrderUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ERPOutboundOrderDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ERPOutboundOrder mutation op: %q", m.Op())
+	}
+}
+
+// ERPOutboundOrderItemClient is a client for the ERPOutboundOrderItem schema.
+type ERPOutboundOrderItemClient struct {
+	config
+}
+
+// NewERPOutboundOrderItemClient returns a client for the ERPOutboundOrderItem from the given config.
+func NewERPOutboundOrderItemClient(c config) *ERPOutboundOrderItemClient {
+	return &ERPOutboundOrderItemClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `erpoutboundorderitem.Hooks(f(g(h())))`.
+func (c *ERPOutboundOrderItemClient) Use(hooks ...Hook) {
+	c.hooks.ERPOutboundOrderItem = append(c.hooks.ERPOutboundOrderItem, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `erpoutboundorderitem.Intercept(f(g(h())))`.
+func (c *ERPOutboundOrderItemClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ERPOutboundOrderItem = append(c.inters.ERPOutboundOrderItem, interceptors...)
+}
+
+// Create returns a builder for creating a ERPOutboundOrderItem entity.
+func (c *ERPOutboundOrderItemClient) Create() *ERPOutboundOrderItemCreate {
+	mutation := newERPOutboundOrderItemMutation(c.config, OpCreate)
+	return &ERPOutboundOrderItemCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ERPOutboundOrderItem entities.
+func (c *ERPOutboundOrderItemClient) CreateBulk(builders ...*ERPOutboundOrderItemCreate) *ERPOutboundOrderItemCreateBulk {
+	return &ERPOutboundOrderItemCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ERPOutboundOrderItemClient) MapCreateBulk(slice any, setFunc func(*ERPOutboundOrderItemCreate, int)) *ERPOutboundOrderItemCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ERPOutboundOrderItemCreateBulk{err: fmt.Errorf("calling to ERPOutboundOrderItemClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ERPOutboundOrderItemCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ERPOutboundOrderItemCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ERPOutboundOrderItem.
+func (c *ERPOutboundOrderItemClient) Update() *ERPOutboundOrderItemUpdate {
+	mutation := newERPOutboundOrderItemMutation(c.config, OpUpdate)
+	return &ERPOutboundOrderItemUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ERPOutboundOrderItemClient) UpdateOne(_m *ERPOutboundOrderItem) *ERPOutboundOrderItemUpdateOne {
+	mutation := newERPOutboundOrderItemMutation(c.config, OpUpdateOne, withERPOutboundOrderItem(_m))
+	return &ERPOutboundOrderItemUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ERPOutboundOrderItemClient) UpdateOneID(id int) *ERPOutboundOrderItemUpdateOne {
+	mutation := newERPOutboundOrderItemMutation(c.config, OpUpdateOne, withERPOutboundOrderItemID(id))
+	return &ERPOutboundOrderItemUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ERPOutboundOrderItem.
+func (c *ERPOutboundOrderItemClient) Delete() *ERPOutboundOrderItemDelete {
+	mutation := newERPOutboundOrderItemMutation(c.config, OpDelete)
+	return &ERPOutboundOrderItemDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ERPOutboundOrderItemClient) DeleteOne(_m *ERPOutboundOrderItem) *ERPOutboundOrderItemDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ERPOutboundOrderItemClient) DeleteOneID(id int) *ERPOutboundOrderItemDeleteOne {
+	builder := c.Delete().Where(erpoutboundorderitem.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ERPOutboundOrderItemDeleteOne{builder}
+}
+
+// Query returns a query builder for ERPOutboundOrderItem.
+func (c *ERPOutboundOrderItemClient) Query() *ERPOutboundOrderItemQuery {
+	return &ERPOutboundOrderItemQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeERPOutboundOrderItem},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ERPOutboundOrderItem entity by its id.
+func (c *ERPOutboundOrderItemClient) Get(ctx context.Context, id int) (*ERPOutboundOrderItem, error) {
+	return c.Query().Where(erpoutboundorderitem.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ERPOutboundOrderItemClient) GetX(ctx context.Context, id int) *ERPOutboundOrderItem {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ERPOutboundOrderItemClient) Hooks() []Hook {
+	return c.hooks.ERPOutboundOrderItem
+}
+
+// Interceptors returns the client interceptors.
+func (c *ERPOutboundOrderItemClient) Interceptors() []Interceptor {
+	return c.inters.ERPOutboundOrderItem
+}
+
+func (c *ERPOutboundOrderItemClient) mutate(ctx context.Context, m *ERPOutboundOrderItemMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ERPOutboundOrderItemCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ERPOutboundOrderItemUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ERPOutboundOrderItemUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ERPOutboundOrderItemDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ERPOutboundOrderItem mutation op: %q", m.Op())
+	}
+}
+
+// ERPPartnerClient is a client for the ERPPartner schema.
+type ERPPartnerClient struct {
+	config
+}
+
+// NewERPPartnerClient returns a client for the ERPPartner from the given config.
+func NewERPPartnerClient(c config) *ERPPartnerClient {
+	return &ERPPartnerClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `erppartner.Hooks(f(g(h())))`.
+func (c *ERPPartnerClient) Use(hooks ...Hook) {
+	c.hooks.ERPPartner = append(c.hooks.ERPPartner, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `erppartner.Intercept(f(g(h())))`.
+func (c *ERPPartnerClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ERPPartner = append(c.inters.ERPPartner, interceptors...)
+}
+
+// Create returns a builder for creating a ERPPartner entity.
+func (c *ERPPartnerClient) Create() *ERPPartnerCreate {
+	mutation := newERPPartnerMutation(c.config, OpCreate)
+	return &ERPPartnerCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ERPPartner entities.
+func (c *ERPPartnerClient) CreateBulk(builders ...*ERPPartnerCreate) *ERPPartnerCreateBulk {
+	return &ERPPartnerCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ERPPartnerClient) MapCreateBulk(slice any, setFunc func(*ERPPartnerCreate, int)) *ERPPartnerCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ERPPartnerCreateBulk{err: fmt.Errorf("calling to ERPPartnerClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ERPPartnerCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ERPPartnerCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ERPPartner.
+func (c *ERPPartnerClient) Update() *ERPPartnerUpdate {
+	mutation := newERPPartnerMutation(c.config, OpUpdate)
+	return &ERPPartnerUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ERPPartnerClient) UpdateOne(_m *ERPPartner) *ERPPartnerUpdateOne {
+	mutation := newERPPartnerMutation(c.config, OpUpdateOne, withERPPartner(_m))
+	return &ERPPartnerUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ERPPartnerClient) UpdateOneID(id int) *ERPPartnerUpdateOne {
+	mutation := newERPPartnerMutation(c.config, OpUpdateOne, withERPPartnerID(id))
+	return &ERPPartnerUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ERPPartner.
+func (c *ERPPartnerClient) Delete() *ERPPartnerDelete {
+	mutation := newERPPartnerMutation(c.config, OpDelete)
+	return &ERPPartnerDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ERPPartnerClient) DeleteOne(_m *ERPPartner) *ERPPartnerDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ERPPartnerClient) DeleteOneID(id int) *ERPPartnerDeleteOne {
+	builder := c.Delete().Where(erppartner.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ERPPartnerDeleteOne{builder}
+}
+
+// Query returns a query builder for ERPPartner.
+func (c *ERPPartnerClient) Query() *ERPPartnerQuery {
+	return &ERPPartnerQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeERPPartner},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ERPPartner entity by its id.
+func (c *ERPPartnerClient) Get(ctx context.Context, id int) (*ERPPartner, error) {
+	return c.Query().Where(erppartner.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ERPPartnerClient) GetX(ctx context.Context, id int) *ERPPartner {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ERPPartnerClient) Hooks() []Hook {
+	return c.hooks.ERPPartner
+}
+
+// Interceptors returns the client interceptors.
+func (c *ERPPartnerClient) Interceptors() []Interceptor {
+	return c.inters.ERPPartner
+}
+
+func (c *ERPPartnerClient) mutate(ctx context.Context, m *ERPPartnerMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ERPPartnerCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ERPPartnerUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ERPPartnerUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ERPPartnerDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ERPPartner mutation op: %q", m.Op())
+	}
+}
+
+// ERPProductClient is a client for the ERPProduct schema.
+type ERPProductClient struct {
+	config
+}
+
+// NewERPProductClient returns a client for the ERPProduct from the given config.
+func NewERPProductClient(c config) *ERPProductClient {
+	return &ERPProductClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `erpproduct.Hooks(f(g(h())))`.
+func (c *ERPProductClient) Use(hooks ...Hook) {
+	c.hooks.ERPProduct = append(c.hooks.ERPProduct, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `erpproduct.Intercept(f(g(h())))`.
+func (c *ERPProductClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ERPProduct = append(c.inters.ERPProduct, interceptors...)
+}
+
+// Create returns a builder for creating a ERPProduct entity.
+func (c *ERPProductClient) Create() *ERPProductCreate {
+	mutation := newERPProductMutation(c.config, OpCreate)
+	return &ERPProductCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ERPProduct entities.
+func (c *ERPProductClient) CreateBulk(builders ...*ERPProductCreate) *ERPProductCreateBulk {
+	return &ERPProductCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ERPProductClient) MapCreateBulk(slice any, setFunc func(*ERPProductCreate, int)) *ERPProductCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ERPProductCreateBulk{err: fmt.Errorf("calling to ERPProductClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ERPProductCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ERPProductCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ERPProduct.
+func (c *ERPProductClient) Update() *ERPProductUpdate {
+	mutation := newERPProductMutation(c.config, OpUpdate)
+	return &ERPProductUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ERPProductClient) UpdateOne(_m *ERPProduct) *ERPProductUpdateOne {
+	mutation := newERPProductMutation(c.config, OpUpdateOne, withERPProduct(_m))
+	return &ERPProductUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ERPProductClient) UpdateOneID(id int) *ERPProductUpdateOne {
+	mutation := newERPProductMutation(c.config, OpUpdateOne, withERPProductID(id))
+	return &ERPProductUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ERPProduct.
+func (c *ERPProductClient) Delete() *ERPProductDelete {
+	mutation := newERPProductMutation(c.config, OpDelete)
+	return &ERPProductDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ERPProductClient) DeleteOne(_m *ERPProduct) *ERPProductDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ERPProductClient) DeleteOneID(id int) *ERPProductDeleteOne {
+	builder := c.Delete().Where(erpproduct.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ERPProductDeleteOne{builder}
+}
+
+// Query returns a query builder for ERPProduct.
+func (c *ERPProductClient) Query() *ERPProductQuery {
+	return &ERPProductQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeERPProduct},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ERPProduct entity by its id.
+func (c *ERPProductClient) Get(ctx context.Context, id int) (*ERPProduct, error) {
+	return c.Query().Where(erpproduct.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ERPProductClient) GetX(ctx context.Context, id int) *ERPProduct {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ERPProductClient) Hooks() []Hook {
+	return c.hooks.ERPProduct
+}
+
+// Interceptors returns the client interceptors.
+func (c *ERPProductClient) Interceptors() []Interceptor {
+	return c.inters.ERPProduct
+}
+
+func (c *ERPProductClient) mutate(ctx context.Context, m *ERPProductMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ERPProductCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ERPProductUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ERPProductUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ERPProductDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ERPProduct mutation op: %q", m.Op())
+	}
+}
+
+// ERPPurchaseContractClient is a client for the ERPPurchaseContract schema.
+type ERPPurchaseContractClient struct {
+	config
+}
+
+// NewERPPurchaseContractClient returns a client for the ERPPurchaseContract from the given config.
+func NewERPPurchaseContractClient(c config) *ERPPurchaseContractClient {
+	return &ERPPurchaseContractClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `erppurchasecontract.Hooks(f(g(h())))`.
+func (c *ERPPurchaseContractClient) Use(hooks ...Hook) {
+	c.hooks.ERPPurchaseContract = append(c.hooks.ERPPurchaseContract, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `erppurchasecontract.Intercept(f(g(h())))`.
+func (c *ERPPurchaseContractClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ERPPurchaseContract = append(c.inters.ERPPurchaseContract, interceptors...)
+}
+
+// Create returns a builder for creating a ERPPurchaseContract entity.
+func (c *ERPPurchaseContractClient) Create() *ERPPurchaseContractCreate {
+	mutation := newERPPurchaseContractMutation(c.config, OpCreate)
+	return &ERPPurchaseContractCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ERPPurchaseContract entities.
+func (c *ERPPurchaseContractClient) CreateBulk(builders ...*ERPPurchaseContractCreate) *ERPPurchaseContractCreateBulk {
+	return &ERPPurchaseContractCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ERPPurchaseContractClient) MapCreateBulk(slice any, setFunc func(*ERPPurchaseContractCreate, int)) *ERPPurchaseContractCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ERPPurchaseContractCreateBulk{err: fmt.Errorf("calling to ERPPurchaseContractClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ERPPurchaseContractCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ERPPurchaseContractCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ERPPurchaseContract.
+func (c *ERPPurchaseContractClient) Update() *ERPPurchaseContractUpdate {
+	mutation := newERPPurchaseContractMutation(c.config, OpUpdate)
+	return &ERPPurchaseContractUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ERPPurchaseContractClient) UpdateOne(_m *ERPPurchaseContract) *ERPPurchaseContractUpdateOne {
+	mutation := newERPPurchaseContractMutation(c.config, OpUpdateOne, withERPPurchaseContract(_m))
+	return &ERPPurchaseContractUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ERPPurchaseContractClient) UpdateOneID(id int) *ERPPurchaseContractUpdateOne {
+	mutation := newERPPurchaseContractMutation(c.config, OpUpdateOne, withERPPurchaseContractID(id))
+	return &ERPPurchaseContractUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ERPPurchaseContract.
+func (c *ERPPurchaseContractClient) Delete() *ERPPurchaseContractDelete {
+	mutation := newERPPurchaseContractMutation(c.config, OpDelete)
+	return &ERPPurchaseContractDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ERPPurchaseContractClient) DeleteOne(_m *ERPPurchaseContract) *ERPPurchaseContractDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ERPPurchaseContractClient) DeleteOneID(id int) *ERPPurchaseContractDeleteOne {
+	builder := c.Delete().Where(erppurchasecontract.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ERPPurchaseContractDeleteOne{builder}
+}
+
+// Query returns a query builder for ERPPurchaseContract.
+func (c *ERPPurchaseContractClient) Query() *ERPPurchaseContractQuery {
+	return &ERPPurchaseContractQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeERPPurchaseContract},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ERPPurchaseContract entity by its id.
+func (c *ERPPurchaseContractClient) Get(ctx context.Context, id int) (*ERPPurchaseContract, error) {
+	return c.Query().Where(erppurchasecontract.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ERPPurchaseContractClient) GetX(ctx context.Context, id int) *ERPPurchaseContract {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ERPPurchaseContractClient) Hooks() []Hook {
+	return c.hooks.ERPPurchaseContract
+}
+
+// Interceptors returns the client interceptors.
+func (c *ERPPurchaseContractClient) Interceptors() []Interceptor {
+	return c.inters.ERPPurchaseContract
+}
+
+func (c *ERPPurchaseContractClient) mutate(ctx context.Context, m *ERPPurchaseContractMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ERPPurchaseContractCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ERPPurchaseContractUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ERPPurchaseContractUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ERPPurchaseContractDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ERPPurchaseContract mutation op: %q", m.Op())
+	}
+}
+
+// ERPPurchaseContractItemClient is a client for the ERPPurchaseContractItem schema.
+type ERPPurchaseContractItemClient struct {
+	config
+}
+
+// NewERPPurchaseContractItemClient returns a client for the ERPPurchaseContractItem from the given config.
+func NewERPPurchaseContractItemClient(c config) *ERPPurchaseContractItemClient {
+	return &ERPPurchaseContractItemClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `erppurchasecontractitem.Hooks(f(g(h())))`.
+func (c *ERPPurchaseContractItemClient) Use(hooks ...Hook) {
+	c.hooks.ERPPurchaseContractItem = append(c.hooks.ERPPurchaseContractItem, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `erppurchasecontractitem.Intercept(f(g(h())))`.
+func (c *ERPPurchaseContractItemClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ERPPurchaseContractItem = append(c.inters.ERPPurchaseContractItem, interceptors...)
+}
+
+// Create returns a builder for creating a ERPPurchaseContractItem entity.
+func (c *ERPPurchaseContractItemClient) Create() *ERPPurchaseContractItemCreate {
+	mutation := newERPPurchaseContractItemMutation(c.config, OpCreate)
+	return &ERPPurchaseContractItemCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ERPPurchaseContractItem entities.
+func (c *ERPPurchaseContractItemClient) CreateBulk(builders ...*ERPPurchaseContractItemCreate) *ERPPurchaseContractItemCreateBulk {
+	return &ERPPurchaseContractItemCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ERPPurchaseContractItemClient) MapCreateBulk(slice any, setFunc func(*ERPPurchaseContractItemCreate, int)) *ERPPurchaseContractItemCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ERPPurchaseContractItemCreateBulk{err: fmt.Errorf("calling to ERPPurchaseContractItemClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ERPPurchaseContractItemCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ERPPurchaseContractItemCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ERPPurchaseContractItem.
+func (c *ERPPurchaseContractItemClient) Update() *ERPPurchaseContractItemUpdate {
+	mutation := newERPPurchaseContractItemMutation(c.config, OpUpdate)
+	return &ERPPurchaseContractItemUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ERPPurchaseContractItemClient) UpdateOne(_m *ERPPurchaseContractItem) *ERPPurchaseContractItemUpdateOne {
+	mutation := newERPPurchaseContractItemMutation(c.config, OpUpdateOne, withERPPurchaseContractItem(_m))
+	return &ERPPurchaseContractItemUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ERPPurchaseContractItemClient) UpdateOneID(id int) *ERPPurchaseContractItemUpdateOne {
+	mutation := newERPPurchaseContractItemMutation(c.config, OpUpdateOne, withERPPurchaseContractItemID(id))
+	return &ERPPurchaseContractItemUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ERPPurchaseContractItem.
+func (c *ERPPurchaseContractItemClient) Delete() *ERPPurchaseContractItemDelete {
+	mutation := newERPPurchaseContractItemMutation(c.config, OpDelete)
+	return &ERPPurchaseContractItemDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ERPPurchaseContractItemClient) DeleteOne(_m *ERPPurchaseContractItem) *ERPPurchaseContractItemDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ERPPurchaseContractItemClient) DeleteOneID(id int) *ERPPurchaseContractItemDeleteOne {
+	builder := c.Delete().Where(erppurchasecontractitem.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ERPPurchaseContractItemDeleteOne{builder}
+}
+
+// Query returns a query builder for ERPPurchaseContractItem.
+func (c *ERPPurchaseContractItemClient) Query() *ERPPurchaseContractItemQuery {
+	return &ERPPurchaseContractItemQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeERPPurchaseContractItem},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ERPPurchaseContractItem entity by its id.
+func (c *ERPPurchaseContractItemClient) Get(ctx context.Context, id int) (*ERPPurchaseContractItem, error) {
+	return c.Query().Where(erppurchasecontractitem.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ERPPurchaseContractItemClient) GetX(ctx context.Context, id int) *ERPPurchaseContractItem {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ERPPurchaseContractItemClient) Hooks() []Hook {
+	return c.hooks.ERPPurchaseContractItem
+}
+
+// Interceptors returns the client interceptors.
+func (c *ERPPurchaseContractItemClient) Interceptors() []Interceptor {
+	return c.inters.ERPPurchaseContractItem
+}
+
+func (c *ERPPurchaseContractItemClient) mutate(ctx context.Context, m *ERPPurchaseContractItemMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ERPPurchaseContractItemCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ERPPurchaseContractItemUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ERPPurchaseContractItemUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ERPPurchaseContractItemDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ERPPurchaseContractItem mutation op: %q", m.Op())
+	}
+}
+
+// ERPQuotationClient is a client for the ERPQuotation schema.
+type ERPQuotationClient struct {
+	config
+}
+
+// NewERPQuotationClient returns a client for the ERPQuotation from the given config.
+func NewERPQuotationClient(c config) *ERPQuotationClient {
+	return &ERPQuotationClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `erpquotation.Hooks(f(g(h())))`.
+func (c *ERPQuotationClient) Use(hooks ...Hook) {
+	c.hooks.ERPQuotation = append(c.hooks.ERPQuotation, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `erpquotation.Intercept(f(g(h())))`.
+func (c *ERPQuotationClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ERPQuotation = append(c.inters.ERPQuotation, interceptors...)
+}
+
+// Create returns a builder for creating a ERPQuotation entity.
+func (c *ERPQuotationClient) Create() *ERPQuotationCreate {
+	mutation := newERPQuotationMutation(c.config, OpCreate)
+	return &ERPQuotationCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ERPQuotation entities.
+func (c *ERPQuotationClient) CreateBulk(builders ...*ERPQuotationCreate) *ERPQuotationCreateBulk {
+	return &ERPQuotationCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ERPQuotationClient) MapCreateBulk(slice any, setFunc func(*ERPQuotationCreate, int)) *ERPQuotationCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ERPQuotationCreateBulk{err: fmt.Errorf("calling to ERPQuotationClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ERPQuotationCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ERPQuotationCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ERPQuotation.
+func (c *ERPQuotationClient) Update() *ERPQuotationUpdate {
+	mutation := newERPQuotationMutation(c.config, OpUpdate)
+	return &ERPQuotationUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ERPQuotationClient) UpdateOne(_m *ERPQuotation) *ERPQuotationUpdateOne {
+	mutation := newERPQuotationMutation(c.config, OpUpdateOne, withERPQuotation(_m))
+	return &ERPQuotationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ERPQuotationClient) UpdateOneID(id int) *ERPQuotationUpdateOne {
+	mutation := newERPQuotationMutation(c.config, OpUpdateOne, withERPQuotationID(id))
+	return &ERPQuotationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ERPQuotation.
+func (c *ERPQuotationClient) Delete() *ERPQuotationDelete {
+	mutation := newERPQuotationMutation(c.config, OpDelete)
+	return &ERPQuotationDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ERPQuotationClient) DeleteOne(_m *ERPQuotation) *ERPQuotationDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ERPQuotationClient) DeleteOneID(id int) *ERPQuotationDeleteOne {
+	builder := c.Delete().Where(erpquotation.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ERPQuotationDeleteOne{builder}
+}
+
+// Query returns a query builder for ERPQuotation.
+func (c *ERPQuotationClient) Query() *ERPQuotationQuery {
+	return &ERPQuotationQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeERPQuotation},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ERPQuotation entity by its id.
+func (c *ERPQuotationClient) Get(ctx context.Context, id int) (*ERPQuotation, error) {
+	return c.Query().Where(erpquotation.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ERPQuotationClient) GetX(ctx context.Context, id int) *ERPQuotation {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ERPQuotationClient) Hooks() []Hook {
+	return c.hooks.ERPQuotation
+}
+
+// Interceptors returns the client interceptors.
+func (c *ERPQuotationClient) Interceptors() []Interceptor {
+	return c.inters.ERPQuotation
+}
+
+func (c *ERPQuotationClient) mutate(ctx context.Context, m *ERPQuotationMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ERPQuotationCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ERPQuotationUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ERPQuotationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ERPQuotationDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ERPQuotation mutation op: %q", m.Op())
+	}
+}
+
+// ERPQuotationItemClient is a client for the ERPQuotationItem schema.
+type ERPQuotationItemClient struct {
+	config
+}
+
+// NewERPQuotationItemClient returns a client for the ERPQuotationItem from the given config.
+func NewERPQuotationItemClient(c config) *ERPQuotationItemClient {
+	return &ERPQuotationItemClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `erpquotationitem.Hooks(f(g(h())))`.
+func (c *ERPQuotationItemClient) Use(hooks ...Hook) {
+	c.hooks.ERPQuotationItem = append(c.hooks.ERPQuotationItem, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `erpquotationitem.Intercept(f(g(h())))`.
+func (c *ERPQuotationItemClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ERPQuotationItem = append(c.inters.ERPQuotationItem, interceptors...)
+}
+
+// Create returns a builder for creating a ERPQuotationItem entity.
+func (c *ERPQuotationItemClient) Create() *ERPQuotationItemCreate {
+	mutation := newERPQuotationItemMutation(c.config, OpCreate)
+	return &ERPQuotationItemCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ERPQuotationItem entities.
+func (c *ERPQuotationItemClient) CreateBulk(builders ...*ERPQuotationItemCreate) *ERPQuotationItemCreateBulk {
+	return &ERPQuotationItemCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ERPQuotationItemClient) MapCreateBulk(slice any, setFunc func(*ERPQuotationItemCreate, int)) *ERPQuotationItemCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ERPQuotationItemCreateBulk{err: fmt.Errorf("calling to ERPQuotationItemClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ERPQuotationItemCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ERPQuotationItemCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ERPQuotationItem.
+func (c *ERPQuotationItemClient) Update() *ERPQuotationItemUpdate {
+	mutation := newERPQuotationItemMutation(c.config, OpUpdate)
+	return &ERPQuotationItemUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ERPQuotationItemClient) UpdateOne(_m *ERPQuotationItem) *ERPQuotationItemUpdateOne {
+	mutation := newERPQuotationItemMutation(c.config, OpUpdateOne, withERPQuotationItem(_m))
+	return &ERPQuotationItemUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ERPQuotationItemClient) UpdateOneID(id int) *ERPQuotationItemUpdateOne {
+	mutation := newERPQuotationItemMutation(c.config, OpUpdateOne, withERPQuotationItemID(id))
+	return &ERPQuotationItemUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ERPQuotationItem.
+func (c *ERPQuotationItemClient) Delete() *ERPQuotationItemDelete {
+	mutation := newERPQuotationItemMutation(c.config, OpDelete)
+	return &ERPQuotationItemDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ERPQuotationItemClient) DeleteOne(_m *ERPQuotationItem) *ERPQuotationItemDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ERPQuotationItemClient) DeleteOneID(id int) *ERPQuotationItemDeleteOne {
+	builder := c.Delete().Where(erpquotationitem.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ERPQuotationItemDeleteOne{builder}
+}
+
+// Query returns a query builder for ERPQuotationItem.
+func (c *ERPQuotationItemClient) Query() *ERPQuotationItemQuery {
+	return &ERPQuotationItemQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeERPQuotationItem},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ERPQuotationItem entity by its id.
+func (c *ERPQuotationItemClient) Get(ctx context.Context, id int) (*ERPQuotationItem, error) {
+	return c.Query().Where(erpquotationitem.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ERPQuotationItemClient) GetX(ctx context.Context, id int) *ERPQuotationItem {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ERPQuotationItemClient) Hooks() []Hook {
+	return c.hooks.ERPQuotationItem
+}
+
+// Interceptors returns the client interceptors.
+func (c *ERPQuotationItemClient) Interceptors() []Interceptor {
+	return c.inters.ERPQuotationItem
+}
+
+func (c *ERPQuotationItemClient) mutate(ctx context.Context, m *ERPQuotationItemMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ERPQuotationItemCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ERPQuotationItemUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ERPQuotationItemUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ERPQuotationItemDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ERPQuotationItem mutation op: %q", m.Op())
+	}
+}
+
+// ERPSequenceClient is a client for the ERPSequence schema.
+type ERPSequenceClient struct {
+	config
+}
+
+// NewERPSequenceClient returns a client for the ERPSequence from the given config.
+func NewERPSequenceClient(c config) *ERPSequenceClient {
+	return &ERPSequenceClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `erpsequence.Hooks(f(g(h())))`.
+func (c *ERPSequenceClient) Use(hooks ...Hook) {
+	c.hooks.ERPSequence = append(c.hooks.ERPSequence, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `erpsequence.Intercept(f(g(h())))`.
+func (c *ERPSequenceClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ERPSequence = append(c.inters.ERPSequence, interceptors...)
+}
+
+// Create returns a builder for creating a ERPSequence entity.
+func (c *ERPSequenceClient) Create() *ERPSequenceCreate {
+	mutation := newERPSequenceMutation(c.config, OpCreate)
+	return &ERPSequenceCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ERPSequence entities.
+func (c *ERPSequenceClient) CreateBulk(builders ...*ERPSequenceCreate) *ERPSequenceCreateBulk {
+	return &ERPSequenceCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ERPSequenceClient) MapCreateBulk(slice any, setFunc func(*ERPSequenceCreate, int)) *ERPSequenceCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ERPSequenceCreateBulk{err: fmt.Errorf("calling to ERPSequenceClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ERPSequenceCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ERPSequenceCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ERPSequence.
+func (c *ERPSequenceClient) Update() *ERPSequenceUpdate {
+	mutation := newERPSequenceMutation(c.config, OpUpdate)
+	return &ERPSequenceUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ERPSequenceClient) UpdateOne(_m *ERPSequence) *ERPSequenceUpdateOne {
+	mutation := newERPSequenceMutation(c.config, OpUpdateOne, withERPSequence(_m))
+	return &ERPSequenceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ERPSequenceClient) UpdateOneID(id int) *ERPSequenceUpdateOne {
+	mutation := newERPSequenceMutation(c.config, OpUpdateOne, withERPSequenceID(id))
+	return &ERPSequenceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ERPSequence.
+func (c *ERPSequenceClient) Delete() *ERPSequenceDelete {
+	mutation := newERPSequenceMutation(c.config, OpDelete)
+	return &ERPSequenceDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ERPSequenceClient) DeleteOne(_m *ERPSequence) *ERPSequenceDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ERPSequenceClient) DeleteOneID(id int) *ERPSequenceDeleteOne {
+	builder := c.Delete().Where(erpsequence.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ERPSequenceDeleteOne{builder}
+}
+
+// Query returns a query builder for ERPSequence.
+func (c *ERPSequenceClient) Query() *ERPSequenceQuery {
+	return &ERPSequenceQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeERPSequence},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ERPSequence entity by its id.
+func (c *ERPSequenceClient) Get(ctx context.Context, id int) (*ERPSequence, error) {
+	return c.Query().Where(erpsequence.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ERPSequenceClient) GetX(ctx context.Context, id int) *ERPSequence {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ERPSequenceClient) Hooks() []Hook {
+	return c.hooks.ERPSequence
+}
+
+// Interceptors returns the client interceptors.
+func (c *ERPSequenceClient) Interceptors() []Interceptor {
+	return c.inters.ERPSequence
+}
+
+func (c *ERPSequenceClient) mutate(ctx context.Context, m *ERPSequenceMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ERPSequenceCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ERPSequenceUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ERPSequenceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ERPSequenceDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ERPSequence mutation op: %q", m.Op())
+	}
+}
+
+// ERPSettlementClient is a client for the ERPSettlement schema.
+type ERPSettlementClient struct {
+	config
+}
+
+// NewERPSettlementClient returns a client for the ERPSettlement from the given config.
+func NewERPSettlementClient(c config) *ERPSettlementClient {
+	return &ERPSettlementClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `erpsettlement.Hooks(f(g(h())))`.
+func (c *ERPSettlementClient) Use(hooks ...Hook) {
+	c.hooks.ERPSettlement = append(c.hooks.ERPSettlement, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `erpsettlement.Intercept(f(g(h())))`.
+func (c *ERPSettlementClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ERPSettlement = append(c.inters.ERPSettlement, interceptors...)
+}
+
+// Create returns a builder for creating a ERPSettlement entity.
+func (c *ERPSettlementClient) Create() *ERPSettlementCreate {
+	mutation := newERPSettlementMutation(c.config, OpCreate)
+	return &ERPSettlementCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ERPSettlement entities.
+func (c *ERPSettlementClient) CreateBulk(builders ...*ERPSettlementCreate) *ERPSettlementCreateBulk {
+	return &ERPSettlementCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ERPSettlementClient) MapCreateBulk(slice any, setFunc func(*ERPSettlementCreate, int)) *ERPSettlementCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ERPSettlementCreateBulk{err: fmt.Errorf("calling to ERPSettlementClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ERPSettlementCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ERPSettlementCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ERPSettlement.
+func (c *ERPSettlementClient) Update() *ERPSettlementUpdate {
+	mutation := newERPSettlementMutation(c.config, OpUpdate)
+	return &ERPSettlementUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ERPSettlementClient) UpdateOne(_m *ERPSettlement) *ERPSettlementUpdateOne {
+	mutation := newERPSettlementMutation(c.config, OpUpdateOne, withERPSettlement(_m))
+	return &ERPSettlementUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ERPSettlementClient) UpdateOneID(id int) *ERPSettlementUpdateOne {
+	mutation := newERPSettlementMutation(c.config, OpUpdateOne, withERPSettlementID(id))
+	return &ERPSettlementUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ERPSettlement.
+func (c *ERPSettlementClient) Delete() *ERPSettlementDelete {
+	mutation := newERPSettlementMutation(c.config, OpDelete)
+	return &ERPSettlementDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ERPSettlementClient) DeleteOne(_m *ERPSettlement) *ERPSettlementDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ERPSettlementClient) DeleteOneID(id int) *ERPSettlementDeleteOne {
+	builder := c.Delete().Where(erpsettlement.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ERPSettlementDeleteOne{builder}
+}
+
+// Query returns a query builder for ERPSettlement.
+func (c *ERPSettlementClient) Query() *ERPSettlementQuery {
+	return &ERPSettlementQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeERPSettlement},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ERPSettlement entity by its id.
+func (c *ERPSettlementClient) Get(ctx context.Context, id int) (*ERPSettlement, error) {
+	return c.Query().Where(erpsettlement.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ERPSettlementClient) GetX(ctx context.Context, id int) *ERPSettlement {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ERPSettlementClient) Hooks() []Hook {
+	return c.hooks.ERPSettlement
+}
+
+// Interceptors returns the client interceptors.
+func (c *ERPSettlementClient) Interceptors() []Interceptor {
+	return c.inters.ERPSettlement
+}
+
+func (c *ERPSettlementClient) mutate(ctx context.Context, m *ERPSettlementMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ERPSettlementCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ERPSettlementUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ERPSettlementUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ERPSettlementDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ERPSettlement mutation op: %q", m.Op())
+	}
+}
+
+// ERPShipmentDetailClient is a client for the ERPShipmentDetail schema.
+type ERPShipmentDetailClient struct {
+	config
+}
+
+// NewERPShipmentDetailClient returns a client for the ERPShipmentDetail from the given config.
+func NewERPShipmentDetailClient(c config) *ERPShipmentDetailClient {
+	return &ERPShipmentDetailClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `erpshipmentdetail.Hooks(f(g(h())))`.
+func (c *ERPShipmentDetailClient) Use(hooks ...Hook) {
+	c.hooks.ERPShipmentDetail = append(c.hooks.ERPShipmentDetail, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `erpshipmentdetail.Intercept(f(g(h())))`.
+func (c *ERPShipmentDetailClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ERPShipmentDetail = append(c.inters.ERPShipmentDetail, interceptors...)
+}
+
+// Create returns a builder for creating a ERPShipmentDetail entity.
+func (c *ERPShipmentDetailClient) Create() *ERPShipmentDetailCreate {
+	mutation := newERPShipmentDetailMutation(c.config, OpCreate)
+	return &ERPShipmentDetailCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ERPShipmentDetail entities.
+func (c *ERPShipmentDetailClient) CreateBulk(builders ...*ERPShipmentDetailCreate) *ERPShipmentDetailCreateBulk {
+	return &ERPShipmentDetailCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ERPShipmentDetailClient) MapCreateBulk(slice any, setFunc func(*ERPShipmentDetailCreate, int)) *ERPShipmentDetailCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ERPShipmentDetailCreateBulk{err: fmt.Errorf("calling to ERPShipmentDetailClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ERPShipmentDetailCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ERPShipmentDetailCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ERPShipmentDetail.
+func (c *ERPShipmentDetailClient) Update() *ERPShipmentDetailUpdate {
+	mutation := newERPShipmentDetailMutation(c.config, OpUpdate)
+	return &ERPShipmentDetailUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ERPShipmentDetailClient) UpdateOne(_m *ERPShipmentDetail) *ERPShipmentDetailUpdateOne {
+	mutation := newERPShipmentDetailMutation(c.config, OpUpdateOne, withERPShipmentDetail(_m))
+	return &ERPShipmentDetailUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ERPShipmentDetailClient) UpdateOneID(id int) *ERPShipmentDetailUpdateOne {
+	mutation := newERPShipmentDetailMutation(c.config, OpUpdateOne, withERPShipmentDetailID(id))
+	return &ERPShipmentDetailUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ERPShipmentDetail.
+func (c *ERPShipmentDetailClient) Delete() *ERPShipmentDetailDelete {
+	mutation := newERPShipmentDetailMutation(c.config, OpDelete)
+	return &ERPShipmentDetailDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ERPShipmentDetailClient) DeleteOne(_m *ERPShipmentDetail) *ERPShipmentDetailDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ERPShipmentDetailClient) DeleteOneID(id int) *ERPShipmentDetailDeleteOne {
+	builder := c.Delete().Where(erpshipmentdetail.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ERPShipmentDetailDeleteOne{builder}
+}
+
+// Query returns a query builder for ERPShipmentDetail.
+func (c *ERPShipmentDetailClient) Query() *ERPShipmentDetailQuery {
+	return &ERPShipmentDetailQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeERPShipmentDetail},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ERPShipmentDetail entity by its id.
+func (c *ERPShipmentDetailClient) Get(ctx context.Context, id int) (*ERPShipmentDetail, error) {
+	return c.Query().Where(erpshipmentdetail.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ERPShipmentDetailClient) GetX(ctx context.Context, id int) *ERPShipmentDetail {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ERPShipmentDetailClient) Hooks() []Hook {
+	return c.hooks.ERPShipmentDetail
+}
+
+// Interceptors returns the client interceptors.
+func (c *ERPShipmentDetailClient) Interceptors() []Interceptor {
+	return c.inters.ERPShipmentDetail
+}
+
+func (c *ERPShipmentDetailClient) mutate(ctx context.Context, m *ERPShipmentDetailMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ERPShipmentDetailCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ERPShipmentDetailUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ERPShipmentDetailUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ERPShipmentDetailDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ERPShipmentDetail mutation op: %q", m.Op())
+	}
+}
+
+// ERPShipmentDetailItemClient is a client for the ERPShipmentDetailItem schema.
+type ERPShipmentDetailItemClient struct {
+	config
+}
+
+// NewERPShipmentDetailItemClient returns a client for the ERPShipmentDetailItem from the given config.
+func NewERPShipmentDetailItemClient(c config) *ERPShipmentDetailItemClient {
+	return &ERPShipmentDetailItemClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `erpshipmentdetailitem.Hooks(f(g(h())))`.
+func (c *ERPShipmentDetailItemClient) Use(hooks ...Hook) {
+	c.hooks.ERPShipmentDetailItem = append(c.hooks.ERPShipmentDetailItem, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `erpshipmentdetailitem.Intercept(f(g(h())))`.
+func (c *ERPShipmentDetailItemClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ERPShipmentDetailItem = append(c.inters.ERPShipmentDetailItem, interceptors...)
+}
+
+// Create returns a builder for creating a ERPShipmentDetailItem entity.
+func (c *ERPShipmentDetailItemClient) Create() *ERPShipmentDetailItemCreate {
+	mutation := newERPShipmentDetailItemMutation(c.config, OpCreate)
+	return &ERPShipmentDetailItemCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ERPShipmentDetailItem entities.
+func (c *ERPShipmentDetailItemClient) CreateBulk(builders ...*ERPShipmentDetailItemCreate) *ERPShipmentDetailItemCreateBulk {
+	return &ERPShipmentDetailItemCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ERPShipmentDetailItemClient) MapCreateBulk(slice any, setFunc func(*ERPShipmentDetailItemCreate, int)) *ERPShipmentDetailItemCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ERPShipmentDetailItemCreateBulk{err: fmt.Errorf("calling to ERPShipmentDetailItemClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ERPShipmentDetailItemCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ERPShipmentDetailItemCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ERPShipmentDetailItem.
+func (c *ERPShipmentDetailItemClient) Update() *ERPShipmentDetailItemUpdate {
+	mutation := newERPShipmentDetailItemMutation(c.config, OpUpdate)
+	return &ERPShipmentDetailItemUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ERPShipmentDetailItemClient) UpdateOne(_m *ERPShipmentDetailItem) *ERPShipmentDetailItemUpdateOne {
+	mutation := newERPShipmentDetailItemMutation(c.config, OpUpdateOne, withERPShipmentDetailItem(_m))
+	return &ERPShipmentDetailItemUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ERPShipmentDetailItemClient) UpdateOneID(id int) *ERPShipmentDetailItemUpdateOne {
+	mutation := newERPShipmentDetailItemMutation(c.config, OpUpdateOne, withERPShipmentDetailItemID(id))
+	return &ERPShipmentDetailItemUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ERPShipmentDetailItem.
+func (c *ERPShipmentDetailItemClient) Delete() *ERPShipmentDetailItemDelete {
+	mutation := newERPShipmentDetailItemMutation(c.config, OpDelete)
+	return &ERPShipmentDetailItemDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ERPShipmentDetailItemClient) DeleteOne(_m *ERPShipmentDetailItem) *ERPShipmentDetailItemDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ERPShipmentDetailItemClient) DeleteOneID(id int) *ERPShipmentDetailItemDeleteOne {
+	builder := c.Delete().Where(erpshipmentdetailitem.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ERPShipmentDetailItemDeleteOne{builder}
+}
+
+// Query returns a query builder for ERPShipmentDetailItem.
+func (c *ERPShipmentDetailItemClient) Query() *ERPShipmentDetailItemQuery {
+	return &ERPShipmentDetailItemQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeERPShipmentDetailItem},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ERPShipmentDetailItem entity by its id.
+func (c *ERPShipmentDetailItemClient) Get(ctx context.Context, id int) (*ERPShipmentDetailItem, error) {
+	return c.Query().Where(erpshipmentdetailitem.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ERPShipmentDetailItemClient) GetX(ctx context.Context, id int) *ERPShipmentDetailItem {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ERPShipmentDetailItemClient) Hooks() []Hook {
+	return c.hooks.ERPShipmentDetailItem
+}
+
+// Interceptors returns the client interceptors.
+func (c *ERPShipmentDetailItemClient) Interceptors() []Interceptor {
+	return c.inters.ERPShipmentDetailItem
+}
+
+func (c *ERPShipmentDetailItemClient) mutate(ctx context.Context, m *ERPShipmentDetailItemMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ERPShipmentDetailItemCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ERPShipmentDetailItemUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ERPShipmentDetailItemUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ERPShipmentDetailItemDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ERPShipmentDetailItem mutation op: %q", m.Op())
+	}
+}
+
+// ERPStockBalanceClient is a client for the ERPStockBalance schema.
+type ERPStockBalanceClient struct {
+	config
+}
+
+// NewERPStockBalanceClient returns a client for the ERPStockBalance from the given config.
+func NewERPStockBalanceClient(c config) *ERPStockBalanceClient {
+	return &ERPStockBalanceClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `erpstockbalance.Hooks(f(g(h())))`.
+func (c *ERPStockBalanceClient) Use(hooks ...Hook) {
+	c.hooks.ERPStockBalance = append(c.hooks.ERPStockBalance, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `erpstockbalance.Intercept(f(g(h())))`.
+func (c *ERPStockBalanceClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ERPStockBalance = append(c.inters.ERPStockBalance, interceptors...)
+}
+
+// Create returns a builder for creating a ERPStockBalance entity.
+func (c *ERPStockBalanceClient) Create() *ERPStockBalanceCreate {
+	mutation := newERPStockBalanceMutation(c.config, OpCreate)
+	return &ERPStockBalanceCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ERPStockBalance entities.
+func (c *ERPStockBalanceClient) CreateBulk(builders ...*ERPStockBalanceCreate) *ERPStockBalanceCreateBulk {
+	return &ERPStockBalanceCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ERPStockBalanceClient) MapCreateBulk(slice any, setFunc func(*ERPStockBalanceCreate, int)) *ERPStockBalanceCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ERPStockBalanceCreateBulk{err: fmt.Errorf("calling to ERPStockBalanceClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ERPStockBalanceCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ERPStockBalanceCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ERPStockBalance.
+func (c *ERPStockBalanceClient) Update() *ERPStockBalanceUpdate {
+	mutation := newERPStockBalanceMutation(c.config, OpUpdate)
+	return &ERPStockBalanceUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ERPStockBalanceClient) UpdateOne(_m *ERPStockBalance) *ERPStockBalanceUpdateOne {
+	mutation := newERPStockBalanceMutation(c.config, OpUpdateOne, withERPStockBalance(_m))
+	return &ERPStockBalanceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ERPStockBalanceClient) UpdateOneID(id int) *ERPStockBalanceUpdateOne {
+	mutation := newERPStockBalanceMutation(c.config, OpUpdateOne, withERPStockBalanceID(id))
+	return &ERPStockBalanceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ERPStockBalance.
+func (c *ERPStockBalanceClient) Delete() *ERPStockBalanceDelete {
+	mutation := newERPStockBalanceMutation(c.config, OpDelete)
+	return &ERPStockBalanceDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ERPStockBalanceClient) DeleteOne(_m *ERPStockBalance) *ERPStockBalanceDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ERPStockBalanceClient) DeleteOneID(id int) *ERPStockBalanceDeleteOne {
+	builder := c.Delete().Where(erpstockbalance.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ERPStockBalanceDeleteOne{builder}
+}
+
+// Query returns a query builder for ERPStockBalance.
+func (c *ERPStockBalanceClient) Query() *ERPStockBalanceQuery {
+	return &ERPStockBalanceQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeERPStockBalance},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ERPStockBalance entity by its id.
+func (c *ERPStockBalanceClient) Get(ctx context.Context, id int) (*ERPStockBalance, error) {
+	return c.Query().Where(erpstockbalance.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ERPStockBalanceClient) GetX(ctx context.Context, id int) *ERPStockBalance {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ERPStockBalanceClient) Hooks() []Hook {
+	return c.hooks.ERPStockBalance
+}
+
+// Interceptors returns the client interceptors.
+func (c *ERPStockBalanceClient) Interceptors() []Interceptor {
+	return c.inters.ERPStockBalance
+}
+
+func (c *ERPStockBalanceClient) mutate(ctx context.Context, m *ERPStockBalanceMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ERPStockBalanceCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ERPStockBalanceUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ERPStockBalanceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ERPStockBalanceDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ERPStockBalance mutation op: %q", m.Op())
+	}
+}
+
+// ERPStockTransactionClient is a client for the ERPStockTransaction schema.
+type ERPStockTransactionClient struct {
+	config
+}
+
+// NewERPStockTransactionClient returns a client for the ERPStockTransaction from the given config.
+func NewERPStockTransactionClient(c config) *ERPStockTransactionClient {
+	return &ERPStockTransactionClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `erpstocktransaction.Hooks(f(g(h())))`.
+func (c *ERPStockTransactionClient) Use(hooks ...Hook) {
+	c.hooks.ERPStockTransaction = append(c.hooks.ERPStockTransaction, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `erpstocktransaction.Intercept(f(g(h())))`.
+func (c *ERPStockTransactionClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ERPStockTransaction = append(c.inters.ERPStockTransaction, interceptors...)
+}
+
+// Create returns a builder for creating a ERPStockTransaction entity.
+func (c *ERPStockTransactionClient) Create() *ERPStockTransactionCreate {
+	mutation := newERPStockTransactionMutation(c.config, OpCreate)
+	return &ERPStockTransactionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ERPStockTransaction entities.
+func (c *ERPStockTransactionClient) CreateBulk(builders ...*ERPStockTransactionCreate) *ERPStockTransactionCreateBulk {
+	return &ERPStockTransactionCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ERPStockTransactionClient) MapCreateBulk(slice any, setFunc func(*ERPStockTransactionCreate, int)) *ERPStockTransactionCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ERPStockTransactionCreateBulk{err: fmt.Errorf("calling to ERPStockTransactionClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ERPStockTransactionCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ERPStockTransactionCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ERPStockTransaction.
+func (c *ERPStockTransactionClient) Update() *ERPStockTransactionUpdate {
+	mutation := newERPStockTransactionMutation(c.config, OpUpdate)
+	return &ERPStockTransactionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ERPStockTransactionClient) UpdateOne(_m *ERPStockTransaction) *ERPStockTransactionUpdateOne {
+	mutation := newERPStockTransactionMutation(c.config, OpUpdateOne, withERPStockTransaction(_m))
+	return &ERPStockTransactionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ERPStockTransactionClient) UpdateOneID(id int) *ERPStockTransactionUpdateOne {
+	mutation := newERPStockTransactionMutation(c.config, OpUpdateOne, withERPStockTransactionID(id))
+	return &ERPStockTransactionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ERPStockTransaction.
+func (c *ERPStockTransactionClient) Delete() *ERPStockTransactionDelete {
+	mutation := newERPStockTransactionMutation(c.config, OpDelete)
+	return &ERPStockTransactionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ERPStockTransactionClient) DeleteOne(_m *ERPStockTransaction) *ERPStockTransactionDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ERPStockTransactionClient) DeleteOneID(id int) *ERPStockTransactionDeleteOne {
+	builder := c.Delete().Where(erpstocktransaction.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ERPStockTransactionDeleteOne{builder}
+}
+
+// Query returns a query builder for ERPStockTransaction.
+func (c *ERPStockTransactionClient) Query() *ERPStockTransactionQuery {
+	return &ERPStockTransactionQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeERPStockTransaction},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ERPStockTransaction entity by its id.
+func (c *ERPStockTransactionClient) Get(ctx context.Context, id int) (*ERPStockTransaction, error) {
+	return c.Query().Where(erpstocktransaction.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ERPStockTransactionClient) GetX(ctx context.Context, id int) *ERPStockTransaction {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ERPStockTransactionClient) Hooks() []Hook {
+	return c.hooks.ERPStockTransaction
+}
+
+// Interceptors returns the client interceptors.
+func (c *ERPStockTransactionClient) Interceptors() []Interceptor {
+	return c.inters.ERPStockTransaction
+}
+
+func (c *ERPStockTransactionClient) mutate(ctx context.Context, m *ERPStockTransactionMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ERPStockTransactionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ERPStockTransactionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ERPStockTransactionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ERPStockTransactionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ERPStockTransaction mutation op: %q", m.Op())
+	}
+}
+
+// ERPWarehouseClient is a client for the ERPWarehouse schema.
+type ERPWarehouseClient struct {
+	config
+}
+
+// NewERPWarehouseClient returns a client for the ERPWarehouse from the given config.
+func NewERPWarehouseClient(c config) *ERPWarehouseClient {
+	return &ERPWarehouseClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `erpwarehouse.Hooks(f(g(h())))`.
+func (c *ERPWarehouseClient) Use(hooks ...Hook) {
+	c.hooks.ERPWarehouse = append(c.hooks.ERPWarehouse, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `erpwarehouse.Intercept(f(g(h())))`.
+func (c *ERPWarehouseClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ERPWarehouse = append(c.inters.ERPWarehouse, interceptors...)
+}
+
+// Create returns a builder for creating a ERPWarehouse entity.
+func (c *ERPWarehouseClient) Create() *ERPWarehouseCreate {
+	mutation := newERPWarehouseMutation(c.config, OpCreate)
+	return &ERPWarehouseCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ERPWarehouse entities.
+func (c *ERPWarehouseClient) CreateBulk(builders ...*ERPWarehouseCreate) *ERPWarehouseCreateBulk {
+	return &ERPWarehouseCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ERPWarehouseClient) MapCreateBulk(slice any, setFunc func(*ERPWarehouseCreate, int)) *ERPWarehouseCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ERPWarehouseCreateBulk{err: fmt.Errorf("calling to ERPWarehouseClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ERPWarehouseCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ERPWarehouseCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ERPWarehouse.
+func (c *ERPWarehouseClient) Update() *ERPWarehouseUpdate {
+	mutation := newERPWarehouseMutation(c.config, OpUpdate)
+	return &ERPWarehouseUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ERPWarehouseClient) UpdateOne(_m *ERPWarehouse) *ERPWarehouseUpdateOne {
+	mutation := newERPWarehouseMutation(c.config, OpUpdateOne, withERPWarehouse(_m))
+	return &ERPWarehouseUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ERPWarehouseClient) UpdateOneID(id int) *ERPWarehouseUpdateOne {
+	mutation := newERPWarehouseMutation(c.config, OpUpdateOne, withERPWarehouseID(id))
+	return &ERPWarehouseUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ERPWarehouse.
+func (c *ERPWarehouseClient) Delete() *ERPWarehouseDelete {
+	mutation := newERPWarehouseMutation(c.config, OpDelete)
+	return &ERPWarehouseDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ERPWarehouseClient) DeleteOne(_m *ERPWarehouse) *ERPWarehouseDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ERPWarehouseClient) DeleteOneID(id int) *ERPWarehouseDeleteOne {
+	builder := c.Delete().Where(erpwarehouse.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ERPWarehouseDeleteOne{builder}
+}
+
+// Query returns a query builder for ERPWarehouse.
+func (c *ERPWarehouseClient) Query() *ERPWarehouseQuery {
+	return &ERPWarehouseQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeERPWarehouse},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ERPWarehouse entity by its id.
+func (c *ERPWarehouseClient) Get(ctx context.Context, id int) (*ERPWarehouse, error) {
+	return c.Query().Where(erpwarehouse.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ERPWarehouseClient) GetX(ctx context.Context, id int) *ERPWarehouse {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ERPWarehouseClient) Hooks() []Hook {
+	return c.hooks.ERPWarehouse
+}
+
+// Interceptors returns the client interceptors.
+func (c *ERPWarehouseClient) Interceptors() []Interceptor {
+	return c.inters.ERPWarehouse
+}
+
+func (c *ERPWarehouseClient) mutate(ctx context.Context, m *ERPWarehouseMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ERPWarehouseCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ERPWarehouseUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ERPWarehouseUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ERPWarehouseDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ERPWarehouse mutation op: %q", m.Op())
+	}
+}
+
+// ERPWorkflowActionLogClient is a client for the ERPWorkflowActionLog schema.
+type ERPWorkflowActionLogClient struct {
+	config
+}
+
+// NewERPWorkflowActionLogClient returns a client for the ERPWorkflowActionLog from the given config.
+func NewERPWorkflowActionLogClient(c config) *ERPWorkflowActionLogClient {
+	return &ERPWorkflowActionLogClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `erpworkflowactionlog.Hooks(f(g(h())))`.
+func (c *ERPWorkflowActionLogClient) Use(hooks ...Hook) {
+	c.hooks.ERPWorkflowActionLog = append(c.hooks.ERPWorkflowActionLog, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `erpworkflowactionlog.Intercept(f(g(h())))`.
+func (c *ERPWorkflowActionLogClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ERPWorkflowActionLog = append(c.inters.ERPWorkflowActionLog, interceptors...)
+}
+
+// Create returns a builder for creating a ERPWorkflowActionLog entity.
+func (c *ERPWorkflowActionLogClient) Create() *ERPWorkflowActionLogCreate {
+	mutation := newERPWorkflowActionLogMutation(c.config, OpCreate)
+	return &ERPWorkflowActionLogCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ERPWorkflowActionLog entities.
+func (c *ERPWorkflowActionLogClient) CreateBulk(builders ...*ERPWorkflowActionLogCreate) *ERPWorkflowActionLogCreateBulk {
+	return &ERPWorkflowActionLogCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ERPWorkflowActionLogClient) MapCreateBulk(slice any, setFunc func(*ERPWorkflowActionLogCreate, int)) *ERPWorkflowActionLogCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ERPWorkflowActionLogCreateBulk{err: fmt.Errorf("calling to ERPWorkflowActionLogClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ERPWorkflowActionLogCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ERPWorkflowActionLogCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ERPWorkflowActionLog.
+func (c *ERPWorkflowActionLogClient) Update() *ERPWorkflowActionLogUpdate {
+	mutation := newERPWorkflowActionLogMutation(c.config, OpUpdate)
+	return &ERPWorkflowActionLogUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ERPWorkflowActionLogClient) UpdateOne(_m *ERPWorkflowActionLog) *ERPWorkflowActionLogUpdateOne {
+	mutation := newERPWorkflowActionLogMutation(c.config, OpUpdateOne, withERPWorkflowActionLog(_m))
+	return &ERPWorkflowActionLogUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ERPWorkflowActionLogClient) UpdateOneID(id int) *ERPWorkflowActionLogUpdateOne {
+	mutation := newERPWorkflowActionLogMutation(c.config, OpUpdateOne, withERPWorkflowActionLogID(id))
+	return &ERPWorkflowActionLogUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ERPWorkflowActionLog.
+func (c *ERPWorkflowActionLogClient) Delete() *ERPWorkflowActionLogDelete {
+	mutation := newERPWorkflowActionLogMutation(c.config, OpDelete)
+	return &ERPWorkflowActionLogDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ERPWorkflowActionLogClient) DeleteOne(_m *ERPWorkflowActionLog) *ERPWorkflowActionLogDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ERPWorkflowActionLogClient) DeleteOneID(id int) *ERPWorkflowActionLogDeleteOne {
+	builder := c.Delete().Where(erpworkflowactionlog.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ERPWorkflowActionLogDeleteOne{builder}
+}
+
+// Query returns a query builder for ERPWorkflowActionLog.
+func (c *ERPWorkflowActionLogClient) Query() *ERPWorkflowActionLogQuery {
+	return &ERPWorkflowActionLogQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeERPWorkflowActionLog},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ERPWorkflowActionLog entity by its id.
+func (c *ERPWorkflowActionLogClient) Get(ctx context.Context, id int) (*ERPWorkflowActionLog, error) {
+	return c.Query().Where(erpworkflowactionlog.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ERPWorkflowActionLogClient) GetX(ctx context.Context, id int) *ERPWorkflowActionLog {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ERPWorkflowActionLogClient) Hooks() []Hook {
+	return c.hooks.ERPWorkflowActionLog
+}
+
+// Interceptors returns the client interceptors.
+func (c *ERPWorkflowActionLogClient) Interceptors() []Interceptor {
+	return c.inters.ERPWorkflowActionLog
+}
+
+func (c *ERPWorkflowActionLogClient) mutate(ctx context.Context, m *ERPWorkflowActionLogMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ERPWorkflowActionLogCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ERPWorkflowActionLogUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ERPWorkflowActionLogUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ERPWorkflowActionLogDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ERPWorkflowActionLog mutation op: %q", m.Op())
+	}
+}
+
+// ERPWorkflowInstanceClient is a client for the ERPWorkflowInstance schema.
+type ERPWorkflowInstanceClient struct {
+	config
+}
+
+// NewERPWorkflowInstanceClient returns a client for the ERPWorkflowInstance from the given config.
+func NewERPWorkflowInstanceClient(c config) *ERPWorkflowInstanceClient {
+	return &ERPWorkflowInstanceClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `erpworkflowinstance.Hooks(f(g(h())))`.
+func (c *ERPWorkflowInstanceClient) Use(hooks ...Hook) {
+	c.hooks.ERPWorkflowInstance = append(c.hooks.ERPWorkflowInstance, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `erpworkflowinstance.Intercept(f(g(h())))`.
+func (c *ERPWorkflowInstanceClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ERPWorkflowInstance = append(c.inters.ERPWorkflowInstance, interceptors...)
+}
+
+// Create returns a builder for creating a ERPWorkflowInstance entity.
+func (c *ERPWorkflowInstanceClient) Create() *ERPWorkflowInstanceCreate {
+	mutation := newERPWorkflowInstanceMutation(c.config, OpCreate)
+	return &ERPWorkflowInstanceCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ERPWorkflowInstance entities.
+func (c *ERPWorkflowInstanceClient) CreateBulk(builders ...*ERPWorkflowInstanceCreate) *ERPWorkflowInstanceCreateBulk {
+	return &ERPWorkflowInstanceCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ERPWorkflowInstanceClient) MapCreateBulk(slice any, setFunc func(*ERPWorkflowInstanceCreate, int)) *ERPWorkflowInstanceCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ERPWorkflowInstanceCreateBulk{err: fmt.Errorf("calling to ERPWorkflowInstanceClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ERPWorkflowInstanceCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ERPWorkflowInstanceCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ERPWorkflowInstance.
+func (c *ERPWorkflowInstanceClient) Update() *ERPWorkflowInstanceUpdate {
+	mutation := newERPWorkflowInstanceMutation(c.config, OpUpdate)
+	return &ERPWorkflowInstanceUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ERPWorkflowInstanceClient) UpdateOne(_m *ERPWorkflowInstance) *ERPWorkflowInstanceUpdateOne {
+	mutation := newERPWorkflowInstanceMutation(c.config, OpUpdateOne, withERPWorkflowInstance(_m))
+	return &ERPWorkflowInstanceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ERPWorkflowInstanceClient) UpdateOneID(id int) *ERPWorkflowInstanceUpdateOne {
+	mutation := newERPWorkflowInstanceMutation(c.config, OpUpdateOne, withERPWorkflowInstanceID(id))
+	return &ERPWorkflowInstanceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ERPWorkflowInstance.
+func (c *ERPWorkflowInstanceClient) Delete() *ERPWorkflowInstanceDelete {
+	mutation := newERPWorkflowInstanceMutation(c.config, OpDelete)
+	return &ERPWorkflowInstanceDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ERPWorkflowInstanceClient) DeleteOne(_m *ERPWorkflowInstance) *ERPWorkflowInstanceDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ERPWorkflowInstanceClient) DeleteOneID(id int) *ERPWorkflowInstanceDeleteOne {
+	builder := c.Delete().Where(erpworkflowinstance.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ERPWorkflowInstanceDeleteOne{builder}
+}
+
+// Query returns a query builder for ERPWorkflowInstance.
+func (c *ERPWorkflowInstanceClient) Query() *ERPWorkflowInstanceQuery {
+	return &ERPWorkflowInstanceQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeERPWorkflowInstance},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ERPWorkflowInstance entity by its id.
+func (c *ERPWorkflowInstanceClient) Get(ctx context.Context, id int) (*ERPWorkflowInstance, error) {
+	return c.Query().Where(erpworkflowinstance.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ERPWorkflowInstanceClient) GetX(ctx context.Context, id int) *ERPWorkflowInstance {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ERPWorkflowInstanceClient) Hooks() []Hook {
+	return c.hooks.ERPWorkflowInstance
+}
+
+// Interceptors returns the client interceptors.
+func (c *ERPWorkflowInstanceClient) Interceptors() []Interceptor {
+	return c.inters.ERPWorkflowInstance
+}
+
+func (c *ERPWorkflowInstanceClient) mutate(ctx context.Context, m *ERPWorkflowInstanceMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ERPWorkflowInstanceCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ERPWorkflowInstanceUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ERPWorkflowInstanceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ERPWorkflowInstanceDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ERPWorkflowInstance mutation op: %q", m.Op())
+	}
+}
+
+// ERPWorkflowTaskClient is a client for the ERPWorkflowTask schema.
+type ERPWorkflowTaskClient struct {
+	config
+}
+
+// NewERPWorkflowTaskClient returns a client for the ERPWorkflowTask from the given config.
+func NewERPWorkflowTaskClient(c config) *ERPWorkflowTaskClient {
+	return &ERPWorkflowTaskClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `erpworkflowtask.Hooks(f(g(h())))`.
+func (c *ERPWorkflowTaskClient) Use(hooks ...Hook) {
+	c.hooks.ERPWorkflowTask = append(c.hooks.ERPWorkflowTask, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `erpworkflowtask.Intercept(f(g(h())))`.
+func (c *ERPWorkflowTaskClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ERPWorkflowTask = append(c.inters.ERPWorkflowTask, interceptors...)
+}
+
+// Create returns a builder for creating a ERPWorkflowTask entity.
+func (c *ERPWorkflowTaskClient) Create() *ERPWorkflowTaskCreate {
+	mutation := newERPWorkflowTaskMutation(c.config, OpCreate)
+	return &ERPWorkflowTaskCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ERPWorkflowTask entities.
+func (c *ERPWorkflowTaskClient) CreateBulk(builders ...*ERPWorkflowTaskCreate) *ERPWorkflowTaskCreateBulk {
+	return &ERPWorkflowTaskCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ERPWorkflowTaskClient) MapCreateBulk(slice any, setFunc func(*ERPWorkflowTaskCreate, int)) *ERPWorkflowTaskCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ERPWorkflowTaskCreateBulk{err: fmt.Errorf("calling to ERPWorkflowTaskClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ERPWorkflowTaskCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ERPWorkflowTaskCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ERPWorkflowTask.
+func (c *ERPWorkflowTaskClient) Update() *ERPWorkflowTaskUpdate {
+	mutation := newERPWorkflowTaskMutation(c.config, OpUpdate)
+	return &ERPWorkflowTaskUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ERPWorkflowTaskClient) UpdateOne(_m *ERPWorkflowTask) *ERPWorkflowTaskUpdateOne {
+	mutation := newERPWorkflowTaskMutation(c.config, OpUpdateOne, withERPWorkflowTask(_m))
+	return &ERPWorkflowTaskUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ERPWorkflowTaskClient) UpdateOneID(id int) *ERPWorkflowTaskUpdateOne {
+	mutation := newERPWorkflowTaskMutation(c.config, OpUpdateOne, withERPWorkflowTaskID(id))
+	return &ERPWorkflowTaskUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ERPWorkflowTask.
+func (c *ERPWorkflowTaskClient) Delete() *ERPWorkflowTaskDelete {
+	mutation := newERPWorkflowTaskMutation(c.config, OpDelete)
+	return &ERPWorkflowTaskDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ERPWorkflowTaskClient) DeleteOne(_m *ERPWorkflowTask) *ERPWorkflowTaskDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ERPWorkflowTaskClient) DeleteOneID(id int) *ERPWorkflowTaskDeleteOne {
+	builder := c.Delete().Where(erpworkflowtask.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ERPWorkflowTaskDeleteOne{builder}
+}
+
+// Query returns a query builder for ERPWorkflowTask.
+func (c *ERPWorkflowTaskClient) Query() *ERPWorkflowTaskQuery {
+	return &ERPWorkflowTaskQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeERPWorkflowTask},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ERPWorkflowTask entity by its id.
+func (c *ERPWorkflowTaskClient) Get(ctx context.Context, id int) (*ERPWorkflowTask, error) {
+	return c.Query().Where(erpworkflowtask.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ERPWorkflowTaskClient) GetX(ctx context.Context, id int) *ERPWorkflowTask {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ERPWorkflowTaskClient) Hooks() []Hook {
+	return c.hooks.ERPWorkflowTask
+}
+
+// Interceptors returns the client interceptors.
+func (c *ERPWorkflowTaskClient) Interceptors() []Interceptor {
+	return c.inters.ERPWorkflowTask
+}
+
+func (c *ERPWorkflowTaskClient) mutate(ctx context.Context, m *ERPWorkflowTaskMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ERPWorkflowTaskCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ERPWorkflowTaskUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ERPWorkflowTaskUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ERPWorkflowTaskDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ERPWorkflowTask mutation op: %q", m.Op())
 	}
 }
 
@@ -619,9 +4444,22 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		AdminUser, ERPModuleRecord, User []ent.Hook
+		AdminUser, ERPAttachment, ERPBankReceipt, ERPBankReceiptClaim, ERPDocLink,
+		ERPExportSale, ERPExportSaleItem, ERPInboundNotice, ERPInboundNoticeItem,
+		ERPLocation, ERPModuleRecord, ERPOutboundOrder, ERPOutboundOrderItem,
+		ERPPartner, ERPProduct, ERPPurchaseContract, ERPPurchaseContractItem,
+		ERPQuotation, ERPQuotationItem, ERPSequence, ERPSettlement, ERPShipmentDetail,
+		ERPShipmentDetailItem, ERPStockBalance, ERPStockTransaction, ERPWarehouse,
+		ERPWorkflowActionLog, ERPWorkflowInstance, ERPWorkflowTask, User []ent.Hook
 	}
 	inters struct {
-		AdminUser, ERPModuleRecord, User []ent.Interceptor
+		AdminUser, ERPAttachment, ERPBankReceipt, ERPBankReceiptClaim, ERPDocLink,
+		ERPExportSale, ERPExportSaleItem, ERPInboundNotice, ERPInboundNoticeItem,
+		ERPLocation, ERPModuleRecord, ERPOutboundOrder, ERPOutboundOrderItem,
+		ERPPartner, ERPProduct, ERPPurchaseContract, ERPPurchaseContractItem,
+		ERPQuotation, ERPQuotationItem, ERPSequence, ERPSettlement, ERPShipmentDetail,
+		ERPShipmentDetailItem, ERPStockBalance, ERPStockTransaction, ERPWarehouse,
+		ERPWorkflowActionLog, ERPWorkflowInstance, ERPWorkflowTask,
+		User []ent.Interceptor
 	}
 )

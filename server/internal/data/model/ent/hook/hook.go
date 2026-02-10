@@ -20,6 +20,114 @@ func (f AdminUserFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, e
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AdminUserMutation", m)
 }
 
+// The ERPAttachmentFunc type is an adapter to allow the use of ordinary
+// function as ERPAttachment mutator.
+type ERPAttachmentFunc func(context.Context, *ent.ERPAttachmentMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ERPAttachmentFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ERPAttachmentMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ERPAttachmentMutation", m)
+}
+
+// The ERPBankReceiptFunc type is an adapter to allow the use of ordinary
+// function as ERPBankReceipt mutator.
+type ERPBankReceiptFunc func(context.Context, *ent.ERPBankReceiptMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ERPBankReceiptFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ERPBankReceiptMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ERPBankReceiptMutation", m)
+}
+
+// The ERPBankReceiptClaimFunc type is an adapter to allow the use of ordinary
+// function as ERPBankReceiptClaim mutator.
+type ERPBankReceiptClaimFunc func(context.Context, *ent.ERPBankReceiptClaimMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ERPBankReceiptClaimFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ERPBankReceiptClaimMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ERPBankReceiptClaimMutation", m)
+}
+
+// The ERPDocLinkFunc type is an adapter to allow the use of ordinary
+// function as ERPDocLink mutator.
+type ERPDocLinkFunc func(context.Context, *ent.ERPDocLinkMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ERPDocLinkFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ERPDocLinkMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ERPDocLinkMutation", m)
+}
+
+// The ERPExportSaleFunc type is an adapter to allow the use of ordinary
+// function as ERPExportSale mutator.
+type ERPExportSaleFunc func(context.Context, *ent.ERPExportSaleMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ERPExportSaleFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ERPExportSaleMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ERPExportSaleMutation", m)
+}
+
+// The ERPExportSaleItemFunc type is an adapter to allow the use of ordinary
+// function as ERPExportSaleItem mutator.
+type ERPExportSaleItemFunc func(context.Context, *ent.ERPExportSaleItemMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ERPExportSaleItemFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ERPExportSaleItemMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ERPExportSaleItemMutation", m)
+}
+
+// The ERPInboundNoticeFunc type is an adapter to allow the use of ordinary
+// function as ERPInboundNotice mutator.
+type ERPInboundNoticeFunc func(context.Context, *ent.ERPInboundNoticeMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ERPInboundNoticeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ERPInboundNoticeMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ERPInboundNoticeMutation", m)
+}
+
+// The ERPInboundNoticeItemFunc type is an adapter to allow the use of ordinary
+// function as ERPInboundNoticeItem mutator.
+type ERPInboundNoticeItemFunc func(context.Context, *ent.ERPInboundNoticeItemMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ERPInboundNoticeItemFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ERPInboundNoticeItemMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ERPInboundNoticeItemMutation", m)
+}
+
+// The ERPLocationFunc type is an adapter to allow the use of ordinary
+// function as ERPLocation mutator.
+type ERPLocationFunc func(context.Context, *ent.ERPLocationMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ERPLocationFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ERPLocationMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ERPLocationMutation", m)
+}
+
 // The ERPModuleRecordFunc type is an adapter to allow the use of ordinary
 // function as ERPModuleRecord mutator.
 type ERPModuleRecordFunc func(context.Context, *ent.ERPModuleRecordMutation) (ent.Value, error)
@@ -30,6 +138,222 @@ func (f ERPModuleRecordFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Va
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ERPModuleRecordMutation", m)
+}
+
+// The ERPOutboundOrderFunc type is an adapter to allow the use of ordinary
+// function as ERPOutboundOrder mutator.
+type ERPOutboundOrderFunc func(context.Context, *ent.ERPOutboundOrderMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ERPOutboundOrderFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ERPOutboundOrderMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ERPOutboundOrderMutation", m)
+}
+
+// The ERPOutboundOrderItemFunc type is an adapter to allow the use of ordinary
+// function as ERPOutboundOrderItem mutator.
+type ERPOutboundOrderItemFunc func(context.Context, *ent.ERPOutboundOrderItemMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ERPOutboundOrderItemFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ERPOutboundOrderItemMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ERPOutboundOrderItemMutation", m)
+}
+
+// The ERPPartnerFunc type is an adapter to allow the use of ordinary
+// function as ERPPartner mutator.
+type ERPPartnerFunc func(context.Context, *ent.ERPPartnerMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ERPPartnerFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ERPPartnerMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ERPPartnerMutation", m)
+}
+
+// The ERPProductFunc type is an adapter to allow the use of ordinary
+// function as ERPProduct mutator.
+type ERPProductFunc func(context.Context, *ent.ERPProductMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ERPProductFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ERPProductMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ERPProductMutation", m)
+}
+
+// The ERPPurchaseContractFunc type is an adapter to allow the use of ordinary
+// function as ERPPurchaseContract mutator.
+type ERPPurchaseContractFunc func(context.Context, *ent.ERPPurchaseContractMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ERPPurchaseContractFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ERPPurchaseContractMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ERPPurchaseContractMutation", m)
+}
+
+// The ERPPurchaseContractItemFunc type is an adapter to allow the use of ordinary
+// function as ERPPurchaseContractItem mutator.
+type ERPPurchaseContractItemFunc func(context.Context, *ent.ERPPurchaseContractItemMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ERPPurchaseContractItemFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ERPPurchaseContractItemMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ERPPurchaseContractItemMutation", m)
+}
+
+// The ERPQuotationFunc type is an adapter to allow the use of ordinary
+// function as ERPQuotation mutator.
+type ERPQuotationFunc func(context.Context, *ent.ERPQuotationMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ERPQuotationFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ERPQuotationMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ERPQuotationMutation", m)
+}
+
+// The ERPQuotationItemFunc type is an adapter to allow the use of ordinary
+// function as ERPQuotationItem mutator.
+type ERPQuotationItemFunc func(context.Context, *ent.ERPQuotationItemMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ERPQuotationItemFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ERPQuotationItemMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ERPQuotationItemMutation", m)
+}
+
+// The ERPSequenceFunc type is an adapter to allow the use of ordinary
+// function as ERPSequence mutator.
+type ERPSequenceFunc func(context.Context, *ent.ERPSequenceMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ERPSequenceFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ERPSequenceMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ERPSequenceMutation", m)
+}
+
+// The ERPSettlementFunc type is an adapter to allow the use of ordinary
+// function as ERPSettlement mutator.
+type ERPSettlementFunc func(context.Context, *ent.ERPSettlementMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ERPSettlementFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ERPSettlementMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ERPSettlementMutation", m)
+}
+
+// The ERPShipmentDetailFunc type is an adapter to allow the use of ordinary
+// function as ERPShipmentDetail mutator.
+type ERPShipmentDetailFunc func(context.Context, *ent.ERPShipmentDetailMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ERPShipmentDetailFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ERPShipmentDetailMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ERPShipmentDetailMutation", m)
+}
+
+// The ERPShipmentDetailItemFunc type is an adapter to allow the use of ordinary
+// function as ERPShipmentDetailItem mutator.
+type ERPShipmentDetailItemFunc func(context.Context, *ent.ERPShipmentDetailItemMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ERPShipmentDetailItemFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ERPShipmentDetailItemMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ERPShipmentDetailItemMutation", m)
+}
+
+// The ERPStockBalanceFunc type is an adapter to allow the use of ordinary
+// function as ERPStockBalance mutator.
+type ERPStockBalanceFunc func(context.Context, *ent.ERPStockBalanceMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ERPStockBalanceFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ERPStockBalanceMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ERPStockBalanceMutation", m)
+}
+
+// The ERPStockTransactionFunc type is an adapter to allow the use of ordinary
+// function as ERPStockTransaction mutator.
+type ERPStockTransactionFunc func(context.Context, *ent.ERPStockTransactionMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ERPStockTransactionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ERPStockTransactionMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ERPStockTransactionMutation", m)
+}
+
+// The ERPWarehouseFunc type is an adapter to allow the use of ordinary
+// function as ERPWarehouse mutator.
+type ERPWarehouseFunc func(context.Context, *ent.ERPWarehouseMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ERPWarehouseFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ERPWarehouseMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ERPWarehouseMutation", m)
+}
+
+// The ERPWorkflowActionLogFunc type is an adapter to allow the use of ordinary
+// function as ERPWorkflowActionLog mutator.
+type ERPWorkflowActionLogFunc func(context.Context, *ent.ERPWorkflowActionLogMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ERPWorkflowActionLogFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ERPWorkflowActionLogMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ERPWorkflowActionLogMutation", m)
+}
+
+// The ERPWorkflowInstanceFunc type is an adapter to allow the use of ordinary
+// function as ERPWorkflowInstance mutator.
+type ERPWorkflowInstanceFunc func(context.Context, *ent.ERPWorkflowInstanceMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ERPWorkflowInstanceFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ERPWorkflowInstanceMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ERPWorkflowInstanceMutation", m)
+}
+
+// The ERPWorkflowTaskFunc type is an adapter to allow the use of ordinary
+// function as ERPWorkflowTask mutator.
+type ERPWorkflowTaskFunc func(context.Context, *ent.ERPWorkflowTaskMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ERPWorkflowTaskFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ERPWorkflowTaskMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ERPWorkflowTaskMutation", m)
 }
 
 // The UserFunc type is an adapter to allow the use of ordinary

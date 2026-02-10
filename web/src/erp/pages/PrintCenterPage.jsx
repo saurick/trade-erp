@@ -7,13 +7,8 @@ import { useERPData } from '../data/ERPDataContext'
 const { Paragraph, Text, Title } = Typography
 
 const recordSourceMap = {
-  quotation: 'quotations',
   pi: 'exportSales',
-  production: 'exportSales',
   purchase: 'purchaseContracts',
-  invoice: 'shipmentDetails',
-  packing: 'shipmentDetails',
-  delivery: 'shipmentDetails',
   billingInfo: 'partners',
 }
 
@@ -29,6 +24,7 @@ const PrintCenterPage = () => {
     }
     return (moduleRecords[moduleKey] || [])[0] || {}
   }, [activeKey, moduleRecords])
+  const hasActiveRecord = Boolean(activeRecord && activeRecord.id)
 
   const activeTemplate = useMemo(
     () => templateList.find((item) => item.key === activeKey),
@@ -37,6 +33,10 @@ const PrintCenterPage = () => {
   const uploadDisabled = activeKey === 'billingInfo' || activeKey === 'pi' || activeKey === 'purchase'
 
   const handleOpenEditablePrint = async () => {
+    if (!hasActiveRecord) {
+      message.warning('当前模板缺少数据库记录，请先在对应业务菜单新增数据')
+      return
+    }
     try {
       await openPrintWindow(activeKey, activeRecord)
     } catch (err) {
@@ -64,7 +64,7 @@ const PrintCenterPage = () => {
 
   return (
     <Space direction="vertical" size={16} style={{ width: '100%' }}>
-      <Card className="erp-page-card" bordered={false}>
+      <Card className="erp-page-card" variant="borderless">
         <Title level={4} style={{ margin: 0 }}>
           打印模板中心
         </Title>
@@ -73,7 +73,7 @@ const PrintCenterPage = () => {
         </Paragraph>
       </Card>
 
-      <Card className="erp-page-card" bordered={false}>
+      <Card className="erp-page-card" variant="borderless">
         <Row gutter={[16, 16]}>
           <Col xs={24} lg={8}>
             <Tabs
@@ -102,6 +102,7 @@ const PrintCenterPage = () => {
                     type="primary"
                     icon={<PrinterOutlined />}
                     onClick={handleOpenEditablePrint}
+                    disabled={!hasActiveRecord}
                   >
                     打开可编辑打印窗口
                   </Button>
@@ -118,8 +119,13 @@ const PrintCenterPage = () => {
                 </Space>
 
                 <Paragraph style={{ marginBottom: 0 }}>
-                  模板提示：采购合同、PI、开票信息默认使用固定版式（来源于原始文件版式），不再走 Excel 自动解析；其余发票相关默认使用 `export-invoice-template.xls`。
+                  模板提示：当前仅保留采购合同、PI、开票信息三种模板，均为固定版式（来源于原始文件版式）。
                 </Paragraph>
+                {!hasActiveRecord ? (
+                  <Text type="warning">
+                    当前模板暂无数据库记录，打印按钮已禁用。
+                  </Text>
+                ) : null}
                 {uploadDisabled ? (
                   <Text type="secondary">
                     {activeKey === 'billingInfo'

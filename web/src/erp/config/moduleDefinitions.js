@@ -154,7 +154,7 @@ export const moduleDefinitions = [
     section: 'sales',
     codePrefix: 'QT',
     defaultStatus: BOX_STATUS.DRAFT,
-    description: '报价录入与产品明细，支持打印报价单/PI；客户接受后可生成外销。',
+    description: '报价录入与产品明细，支持打印 PI；客户接受后可生成外销。',
     columns: [
       { title: '报价单编码', dataIndex: 'code' },
       { title: '客户', dataIndex: 'customerName' },
@@ -221,11 +221,6 @@ export const moduleDefinitions = [
         },
       },
       {
-        key: 'print-quote',
-        label: '打印报价单',
-        onRun: (record, helpers) => helpers.openPrintWindow('quotation', record),
-      },
-      {
         key: 'print-pi',
         label: '打印PI',
         onRun: (record, helpers) => helpers.openPrintWindow('pi', record),
@@ -239,7 +234,7 @@ export const moduleDefinitions = [
     section: 'sales',
     codePrefix: 'XS',
     defaultStatus: BOX_STATUS.DRAFT,
-    description: '外销录入，支持 PI/生产加工申请单打印与审批。',
+    description: '外销录入，支持 PI 打印与审批。',
     columns: [
       { title: '合同编号', dataIndex: 'code' },
       { title: '客户合同号', dataIndex: 'customerContractNo' },
@@ -341,11 +336,6 @@ export const moduleDefinitions = [
         key: 'print-pi',
         label: '打印PI',
         onRun: (record, helpers) => helpers.openPrintWindow('pi', record),
-      },
-      {
-        key: 'print-apply',
-        label: '打印加工申请单',
-        onRun: (record, helpers) => helpers.openPrintWindow('production', record),
       },
     ],
   },
@@ -498,7 +488,7 @@ export const moduleDefinitions = [
     section: 'sales',
     codePrefix: 'CY',
     defaultStatus: BOX_STATUS.DRAFT,
-    description: '导入外销明细，提交审批并输出商业发票/装箱单/送货单模板。',
+    description: '导入外销明细并提交审批。',
     columns: [
       { title: '发票号', dataIndex: 'code' },
       { title: '客户', dataIndex: 'customerName' },
@@ -589,21 +579,6 @@ export const moduleDefinitions = [
           }))
           helpers.notify.success('已生成结汇')
         },
-      },
-      {
-        key: 'print-invoice',
-        label: '打印商业发票',
-        onRun: (record, helpers) => helpers.openPrintWindow('invoice', record),
-      },
-      {
-        key: 'print-packing',
-        label: '打印装箱单',
-        onRun: (record, helpers) => helpers.openPrintWindow('packing', record),
-      },
-      {
-        key: 'print-delivery',
-        label: '打印送货单',
-        onRun: (record, helpers) => helpers.openPrintWindow('delivery', record),
       },
     ],
   },

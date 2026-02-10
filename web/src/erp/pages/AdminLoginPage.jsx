@@ -40,7 +40,7 @@ const AdminLoginPage = () => {
   return (
     <div className="erp-login-page">
       <div className="erp-login-page__bg" />
-      <Card bordered={false} className="erp-login-card">
+      <Card variant="borderless" className="erp-login-card">
         <Space direction="vertical" size={16} style={{ width: '100%' }}>
           <img src="/templates/billing-info-logo.png" alt="KS Magnetics" className="erp-login-logo" />
           <div>

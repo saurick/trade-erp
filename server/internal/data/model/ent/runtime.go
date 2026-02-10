@@ -4,7 +4,34 @@ package ent
 
 import (
 	"server/internal/data/model/ent/adminuser"
+	"server/internal/data/model/ent/erpattachment"
+	"server/internal/data/model/ent/erpbankreceipt"
+	"server/internal/data/model/ent/erpbankreceiptclaim"
+	"server/internal/data/model/ent/erpdoclink"
+	"server/internal/data/model/ent/erpexportsale"
+	"server/internal/data/model/ent/erpexportsaleitem"
+	"server/internal/data/model/ent/erpinboundnotice"
+	"server/internal/data/model/ent/erpinboundnoticeitem"
+	"server/internal/data/model/ent/erplocation"
 	"server/internal/data/model/ent/erpmodulerecord"
+	"server/internal/data/model/ent/erpoutboundorder"
+	"server/internal/data/model/ent/erpoutboundorderitem"
+	"server/internal/data/model/ent/erppartner"
+	"server/internal/data/model/ent/erpproduct"
+	"server/internal/data/model/ent/erppurchasecontract"
+	"server/internal/data/model/ent/erppurchasecontractitem"
+	"server/internal/data/model/ent/erpquotation"
+	"server/internal/data/model/ent/erpquotationitem"
+	"server/internal/data/model/ent/erpsequence"
+	"server/internal/data/model/ent/erpsettlement"
+	"server/internal/data/model/ent/erpshipmentdetail"
+	"server/internal/data/model/ent/erpshipmentdetailitem"
+	"server/internal/data/model/ent/erpstockbalance"
+	"server/internal/data/model/ent/erpstocktransaction"
+	"server/internal/data/model/ent/erpwarehouse"
+	"server/internal/data/model/ent/erpworkflowactionlog"
+	"server/internal/data/model/ent/erpworkflowinstance"
+	"server/internal/data/model/ent/erpworkflowtask"
 	"server/internal/data/model/ent/user"
 	"server/internal/data/model/schema"
 	"time"
@@ -62,6 +89,572 @@ func init() {
 	adminuser.DefaultUpdatedAt = adminuserDescUpdatedAt.Default.(func() time.Time)
 	// adminuser.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	adminuser.UpdateDefaultUpdatedAt = adminuserDescUpdatedAt.UpdateDefault.(func() time.Time)
+	erpattachmentFields := schema.ERPAttachment{}.Fields()
+	_ = erpattachmentFields
+	// erpattachmentDescCategory is the schema descriptor for category field.
+	erpattachmentDescCategory := erpattachmentFields[0].Descriptor()
+	// erpattachment.DefaultCategory holds the default value on creation for the category field.
+	erpattachment.DefaultCategory = erpattachmentDescCategory.Default.(string)
+	// erpattachment.CategoryValidator is a validator for the "category" field. It is called by the builders before save.
+	erpattachment.CategoryValidator = erpattachmentDescCategory.Validators[0].(func(string) error)
+	// erpattachmentDescBizModule is the schema descriptor for biz_module field.
+	erpattachmentDescBizModule := erpattachmentFields[1].Descriptor()
+	// erpattachment.BizModuleValidator is a validator for the "biz_module" field. It is called by the builders before save.
+	erpattachment.BizModuleValidator = func() func(string) error {
+		validators := erpattachmentDescBizModule.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(biz_module string) error {
+			for _, fn := range fns {
+				if err := fn(biz_module); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// erpattachmentDescBizCode is the schema descriptor for biz_code field.
+	erpattachmentDescBizCode := erpattachmentFields[2].Descriptor()
+	// erpattachment.BizCodeValidator is a validator for the "biz_code" field. It is called by the builders before save.
+	erpattachment.BizCodeValidator = func() func(string) error {
+		validators := erpattachmentDescBizCode.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(biz_code string) error {
+			for _, fn := range fns {
+				if err := fn(biz_code); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// erpattachmentDescFileName is the schema descriptor for file_name field.
+	erpattachmentDescFileName := erpattachmentFields[3].Descriptor()
+	// erpattachment.FileNameValidator is a validator for the "file_name" field. It is called by the builders before save.
+	erpattachment.FileNameValidator = func() func(string) error {
+		validators := erpattachmentDescFileName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(file_name string) error {
+			for _, fn := range fns {
+				if err := fn(file_name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// erpattachmentDescFileURL is the schema descriptor for file_url field.
+	erpattachmentDescFileURL := erpattachmentFields[4].Descriptor()
+	// erpattachment.FileURLValidator is a validator for the "file_url" field. It is called by the builders before save.
+	erpattachment.FileURLValidator = func() func(string) error {
+		validators := erpattachmentDescFileURL.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(file_url string) error {
+			for _, fn := range fns {
+				if err := fn(file_url); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// erpattachmentDescMimeType is the schema descriptor for mime_type field.
+	erpattachmentDescMimeType := erpattachmentFields[5].Descriptor()
+	// erpattachment.MimeTypeValidator is a validator for the "mime_type" field. It is called by the builders before save.
+	erpattachment.MimeTypeValidator = erpattachmentDescMimeType.Validators[0].(func(string) error)
+	// erpattachmentDescFileSize is the schema descriptor for file_size field.
+	erpattachmentDescFileSize := erpattachmentFields[6].Descriptor()
+	// erpattachment.DefaultFileSize holds the default value on creation for the file_size field.
+	erpattachment.DefaultFileSize = erpattachmentDescFileSize.Default.(int64)
+	// erpattachmentDescCreatedAt is the schema descriptor for created_at field.
+	erpattachmentDescCreatedAt := erpattachmentFields[8].Descriptor()
+	// erpattachment.DefaultCreatedAt holds the default value on creation for the created_at field.
+	erpattachment.DefaultCreatedAt = erpattachmentDescCreatedAt.Default.(func() time.Time)
+	erpbankreceiptFields := schema.ERPBankReceipt{}.Fields()
+	_ = erpbankreceiptFields
+	// erpbankreceiptDescCode is the schema descriptor for code field.
+	erpbankreceiptDescCode := erpbankreceiptFields[0].Descriptor()
+	// erpbankreceipt.CodeValidator is a validator for the "code" field. It is called by the builders before save.
+	erpbankreceipt.CodeValidator = func() func(string) error {
+		validators := erpbankreceiptDescCode.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(code string) error {
+			for _, fn := range fns {
+				if err := fn(code); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// erpbankreceiptDescFundType is the schema descriptor for fund_type field.
+	erpbankreceiptDescFundType := erpbankreceiptFields[2].Descriptor()
+	// erpbankreceipt.FundTypeValidator is a validator for the "fund_type" field. It is called by the builders before save.
+	erpbankreceipt.FundTypeValidator = func() func(string) error {
+		validators := erpbankreceiptDescFundType.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(fund_type string) error {
+			for _, fn := range fns {
+				if err := fn(fund_type); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// erpbankreceiptDescCurrency is the schema descriptor for currency field.
+	erpbankreceiptDescCurrency := erpbankreceiptFields[3].Descriptor()
+	// erpbankreceipt.DefaultCurrency holds the default value on creation for the currency field.
+	erpbankreceipt.DefaultCurrency = erpbankreceiptDescCurrency.Default.(string)
+	// erpbankreceipt.CurrencyValidator is a validator for the "currency" field. It is called by the builders before save.
+	erpbankreceipt.CurrencyValidator = erpbankreceiptDescCurrency.Validators[0].(func(string) error)
+	// erpbankreceiptDescBankFee is the schema descriptor for bank_fee field.
+	erpbankreceiptDescBankFee := erpbankreceiptFields[5].Descriptor()
+	// erpbankreceipt.DefaultBankFee holds the default value on creation for the bank_fee field.
+	erpbankreceipt.DefaultBankFee = erpbankreceiptDescBankFee.Default.(float64)
+	// erpbankreceiptDescNetAmount is the schema descriptor for net_amount field.
+	erpbankreceiptDescNetAmount := erpbankreceiptFields[6].Descriptor()
+	// erpbankreceipt.DefaultNetAmount holds the default value on creation for the net_amount field.
+	erpbankreceipt.DefaultNetAmount = erpbankreceiptDescNetAmount.Default.(float64)
+	// erpbankreceiptDescRefNo is the schema descriptor for ref_no field.
+	erpbankreceiptDescRefNo := erpbankreceiptFields[7].Descriptor()
+	// erpbankreceipt.RefNoValidator is a validator for the "ref_no" field. It is called by the builders before save.
+	erpbankreceipt.RefNoValidator = erpbankreceiptDescRefNo.Validators[0].(func(string) error)
+	// erpbankreceiptDescStatus is the schema descriptor for status field.
+	erpbankreceiptDescStatus := erpbankreceiptFields[8].Descriptor()
+	// erpbankreceipt.DefaultStatus holds the default value on creation for the status field.
+	erpbankreceipt.DefaultStatus = erpbankreceiptDescStatus.Default.(string)
+	// erpbankreceipt.StatusValidator is a validator for the "status" field. It is called by the builders before save.
+	erpbankreceipt.StatusValidator = erpbankreceiptDescStatus.Validators[0].(func(string) error)
+	// erpbankreceiptDescCreatedAt is the schema descriptor for created_at field.
+	erpbankreceiptDescCreatedAt := erpbankreceiptFields[11].Descriptor()
+	// erpbankreceipt.DefaultCreatedAt holds the default value on creation for the created_at field.
+	erpbankreceipt.DefaultCreatedAt = erpbankreceiptDescCreatedAt.Default.(func() time.Time)
+	// erpbankreceiptDescUpdatedAt is the schema descriptor for updated_at field.
+	erpbankreceiptDescUpdatedAt := erpbankreceiptFields[12].Descriptor()
+	// erpbankreceipt.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	erpbankreceipt.DefaultUpdatedAt = erpbankreceiptDescUpdatedAt.Default.(func() time.Time)
+	// erpbankreceipt.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	erpbankreceipt.UpdateDefaultUpdatedAt = erpbankreceiptDescUpdatedAt.UpdateDefault.(func() time.Time)
+	erpbankreceiptclaimFields := schema.ERPBankReceiptClaim{}.Fields()
+	_ = erpbankreceiptclaimFields
+	// erpbankreceiptclaimDescReceiptID is the schema descriptor for receipt_id field.
+	erpbankreceiptclaimDescReceiptID := erpbankreceiptclaimFields[0].Descriptor()
+	// erpbankreceiptclaim.ReceiptIDValidator is a validator for the "receipt_id" field. It is called by the builders before save.
+	erpbankreceiptclaim.ReceiptIDValidator = erpbankreceiptclaimDescReceiptID.Validators[0].(func(int) error)
+	// erpbankreceiptclaimDescClaimType is the schema descriptor for claim_type field.
+	erpbankreceiptclaimDescClaimType := erpbankreceiptclaimFields[2].Descriptor()
+	// erpbankreceiptclaim.ClaimTypeValidator is a validator for the "claim_type" field. It is called by the builders before save.
+	erpbankreceiptclaim.ClaimTypeValidator = func() func(string) error {
+		validators := erpbankreceiptclaimDescClaimType.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(claim_type string) error {
+			for _, fn := range fns {
+				if err := fn(claim_type); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// erpbankreceiptclaimDescConfirmed is the schema descriptor for confirmed field.
+	erpbankreceiptclaimDescConfirmed := erpbankreceiptclaimFields[4].Descriptor()
+	// erpbankreceiptclaim.DefaultConfirmed holds the default value on creation for the confirmed field.
+	erpbankreceiptclaim.DefaultConfirmed = erpbankreceiptclaimDescConfirmed.Default.(bool)
+	// erpbankreceiptclaimDescRemark is the schema descriptor for remark field.
+	erpbankreceiptclaimDescRemark := erpbankreceiptclaimFields[8].Descriptor()
+	// erpbankreceiptclaim.RemarkValidator is a validator for the "remark" field. It is called by the builders before save.
+	erpbankreceiptclaim.RemarkValidator = erpbankreceiptclaimDescRemark.Validators[0].(func(string) error)
+	// erpbankreceiptclaimDescCreatedAt is the schema descriptor for created_at field.
+	erpbankreceiptclaimDescCreatedAt := erpbankreceiptclaimFields[9].Descriptor()
+	// erpbankreceiptclaim.DefaultCreatedAt holds the default value on creation for the created_at field.
+	erpbankreceiptclaim.DefaultCreatedAt = erpbankreceiptclaimDescCreatedAt.Default.(func() time.Time)
+	// erpbankreceiptclaimDescUpdatedAt is the schema descriptor for updated_at field.
+	erpbankreceiptclaimDescUpdatedAt := erpbankreceiptclaimFields[10].Descriptor()
+	// erpbankreceiptclaim.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	erpbankreceiptclaim.DefaultUpdatedAt = erpbankreceiptclaimDescUpdatedAt.Default.(func() time.Time)
+	// erpbankreceiptclaim.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	erpbankreceiptclaim.UpdateDefaultUpdatedAt = erpbankreceiptclaimDescUpdatedAt.UpdateDefault.(func() time.Time)
+	erpdoclinkFields := schema.ERPDocLink{}.Fields()
+	_ = erpdoclinkFields
+	// erpdoclinkDescFromModule is the schema descriptor for from_module field.
+	erpdoclinkDescFromModule := erpdoclinkFields[0].Descriptor()
+	// erpdoclink.FromModuleValidator is a validator for the "from_module" field. It is called by the builders before save.
+	erpdoclink.FromModuleValidator = func() func(string) error {
+		validators := erpdoclinkDescFromModule.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(from_module string) error {
+			for _, fn := range fns {
+				if err := fn(from_module); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// erpdoclinkDescFromCode is the schema descriptor for from_code field.
+	erpdoclinkDescFromCode := erpdoclinkFields[1].Descriptor()
+	// erpdoclink.FromCodeValidator is a validator for the "from_code" field. It is called by the builders before save.
+	erpdoclink.FromCodeValidator = func() func(string) error {
+		validators := erpdoclinkDescFromCode.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(from_code string) error {
+			for _, fn := range fns {
+				if err := fn(from_code); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// erpdoclinkDescToModule is the schema descriptor for to_module field.
+	erpdoclinkDescToModule := erpdoclinkFields[2].Descriptor()
+	// erpdoclink.ToModuleValidator is a validator for the "to_module" field. It is called by the builders before save.
+	erpdoclink.ToModuleValidator = func() func(string) error {
+		validators := erpdoclinkDescToModule.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(to_module string) error {
+			for _, fn := range fns {
+				if err := fn(to_module); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// erpdoclinkDescToCode is the schema descriptor for to_code field.
+	erpdoclinkDescToCode := erpdoclinkFields[3].Descriptor()
+	// erpdoclink.ToCodeValidator is a validator for the "to_code" field. It is called by the builders before save.
+	erpdoclink.ToCodeValidator = func() func(string) error {
+		validators := erpdoclinkDescToCode.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(to_code string) error {
+			for _, fn := range fns {
+				if err := fn(to_code); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// erpdoclinkDescRelationType is the schema descriptor for relation_type field.
+	erpdoclinkDescRelationType := erpdoclinkFields[4].Descriptor()
+	// erpdoclink.DefaultRelationType holds the default value on creation for the relation_type field.
+	erpdoclink.DefaultRelationType = erpdoclinkDescRelationType.Default.(string)
+	// erpdoclink.RelationTypeValidator is a validator for the "relation_type" field. It is called by the builders before save.
+	erpdoclink.RelationTypeValidator = erpdoclinkDescRelationType.Validators[0].(func(string) error)
+	// erpdoclinkDescCreatedAt is the schema descriptor for created_at field.
+	erpdoclinkDescCreatedAt := erpdoclinkFields[5].Descriptor()
+	// erpdoclink.DefaultCreatedAt holds the default value on creation for the created_at field.
+	erpdoclink.DefaultCreatedAt = erpdoclinkDescCreatedAt.Default.(func() time.Time)
+	erpexportsaleFields := schema.ERPExportSale{}.Fields()
+	_ = erpexportsaleFields
+	// erpexportsaleDescCode is the schema descriptor for code field.
+	erpexportsaleDescCode := erpexportsaleFields[0].Descriptor()
+	// erpexportsale.CodeValidator is a validator for the "code" field. It is called by the builders before save.
+	erpexportsale.CodeValidator = func() func(string) error {
+		validators := erpexportsaleDescCode.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(code string) error {
+			for _, fn := range fns {
+				if err := fn(code); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// erpexportsaleDescSourceQuotationCode is the schema descriptor for source_quotation_code field.
+	erpexportsaleDescSourceQuotationCode := erpexportsaleFields[2].Descriptor()
+	// erpexportsale.SourceQuotationCodeValidator is a validator for the "source_quotation_code" field. It is called by the builders before save.
+	erpexportsale.SourceQuotationCodeValidator = erpexportsaleDescSourceQuotationCode.Validators[0].(func(string) error)
+	// erpexportsaleDescCustomerCode is the schema descriptor for customer_code field.
+	erpexportsaleDescCustomerCode := erpexportsaleFields[4].Descriptor()
+	// erpexportsale.CustomerCodeValidator is a validator for the "customer_code" field. It is called by the builders before save.
+	erpexportsale.CustomerCodeValidator = erpexportsaleDescCustomerCode.Validators[0].(func(string) error)
+	// erpexportsaleDescCustomerContractNo is the schema descriptor for customer_contract_no field.
+	erpexportsaleDescCustomerContractNo := erpexportsaleFields[5].Descriptor()
+	// erpexportsale.CustomerContractNoValidator is a validator for the "customer_contract_no" field. It is called by the builders before save.
+	erpexportsale.CustomerContractNoValidator = erpexportsaleDescCustomerContractNo.Validators[0].(func(string) error)
+	// erpexportsaleDescOrderNo is the schema descriptor for order_no field.
+	erpexportsaleDescOrderNo := erpexportsaleFields[6].Descriptor()
+	// erpexportsale.OrderNoValidator is a validator for the "order_no" field. It is called by the builders before save.
+	erpexportsale.OrderNoValidator = erpexportsaleDescOrderNo.Validators[0].(func(string) error)
+	// erpexportsaleDescTransportType is the schema descriptor for transport_type field.
+	erpexportsaleDescTransportType := erpexportsaleFields[10].Descriptor()
+	// erpexportsale.TransportTypeValidator is a validator for the "transport_type" field. It is called by the builders before save.
+	erpexportsale.TransportTypeValidator = erpexportsaleDescTransportType.Validators[0].(func(string) error)
+	// erpexportsaleDescPaymentMethod is the schema descriptor for payment_method field.
+	erpexportsaleDescPaymentMethod := erpexportsaleFields[11].Descriptor()
+	// erpexportsale.PaymentMethodValidator is a validator for the "payment_method" field. It is called by the builders before save.
+	erpexportsale.PaymentMethodValidator = erpexportsaleDescPaymentMethod.Validators[0].(func(string) error)
+	// erpexportsaleDescPriceTerm is the schema descriptor for price_term field.
+	erpexportsaleDescPriceTerm := erpexportsaleFields[12].Descriptor()
+	// erpexportsale.PriceTermValidator is a validator for the "price_term" field. It is called by the builders before save.
+	erpexportsale.PriceTermValidator = erpexportsaleDescPriceTerm.Validators[0].(func(string) error)
+	// erpexportsaleDescStartPlace is the schema descriptor for start_place field.
+	erpexportsaleDescStartPlace := erpexportsaleFields[13].Descriptor()
+	// erpexportsale.StartPlaceValidator is a validator for the "start_place" field. It is called by the builders before save.
+	erpexportsale.StartPlaceValidator = erpexportsaleDescStartPlace.Validators[0].(func(string) error)
+	// erpexportsaleDescEndPlace is the schema descriptor for end_place field.
+	erpexportsaleDescEndPlace := erpexportsaleFields[14].Descriptor()
+	// erpexportsale.EndPlaceValidator is a validator for the "end_place" field. It is called by the builders before save.
+	erpexportsale.EndPlaceValidator = erpexportsaleDescEndPlace.Validators[0].(func(string) error)
+	// erpexportsaleDescOrderFlow is the schema descriptor for order_flow field.
+	erpexportsaleDescOrderFlow := erpexportsaleFields[15].Descriptor()
+	// erpexportsale.OrderFlowValidator is a validator for the "order_flow" field. It is called by the builders before save.
+	erpexportsale.OrderFlowValidator = erpexportsaleDescOrderFlow.Validators[0].(func(string) error)
+	// erpexportsaleDescTotalAmount is the schema descriptor for total_amount field.
+	erpexportsaleDescTotalAmount := erpexportsaleFields[16].Descriptor()
+	// erpexportsale.DefaultTotalAmount holds the default value on creation for the total_amount field.
+	erpexportsale.DefaultTotalAmount = erpexportsaleDescTotalAmount.Default.(float64)
+	// erpexportsaleDescStatus is the schema descriptor for status field.
+	erpexportsaleDescStatus := erpexportsaleFields[17].Descriptor()
+	// erpexportsale.DefaultStatus holds the default value on creation for the status field.
+	erpexportsale.DefaultStatus = erpexportsaleDescStatus.Default.(string)
+	// erpexportsale.StatusValidator is a validator for the "status" field. It is called by the builders before save.
+	erpexportsale.StatusValidator = erpexportsaleDescStatus.Validators[0].(func(string) error)
+	// erpexportsaleDescRemark is the schema descriptor for remark field.
+	erpexportsaleDescRemark := erpexportsaleFields[18].Descriptor()
+	// erpexportsale.RemarkValidator is a validator for the "remark" field. It is called by the builders before save.
+	erpexportsale.RemarkValidator = erpexportsaleDescRemark.Validators[0].(func(string) error)
+	// erpexportsaleDescCreatedAt is the schema descriptor for created_at field.
+	erpexportsaleDescCreatedAt := erpexportsaleFields[21].Descriptor()
+	// erpexportsale.DefaultCreatedAt holds the default value on creation for the created_at field.
+	erpexportsale.DefaultCreatedAt = erpexportsaleDescCreatedAt.Default.(func() time.Time)
+	// erpexportsaleDescUpdatedAt is the schema descriptor for updated_at field.
+	erpexportsaleDescUpdatedAt := erpexportsaleFields[22].Descriptor()
+	// erpexportsale.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	erpexportsale.DefaultUpdatedAt = erpexportsaleDescUpdatedAt.Default.(func() time.Time)
+	// erpexportsale.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	erpexportsale.UpdateDefaultUpdatedAt = erpexportsaleDescUpdatedAt.UpdateDefault.(func() time.Time)
+	erpexportsaleitemFields := schema.ERPExportSaleItem{}.Fields()
+	_ = erpexportsaleitemFields
+	// erpexportsaleitemDescExportSaleID is the schema descriptor for export_sale_id field.
+	erpexportsaleitemDescExportSaleID := erpexportsaleitemFields[0].Descriptor()
+	// erpexportsaleitem.ExportSaleIDValidator is a validator for the "export_sale_id" field. It is called by the builders before save.
+	erpexportsaleitem.ExportSaleIDValidator = erpexportsaleitemDescExportSaleID.Validators[0].(func(int) error)
+	// erpexportsaleitemDescLineNo is the schema descriptor for line_no field.
+	erpexportsaleitemDescLineNo := erpexportsaleitemFields[1].Descriptor()
+	// erpexportsaleitem.LineNoValidator is a validator for the "line_no" field. It is called by the builders before save.
+	erpexportsaleitem.LineNoValidator = erpexportsaleitemDescLineNo.Validators[0].(func(int) error)
+	// erpexportsaleitemDescProductCode is the schema descriptor for product_code field.
+	erpexportsaleitemDescProductCode := erpexportsaleitemFields[3].Descriptor()
+	// erpexportsaleitem.ProductCodeValidator is a validator for the "product_code" field. It is called by the builders before save.
+	erpexportsaleitem.ProductCodeValidator = erpexportsaleitemDescProductCode.Validators[0].(func(string) error)
+	// erpexportsaleitemDescProductName is the schema descriptor for product_name field.
+	erpexportsaleitemDescProductName := erpexportsaleitemFields[4].Descriptor()
+	// erpexportsaleitem.ProductNameValidator is a validator for the "product_name" field. It is called by the builders before save.
+	erpexportsaleitem.ProductNameValidator = erpexportsaleitemDescProductName.Validators[0].(func(string) error)
+	// erpexportsaleitemDescCnDesc is the schema descriptor for cn_desc field.
+	erpexportsaleitemDescCnDesc := erpexportsaleitemFields[5].Descriptor()
+	// erpexportsaleitem.CnDescValidator is a validator for the "cn_desc" field. It is called by the builders before save.
+	erpexportsaleitem.CnDescValidator = erpexportsaleitemDescCnDesc.Validators[0].(func(string) error)
+	// erpexportsaleitemDescEnDesc is the schema descriptor for en_desc field.
+	erpexportsaleitemDescEnDesc := erpexportsaleitemFields[6].Descriptor()
+	// erpexportsaleitem.EnDescValidator is a validator for the "en_desc" field. It is called by the builders before save.
+	erpexportsaleitem.EnDescValidator = erpexportsaleitemDescEnDesc.Validators[0].(func(string) error)
+	// erpexportsaleitemDescQuantity is the schema descriptor for quantity field.
+	erpexportsaleitemDescQuantity := erpexportsaleitemFields[7].Descriptor()
+	// erpexportsaleitem.DefaultQuantity holds the default value on creation for the quantity field.
+	erpexportsaleitem.DefaultQuantity = erpexportsaleitemDescQuantity.Default.(float64)
+	// erpexportsaleitemDescUnitPrice is the schema descriptor for unit_price field.
+	erpexportsaleitemDescUnitPrice := erpexportsaleitemFields[8].Descriptor()
+	// erpexportsaleitem.DefaultUnitPrice holds the default value on creation for the unit_price field.
+	erpexportsaleitem.DefaultUnitPrice = erpexportsaleitemDescUnitPrice.Default.(float64)
+	// erpexportsaleitemDescTotalPrice is the schema descriptor for total_price field.
+	erpexportsaleitemDescTotalPrice := erpexportsaleitemFields[9].Descriptor()
+	// erpexportsaleitem.DefaultTotalPrice holds the default value on creation for the total_price field.
+	erpexportsaleitem.DefaultTotalPrice = erpexportsaleitemDescTotalPrice.Default.(float64)
+	// erpexportsaleitemDescPackDetail is the schema descriptor for pack_detail field.
+	erpexportsaleitemDescPackDetail := erpexportsaleitemFields[10].Descriptor()
+	// erpexportsaleitem.PackDetailValidator is a validator for the "pack_detail" field. It is called by the builders before save.
+	erpexportsaleitem.PackDetailValidator = erpexportsaleitemDescPackDetail.Validators[0].(func(string) error)
+	// erpexportsaleitemDescCreatedAt is the schema descriptor for created_at field.
+	erpexportsaleitemDescCreatedAt := erpexportsaleitemFields[11].Descriptor()
+	// erpexportsaleitem.DefaultCreatedAt holds the default value on creation for the created_at field.
+	erpexportsaleitem.DefaultCreatedAt = erpexportsaleitemDescCreatedAt.Default.(func() time.Time)
+	// erpexportsaleitemDescUpdatedAt is the schema descriptor for updated_at field.
+	erpexportsaleitemDescUpdatedAt := erpexportsaleitemFields[12].Descriptor()
+	// erpexportsaleitem.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	erpexportsaleitem.DefaultUpdatedAt = erpexportsaleitemDescUpdatedAt.Default.(func() time.Time)
+	// erpexportsaleitem.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	erpexportsaleitem.UpdateDefaultUpdatedAt = erpexportsaleitemDescUpdatedAt.UpdateDefault.(func() time.Time)
+	erpinboundnoticeFields := schema.ERPInboundNotice{}.Fields()
+	_ = erpinboundnoticeFields
+	// erpinboundnoticeDescCode is the schema descriptor for code field.
+	erpinboundnoticeDescCode := erpinboundnoticeFields[0].Descriptor()
+	// erpinboundnotice.CodeValidator is a validator for the "code" field. It is called by the builders before save.
+	erpinboundnotice.CodeValidator = func() func(string) error {
+		validators := erpinboundnoticeDescCode.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(code string) error {
+			for _, fn := range fns {
+				if err := fn(code); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// erpinboundnoticeDescSourcePurchaseCode is the schema descriptor for source_purchase_code field.
+	erpinboundnoticeDescSourcePurchaseCode := erpinboundnoticeFields[2].Descriptor()
+	// erpinboundnotice.SourcePurchaseCodeValidator is a validator for the "source_purchase_code" field. It is called by the builders before save.
+	erpinboundnotice.SourcePurchaseCodeValidator = erpinboundnoticeDescSourcePurchaseCode.Validators[0].(func(string) error)
+	// erpinboundnoticeDescEntryNo is the schema descriptor for entry_no field.
+	erpinboundnoticeDescEntryNo := erpinboundnoticeFields[3].Descriptor()
+	// erpinboundnotice.EntryNoValidator is a validator for the "entry_no" field. It is called by the builders before save.
+	erpinboundnotice.EntryNoValidator = erpinboundnoticeDescEntryNo.Validators[0].(func(string) error)
+	// erpinboundnoticeDescQcStatus is the schema descriptor for qc_status field.
+	erpinboundnoticeDescQcStatus := erpinboundnoticeFields[6].Descriptor()
+	// erpinboundnotice.DefaultQcStatus holds the default value on creation for the qc_status field.
+	erpinboundnotice.DefaultQcStatus = erpinboundnoticeDescQcStatus.Default.(string)
+	// erpinboundnotice.QcStatusValidator is a validator for the "qc_status" field. It is called by the builders before save.
+	erpinboundnotice.QcStatusValidator = erpinboundnoticeDescQcStatus.Validators[0].(func(string) error)
+	// erpinboundnoticeDescInboundStatus is the schema descriptor for inbound_status field.
+	erpinboundnoticeDescInboundStatus := erpinboundnoticeFields[7].Descriptor()
+	// erpinboundnotice.DefaultInboundStatus holds the default value on creation for the inbound_status field.
+	erpinboundnotice.DefaultInboundStatus = erpinboundnoticeDescInboundStatus.Default.(string)
+	// erpinboundnotice.InboundStatusValidator is a validator for the "inbound_status" field. It is called by the builders before save.
+	erpinboundnotice.InboundStatusValidator = erpinboundnoticeDescInboundStatus.Validators[0].(func(string) error)
+	// erpinboundnoticeDescRemark is the schema descriptor for remark field.
+	erpinboundnoticeDescRemark := erpinboundnoticeFields[9].Descriptor()
+	// erpinboundnotice.RemarkValidator is a validator for the "remark" field. It is called by the builders before save.
+	erpinboundnotice.RemarkValidator = erpinboundnoticeDescRemark.Validators[0].(func(string) error)
+	// erpinboundnoticeDescCreatedAt is the schema descriptor for created_at field.
+	erpinboundnoticeDescCreatedAt := erpinboundnoticeFields[12].Descriptor()
+	// erpinboundnotice.DefaultCreatedAt holds the default value on creation for the created_at field.
+	erpinboundnotice.DefaultCreatedAt = erpinboundnoticeDescCreatedAt.Default.(func() time.Time)
+	// erpinboundnoticeDescUpdatedAt is the schema descriptor for updated_at field.
+	erpinboundnoticeDescUpdatedAt := erpinboundnoticeFields[13].Descriptor()
+	// erpinboundnotice.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	erpinboundnotice.DefaultUpdatedAt = erpinboundnoticeDescUpdatedAt.Default.(func() time.Time)
+	// erpinboundnotice.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	erpinboundnotice.UpdateDefaultUpdatedAt = erpinboundnoticeDescUpdatedAt.UpdateDefault.(func() time.Time)
+	erpinboundnoticeitemFields := schema.ERPInboundNoticeItem{}.Fields()
+	_ = erpinboundnoticeitemFields
+	// erpinboundnoticeitemDescInboundNoticeID is the schema descriptor for inbound_notice_id field.
+	erpinboundnoticeitemDescInboundNoticeID := erpinboundnoticeitemFields[0].Descriptor()
+	// erpinboundnoticeitem.InboundNoticeIDValidator is a validator for the "inbound_notice_id" field. It is called by the builders before save.
+	erpinboundnoticeitem.InboundNoticeIDValidator = erpinboundnoticeitemDescInboundNoticeID.Validators[0].(func(int) error)
+	// erpinboundnoticeitemDescLineNo is the schema descriptor for line_no field.
+	erpinboundnoticeitemDescLineNo := erpinboundnoticeitemFields[1].Descriptor()
+	// erpinboundnoticeitem.LineNoValidator is a validator for the "line_no" field. It is called by the builders before save.
+	erpinboundnoticeitem.LineNoValidator = erpinboundnoticeitemDescLineNo.Validators[0].(func(int) error)
+	// erpinboundnoticeitemDescProductCode is the schema descriptor for product_code field.
+	erpinboundnoticeitemDescProductCode := erpinboundnoticeitemFields[3].Descriptor()
+	// erpinboundnoticeitem.ProductCodeValidator is a validator for the "product_code" field. It is called by the builders before save.
+	erpinboundnoticeitem.ProductCodeValidator = erpinboundnoticeitemDescProductCode.Validators[0].(func(string) error)
+	// erpinboundnoticeitemDescProductName is the schema descriptor for product_name field.
+	erpinboundnoticeitemDescProductName := erpinboundnoticeitemFields[4].Descriptor()
+	// erpinboundnoticeitem.ProductNameValidator is a validator for the "product_name" field. It is called by the builders before save.
+	erpinboundnoticeitem.ProductNameValidator = erpinboundnoticeitemDescProductName.Validators[0].(func(string) error)
+	// erpinboundnoticeitemDescLotNo is the schema descriptor for lot_no field.
+	erpinboundnoticeitemDescLotNo := erpinboundnoticeitemFields[5].Descriptor()
+	// erpinboundnoticeitem.LotNoValidator is a validator for the "lot_no" field. It is called by the builders before save.
+	erpinboundnoticeitem.LotNoValidator = erpinboundnoticeitemDescLotNo.Validators[0].(func(string) error)
+	// erpinboundnoticeitemDescQuantity is the schema descriptor for quantity field.
+	erpinboundnoticeitemDescQuantity := erpinboundnoticeitemFields[6].Descriptor()
+	// erpinboundnoticeitem.DefaultQuantity holds the default value on creation for the quantity field.
+	erpinboundnoticeitem.DefaultQuantity = erpinboundnoticeitemDescQuantity.Default.(float64)
+	// erpinboundnoticeitemDescPassedQty is the schema descriptor for passed_qty field.
+	erpinboundnoticeitemDescPassedQty := erpinboundnoticeitemFields[7].Descriptor()
+	// erpinboundnoticeitem.DefaultPassedQty holds the default value on creation for the passed_qty field.
+	erpinboundnoticeitem.DefaultPassedQty = erpinboundnoticeitemDescPassedQty.Default.(float64)
+	// erpinboundnoticeitemDescRejectedQty is the schema descriptor for rejected_qty field.
+	erpinboundnoticeitemDescRejectedQty := erpinboundnoticeitemFields[8].Descriptor()
+	// erpinboundnoticeitem.DefaultRejectedQty holds the default value on creation for the rejected_qty field.
+	erpinboundnoticeitem.DefaultRejectedQty = erpinboundnoticeitemDescRejectedQty.Default.(float64)
+	// erpinboundnoticeitemDescCreatedAt is the schema descriptor for created_at field.
+	erpinboundnoticeitemDescCreatedAt := erpinboundnoticeitemFields[10].Descriptor()
+	// erpinboundnoticeitem.DefaultCreatedAt holds the default value on creation for the created_at field.
+	erpinboundnoticeitem.DefaultCreatedAt = erpinboundnoticeitemDescCreatedAt.Default.(func() time.Time)
+	// erpinboundnoticeitemDescUpdatedAt is the schema descriptor for updated_at field.
+	erpinboundnoticeitemDescUpdatedAt := erpinboundnoticeitemFields[11].Descriptor()
+	// erpinboundnoticeitem.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	erpinboundnoticeitem.DefaultUpdatedAt = erpinboundnoticeitemDescUpdatedAt.Default.(func() time.Time)
+	// erpinboundnoticeitem.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	erpinboundnoticeitem.UpdateDefaultUpdatedAt = erpinboundnoticeitemDescUpdatedAt.UpdateDefault.(func() time.Time)
+	erplocationFields := schema.ERPLocation{}.Fields()
+	_ = erplocationFields
+	// erplocationDescWarehouseID is the schema descriptor for warehouse_id field.
+	erplocationDescWarehouseID := erplocationFields[0].Descriptor()
+	// erplocation.WarehouseIDValidator is a validator for the "warehouse_id" field. It is called by the builders before save.
+	erplocation.WarehouseIDValidator = erplocationDescWarehouseID.Validators[0].(func(int) error)
+	// erplocationDescCode is the schema descriptor for code field.
+	erplocationDescCode := erplocationFields[1].Descriptor()
+	// erplocation.CodeValidator is a validator for the "code" field. It is called by the builders before save.
+	erplocation.CodeValidator = func() func(string) error {
+		validators := erplocationDescCode.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(code string) error {
+			for _, fn := range fns {
+				if err := fn(code); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// erplocationDescName is the schema descriptor for name field.
+	erplocationDescName := erplocationFields[2].Descriptor()
+	// erplocation.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	erplocation.NameValidator = erplocationDescName.Validators[0].(func(string) error)
+	// erplocationDescDisabled is the schema descriptor for disabled field.
+	erplocationDescDisabled := erplocationFields[3].Descriptor()
+	// erplocation.DefaultDisabled holds the default value on creation for the disabled field.
+	erplocation.DefaultDisabled = erplocationDescDisabled.Default.(bool)
+	// erplocationDescCreatedAt is the schema descriptor for created_at field.
+	erplocationDescCreatedAt := erplocationFields[4].Descriptor()
+	// erplocation.DefaultCreatedAt holds the default value on creation for the created_at field.
+	erplocation.DefaultCreatedAt = erplocationDescCreatedAt.Default.(func() time.Time)
+	// erplocationDescUpdatedAt is the schema descriptor for updated_at field.
+	erplocationDescUpdatedAt := erplocationFields[5].Descriptor()
+	// erplocation.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	erplocation.DefaultUpdatedAt = erplocationDescUpdatedAt.Default.(func() time.Time)
+	// erplocation.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	erplocation.UpdateDefaultUpdatedAt = erplocationDescUpdatedAt.UpdateDefault.(func() time.Time)
 	erpmodulerecordFields := schema.ERPModuleRecord{}.Fields()
 	_ = erpmodulerecordFields
 	// erpmodulerecordDescModuleKey is the schema descriptor for module_key field.
@@ -104,6 +697,1088 @@ func init() {
 	erpmodulerecord.DefaultUpdatedAt = erpmodulerecordDescUpdatedAt.Default.(func() time.Time)
 	// erpmodulerecord.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	erpmodulerecord.UpdateDefaultUpdatedAt = erpmodulerecordDescUpdatedAt.UpdateDefault.(func() time.Time)
+	erpoutboundorderFields := schema.ERPOutboundOrder{}.Fields()
+	_ = erpoutboundorderFields
+	// erpoutboundorderDescCode is the schema descriptor for code field.
+	erpoutboundorderDescCode := erpoutboundorderFields[0].Descriptor()
+	// erpoutboundorder.CodeValidator is a validator for the "code" field. It is called by the builders before save.
+	erpoutboundorder.CodeValidator = func() func(string) error {
+		validators := erpoutboundorderDescCode.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(code string) error {
+			for _, fn := range fns {
+				if err := fn(code); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// erpoutboundorderDescSourceShipmentCode is the schema descriptor for source_shipment_code field.
+	erpoutboundorderDescSourceShipmentCode := erpoutboundorderFields[2].Descriptor()
+	// erpoutboundorder.SourceShipmentCodeValidator is a validator for the "source_shipment_code" field. It is called by the builders before save.
+	erpoutboundorder.SourceShipmentCodeValidator = erpoutboundorderDescSourceShipmentCode.Validators[0].(func(string) error)
+	// erpoutboundorderDescTotalQuantity is the schema descriptor for total_quantity field.
+	erpoutboundorderDescTotalQuantity := erpoutboundorderFields[6].Descriptor()
+	// erpoutboundorder.DefaultTotalQuantity holds the default value on creation for the total_quantity field.
+	erpoutboundorder.DefaultTotalQuantity = erpoutboundorderDescTotalQuantity.Default.(float64)
+	// erpoutboundorderDescStatus is the schema descriptor for status field.
+	erpoutboundorderDescStatus := erpoutboundorderFields[7].Descriptor()
+	// erpoutboundorder.DefaultStatus holds the default value on creation for the status field.
+	erpoutboundorder.DefaultStatus = erpoutboundorderDescStatus.Default.(string)
+	// erpoutboundorder.StatusValidator is a validator for the "status" field. It is called by the builders before save.
+	erpoutboundorder.StatusValidator = erpoutboundorderDescStatus.Validators[0].(func(string) error)
+	// erpoutboundorderDescRemark is the schema descriptor for remark field.
+	erpoutboundorderDescRemark := erpoutboundorderFields[8].Descriptor()
+	// erpoutboundorder.RemarkValidator is a validator for the "remark" field. It is called by the builders before save.
+	erpoutboundorder.RemarkValidator = erpoutboundorderDescRemark.Validators[0].(func(string) error)
+	// erpoutboundorderDescCreatedAt is the schema descriptor for created_at field.
+	erpoutboundorderDescCreatedAt := erpoutboundorderFields[11].Descriptor()
+	// erpoutboundorder.DefaultCreatedAt holds the default value on creation for the created_at field.
+	erpoutboundorder.DefaultCreatedAt = erpoutboundorderDescCreatedAt.Default.(func() time.Time)
+	// erpoutboundorderDescUpdatedAt is the schema descriptor for updated_at field.
+	erpoutboundorderDescUpdatedAt := erpoutboundorderFields[12].Descriptor()
+	// erpoutboundorder.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	erpoutboundorder.DefaultUpdatedAt = erpoutboundorderDescUpdatedAt.Default.(func() time.Time)
+	// erpoutboundorder.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	erpoutboundorder.UpdateDefaultUpdatedAt = erpoutboundorderDescUpdatedAt.UpdateDefault.(func() time.Time)
+	erpoutboundorderitemFields := schema.ERPOutboundOrderItem{}.Fields()
+	_ = erpoutboundorderitemFields
+	// erpoutboundorderitemDescOutboundOrderID is the schema descriptor for outbound_order_id field.
+	erpoutboundorderitemDescOutboundOrderID := erpoutboundorderitemFields[0].Descriptor()
+	// erpoutboundorderitem.OutboundOrderIDValidator is a validator for the "outbound_order_id" field. It is called by the builders before save.
+	erpoutboundorderitem.OutboundOrderIDValidator = erpoutboundorderitemDescOutboundOrderID.Validators[0].(func(int) error)
+	// erpoutboundorderitemDescLineNo is the schema descriptor for line_no field.
+	erpoutboundorderitemDescLineNo := erpoutboundorderitemFields[1].Descriptor()
+	// erpoutboundorderitem.LineNoValidator is a validator for the "line_no" field. It is called by the builders before save.
+	erpoutboundorderitem.LineNoValidator = erpoutboundorderitemDescLineNo.Validators[0].(func(int) error)
+	// erpoutboundorderitemDescProductCode is the schema descriptor for product_code field.
+	erpoutboundorderitemDescProductCode := erpoutboundorderitemFields[3].Descriptor()
+	// erpoutboundorderitem.ProductCodeValidator is a validator for the "product_code" field. It is called by the builders before save.
+	erpoutboundorderitem.ProductCodeValidator = erpoutboundorderitemDescProductCode.Validators[0].(func(string) error)
+	// erpoutboundorderitemDescLotNo is the schema descriptor for lot_no field.
+	erpoutboundorderitemDescLotNo := erpoutboundorderitemFields[4].Descriptor()
+	// erpoutboundorderitem.LotNoValidator is a validator for the "lot_no" field. It is called by the builders before save.
+	erpoutboundorderitem.LotNoValidator = erpoutboundorderitemDescLotNo.Validators[0].(func(string) error)
+	// erpoutboundorderitemDescQuantity is the schema descriptor for quantity field.
+	erpoutboundorderitemDescQuantity := erpoutboundorderitemFields[5].Descriptor()
+	// erpoutboundorderitem.DefaultQuantity holds the default value on creation for the quantity field.
+	erpoutboundorderitem.DefaultQuantity = erpoutboundorderitemDescQuantity.Default.(float64)
+	// erpoutboundorderitemDescCreatedAt is the schema descriptor for created_at field.
+	erpoutboundorderitemDescCreatedAt := erpoutboundorderitemFields[6].Descriptor()
+	// erpoutboundorderitem.DefaultCreatedAt holds the default value on creation for the created_at field.
+	erpoutboundorderitem.DefaultCreatedAt = erpoutboundorderitemDescCreatedAt.Default.(func() time.Time)
+	// erpoutboundorderitemDescUpdatedAt is the schema descriptor for updated_at field.
+	erpoutboundorderitemDescUpdatedAt := erpoutboundorderitemFields[7].Descriptor()
+	// erpoutboundorderitem.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	erpoutboundorderitem.DefaultUpdatedAt = erpoutboundorderitemDescUpdatedAt.Default.(func() time.Time)
+	// erpoutboundorderitem.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	erpoutboundorderitem.UpdateDefaultUpdatedAt = erpoutboundorderitemDescUpdatedAt.UpdateDefault.(func() time.Time)
+	erppartnerFields := schema.ERPPartner{}.Fields()
+	_ = erppartnerFields
+	// erppartnerDescCode is the schema descriptor for code field.
+	erppartnerDescCode := erppartnerFields[0].Descriptor()
+	// erppartner.CodeValidator is a validator for the "code" field. It is called by the builders before save.
+	erppartner.CodeValidator = func() func(string) error {
+		validators := erppartnerDescCode.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(code string) error {
+			for _, fn := range fns {
+				if err := fn(code); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// erppartnerDescPartnerType is the schema descriptor for partner_type field.
+	erppartnerDescPartnerType := erppartnerFields[1].Descriptor()
+	// erppartner.PartnerTypeValidator is a validator for the "partner_type" field. It is called by the builders before save.
+	erppartner.PartnerTypeValidator = func() func(string) error {
+		validators := erppartnerDescPartnerType.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(partner_type string) error {
+			for _, fn := range fns {
+				if err := fn(partner_type); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// erppartnerDescName is the schema descriptor for name field.
+	erppartnerDescName := erppartnerFields[2].Descriptor()
+	// erppartner.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	erppartner.NameValidator = func() func(string) error {
+		validators := erppartnerDescName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(name string) error {
+			for _, fn := range fns {
+				if err := fn(name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// erppartnerDescShortName is the schema descriptor for short_name field.
+	erppartnerDescShortName := erppartnerFields[3].Descriptor()
+	// erppartner.ShortNameValidator is a validator for the "short_name" field. It is called by the builders before save.
+	erppartner.ShortNameValidator = erppartnerDescShortName.Validators[0].(func(string) error)
+	// erppartnerDescTaxNo is the schema descriptor for tax_no field.
+	erppartnerDescTaxNo := erppartnerFields[4].Descriptor()
+	// erppartner.TaxNoValidator is a validator for the "tax_no" field. It is called by the builders before save.
+	erppartner.TaxNoValidator = erppartnerDescTaxNo.Validators[0].(func(string) error)
+	// erppartnerDescCurrency is the schema descriptor for currency field.
+	erppartnerDescCurrency := erppartnerFields[5].Descriptor()
+	// erppartner.DefaultCurrency holds the default value on creation for the currency field.
+	erppartner.DefaultCurrency = erppartnerDescCurrency.Default.(string)
+	// erppartner.CurrencyValidator is a validator for the "currency" field. It is called by the builders before save.
+	erppartner.CurrencyValidator = erppartnerDescCurrency.Validators[0].(func(string) error)
+	// erppartnerDescPaymentCycleDays is the schema descriptor for payment_cycle_days field.
+	erppartnerDescPaymentCycleDays := erppartnerFields[6].Descriptor()
+	// erppartner.DefaultPaymentCycleDays holds the default value on creation for the payment_cycle_days field.
+	erppartner.DefaultPaymentCycleDays = erppartnerDescPaymentCycleDays.Default.(int)
+	// erppartnerDescAddress is the schema descriptor for address field.
+	erppartnerDescAddress := erppartnerFields[7].Descriptor()
+	// erppartner.AddressValidator is a validator for the "address" field. It is called by the builders before save.
+	erppartner.AddressValidator = erppartnerDescAddress.Validators[0].(func(string) error)
+	// erppartnerDescContact is the schema descriptor for contact field.
+	erppartnerDescContact := erppartnerFields[8].Descriptor()
+	// erppartner.ContactValidator is a validator for the "contact" field. It is called by the builders before save.
+	erppartner.ContactValidator = erppartnerDescContact.Validators[0].(func(string) error)
+	// erppartnerDescContactPhone is the schema descriptor for contact_phone field.
+	erppartnerDescContactPhone := erppartnerFields[9].Descriptor()
+	// erppartner.ContactPhoneValidator is a validator for the "contact_phone" field. It is called by the builders before save.
+	erppartner.ContactPhoneValidator = erppartnerDescContactPhone.Validators[0].(func(string) error)
+	// erppartnerDescEmail is the schema descriptor for email field.
+	erppartnerDescEmail := erppartnerFields[10].Descriptor()
+	// erppartner.EmailValidator is a validator for the "email" field. It is called by the builders before save.
+	erppartner.EmailValidator = erppartnerDescEmail.Validators[0].(func(string) error)
+	// erppartnerDescDisabled is the schema descriptor for disabled field.
+	erppartnerDescDisabled := erppartnerFields[11].Descriptor()
+	// erppartner.DefaultDisabled holds the default value on creation for the disabled field.
+	erppartner.DefaultDisabled = erppartnerDescDisabled.Default.(bool)
+	// erppartnerDescCreatedAt is the schema descriptor for created_at field.
+	erppartnerDescCreatedAt := erppartnerFields[15].Descriptor()
+	// erppartner.DefaultCreatedAt holds the default value on creation for the created_at field.
+	erppartner.DefaultCreatedAt = erppartnerDescCreatedAt.Default.(func() time.Time)
+	// erppartnerDescUpdatedAt is the schema descriptor for updated_at field.
+	erppartnerDescUpdatedAt := erppartnerFields[16].Descriptor()
+	// erppartner.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	erppartner.DefaultUpdatedAt = erppartnerDescUpdatedAt.Default.(func() time.Time)
+	// erppartner.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	erppartner.UpdateDefaultUpdatedAt = erppartnerDescUpdatedAt.UpdateDefault.(func() time.Time)
+	erpproductFields := schema.ERPProduct{}.Fields()
+	_ = erpproductFields
+	// erpproductDescCode is the schema descriptor for code field.
+	erpproductDescCode := erpproductFields[0].Descriptor()
+	// erpproduct.CodeValidator is a validator for the "code" field. It is called by the builders before save.
+	erpproduct.CodeValidator = func() func(string) error {
+		validators := erpproductDescCode.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(code string) error {
+			for _, fn := range fns {
+				if err := fn(code); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// erpproductDescHsCode is the schema descriptor for hs_code field.
+	erpproductDescHsCode := erpproductFields[1].Descriptor()
+	// erpproduct.HsCodeValidator is a validator for the "hs_code" field. It is called by the builders before save.
+	erpproduct.HsCodeValidator = erpproductDescHsCode.Validators[0].(func(string) error)
+	// erpproductDescSpecCode is the schema descriptor for spec_code field.
+	erpproductDescSpecCode := erpproductFields[2].Descriptor()
+	// erpproduct.SpecCodeValidator is a validator for the "spec_code" field. It is called by the builders before save.
+	erpproduct.SpecCodeValidator = erpproductDescSpecCode.Validators[0].(func(string) error)
+	// erpproductDescDrawingNo is the schema descriptor for drawing_no field.
+	erpproductDescDrawingNo := erpproductFields[3].Descriptor()
+	// erpproduct.DrawingNoValidator is a validator for the "drawing_no" field. It is called by the builders before save.
+	erpproduct.DrawingNoValidator = erpproductDescDrawingNo.Validators[0].(func(string) error)
+	// erpproductDescCnDesc is the schema descriptor for cn_desc field.
+	erpproductDescCnDesc := erpproductFields[4].Descriptor()
+	// erpproduct.CnDescValidator is a validator for the "cn_desc" field. It is called by the builders before save.
+	erpproduct.CnDescValidator = erpproductDescCnDesc.Validators[0].(func(string) error)
+	// erpproductDescEnDesc is the schema descriptor for en_desc field.
+	erpproductDescEnDesc := erpproductFields[5].Descriptor()
+	// erpproduct.EnDescValidator is a validator for the "en_desc" field. It is called by the builders before save.
+	erpproduct.EnDescValidator = erpproductDescEnDesc.Validators[0].(func(string) error)
+	// erpproductDescUnit is the schema descriptor for unit field.
+	erpproductDescUnit := erpproductFields[6].Descriptor()
+	// erpproduct.DefaultUnit holds the default value on creation for the unit field.
+	erpproduct.DefaultUnit = erpproductDescUnit.Default.(string)
+	// erpproduct.UnitValidator is a validator for the "unit" field. It is called by the builders before save.
+	erpproduct.UnitValidator = erpproductDescUnit.Validators[0].(func(string) error)
+	// erpproductDescDisabled is the schema descriptor for disabled field.
+	erpproductDescDisabled := erpproductFields[7].Descriptor()
+	// erpproduct.DefaultDisabled holds the default value on creation for the disabled field.
+	erpproduct.DefaultDisabled = erpproductDescDisabled.Default.(bool)
+	// erpproductDescCreatedAt is the schema descriptor for created_at field.
+	erpproductDescCreatedAt := erpproductFields[11].Descriptor()
+	// erpproduct.DefaultCreatedAt holds the default value on creation for the created_at field.
+	erpproduct.DefaultCreatedAt = erpproductDescCreatedAt.Default.(func() time.Time)
+	// erpproductDescUpdatedAt is the schema descriptor for updated_at field.
+	erpproductDescUpdatedAt := erpproductFields[12].Descriptor()
+	// erpproduct.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	erpproduct.DefaultUpdatedAt = erpproductDescUpdatedAt.Default.(func() time.Time)
+	// erpproduct.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	erpproduct.UpdateDefaultUpdatedAt = erpproductDescUpdatedAt.UpdateDefault.(func() time.Time)
+	erppurchasecontractFields := schema.ERPPurchaseContract{}.Fields()
+	_ = erppurchasecontractFields
+	// erppurchasecontractDescCode is the schema descriptor for code field.
+	erppurchasecontractDescCode := erppurchasecontractFields[0].Descriptor()
+	// erppurchasecontract.CodeValidator is a validator for the "code" field. It is called by the builders before save.
+	erppurchasecontract.CodeValidator = func() func(string) error {
+		validators := erppurchasecontractDescCode.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(code string) error {
+			for _, fn := range fns {
+				if err := fn(code); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// erppurchasecontractDescSourceExportCode is the schema descriptor for source_export_code field.
+	erppurchasecontractDescSourceExportCode := erppurchasecontractFields[2].Descriptor()
+	// erppurchasecontract.SourceExportCodeValidator is a validator for the "source_export_code" field. It is called by the builders before save.
+	erppurchasecontract.SourceExportCodeValidator = erppurchasecontractDescSourceExportCode.Validators[0].(func(string) error)
+	// erppurchasecontractDescSupplierCode is the schema descriptor for supplier_code field.
+	erppurchasecontractDescSupplierCode := erppurchasecontractFields[4].Descriptor()
+	// erppurchasecontract.SupplierCodeValidator is a validator for the "supplier_code" field. It is called by the builders before save.
+	erppurchasecontract.SupplierCodeValidator = erppurchasecontractDescSupplierCode.Validators[0].(func(string) error)
+	// erppurchasecontractDescSalesNo is the schema descriptor for sales_no field.
+	erppurchasecontractDescSalesNo := erppurchasecontractFields[6].Descriptor()
+	// erppurchasecontract.SalesNoValidator is a validator for the "sales_no" field. It is called by the builders before save.
+	erppurchasecontract.SalesNoValidator = erppurchasecontractDescSalesNo.Validators[0].(func(string) error)
+	// erppurchasecontractDescDeliveryAddress is the schema descriptor for delivery_address field.
+	erppurchasecontractDescDeliveryAddress := erppurchasecontractFields[8].Descriptor()
+	// erppurchasecontract.DeliveryAddressValidator is a validator for the "delivery_address" field. It is called by the builders before save.
+	erppurchasecontract.DeliveryAddressValidator = erppurchasecontractDescDeliveryAddress.Validators[0].(func(string) error)
+	// erppurchasecontractDescFollower is the schema descriptor for follower field.
+	erppurchasecontractDescFollower := erppurchasecontractFields[9].Descriptor()
+	// erppurchasecontract.FollowerValidator is a validator for the "follower" field. It is called by the builders before save.
+	erppurchasecontract.FollowerValidator = erppurchasecontractDescFollower.Validators[0].(func(string) error)
+	// erppurchasecontractDescBuyer is the schema descriptor for buyer field.
+	erppurchasecontractDescBuyer := erppurchasecontractFields[10].Descriptor()
+	// erppurchasecontract.BuyerValidator is a validator for the "buyer" field. It is called by the builders before save.
+	erppurchasecontract.BuyerValidator = erppurchasecontractDescBuyer.Validators[0].(func(string) error)
+	// erppurchasecontractDescInvoiceRequired is the schema descriptor for invoice_required field.
+	erppurchasecontractDescInvoiceRequired := erppurchasecontractFields[11].Descriptor()
+	// erppurchasecontract.DefaultInvoiceRequired holds the default value on creation for the invoice_required field.
+	erppurchasecontract.DefaultInvoiceRequired = erppurchasecontractDescInvoiceRequired.Default.(bool)
+	// erppurchasecontractDescTotalAmount is the schema descriptor for total_amount field.
+	erppurchasecontractDescTotalAmount := erppurchasecontractFields[12].Descriptor()
+	// erppurchasecontract.DefaultTotalAmount holds the default value on creation for the total_amount field.
+	erppurchasecontract.DefaultTotalAmount = erppurchasecontractDescTotalAmount.Default.(float64)
+	// erppurchasecontractDescStatus is the schema descriptor for status field.
+	erppurchasecontractDescStatus := erppurchasecontractFields[13].Descriptor()
+	// erppurchasecontract.DefaultStatus holds the default value on creation for the status field.
+	erppurchasecontract.DefaultStatus = erppurchasecontractDescStatus.Default.(string)
+	// erppurchasecontract.StatusValidator is a validator for the "status" field. It is called by the builders before save.
+	erppurchasecontract.StatusValidator = erppurchasecontractDescStatus.Validators[0].(func(string) error)
+	// erppurchasecontractDescRemark is the schema descriptor for remark field.
+	erppurchasecontractDescRemark := erppurchasecontractFields[14].Descriptor()
+	// erppurchasecontract.RemarkValidator is a validator for the "remark" field. It is called by the builders before save.
+	erppurchasecontract.RemarkValidator = erppurchasecontractDescRemark.Validators[0].(func(string) error)
+	// erppurchasecontractDescCreatedAt is the schema descriptor for created_at field.
+	erppurchasecontractDescCreatedAt := erppurchasecontractFields[17].Descriptor()
+	// erppurchasecontract.DefaultCreatedAt holds the default value on creation for the created_at field.
+	erppurchasecontract.DefaultCreatedAt = erppurchasecontractDescCreatedAt.Default.(func() time.Time)
+	// erppurchasecontractDescUpdatedAt is the schema descriptor for updated_at field.
+	erppurchasecontractDescUpdatedAt := erppurchasecontractFields[18].Descriptor()
+	// erppurchasecontract.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	erppurchasecontract.DefaultUpdatedAt = erppurchasecontractDescUpdatedAt.Default.(func() time.Time)
+	// erppurchasecontract.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	erppurchasecontract.UpdateDefaultUpdatedAt = erppurchasecontractDescUpdatedAt.UpdateDefault.(func() time.Time)
+	erppurchasecontractitemFields := schema.ERPPurchaseContractItem{}.Fields()
+	_ = erppurchasecontractitemFields
+	// erppurchasecontractitemDescPurchaseContractID is the schema descriptor for purchase_contract_id field.
+	erppurchasecontractitemDescPurchaseContractID := erppurchasecontractitemFields[0].Descriptor()
+	// erppurchasecontractitem.PurchaseContractIDValidator is a validator for the "purchase_contract_id" field. It is called by the builders before save.
+	erppurchasecontractitem.PurchaseContractIDValidator = erppurchasecontractitemDescPurchaseContractID.Validators[0].(func(int) error)
+	// erppurchasecontractitemDescLineNo is the schema descriptor for line_no field.
+	erppurchasecontractitemDescLineNo := erppurchasecontractitemFields[1].Descriptor()
+	// erppurchasecontractitem.LineNoValidator is a validator for the "line_no" field. It is called by the builders before save.
+	erppurchasecontractitem.LineNoValidator = erppurchasecontractitemDescLineNo.Validators[0].(func(int) error)
+	// erppurchasecontractitemDescProductCode is the schema descriptor for product_code field.
+	erppurchasecontractitemDescProductCode := erppurchasecontractitemFields[3].Descriptor()
+	// erppurchasecontractitem.ProductCodeValidator is a validator for the "product_code" field. It is called by the builders before save.
+	erppurchasecontractitem.ProductCodeValidator = erppurchasecontractitemDescProductCode.Validators[0].(func(string) error)
+	// erppurchasecontractitemDescProductName is the schema descriptor for product_name field.
+	erppurchasecontractitemDescProductName := erppurchasecontractitemFields[4].Descriptor()
+	// erppurchasecontractitem.ProductNameValidator is a validator for the "product_name" field. It is called by the builders before save.
+	erppurchasecontractitem.ProductNameValidator = erppurchasecontractitemDescProductName.Validators[0].(func(string) error)
+	// erppurchasecontractitemDescSpecCode is the schema descriptor for spec_code field.
+	erppurchasecontractitemDescSpecCode := erppurchasecontractitemFields[5].Descriptor()
+	// erppurchasecontractitem.SpecCodeValidator is a validator for the "spec_code" field. It is called by the builders before save.
+	erppurchasecontractitem.SpecCodeValidator = erppurchasecontractitemDescSpecCode.Validators[0].(func(string) error)
+	// erppurchasecontractitemDescQuantity is the schema descriptor for quantity field.
+	erppurchasecontractitemDescQuantity := erppurchasecontractitemFields[6].Descriptor()
+	// erppurchasecontractitem.DefaultQuantity holds the default value on creation for the quantity field.
+	erppurchasecontractitem.DefaultQuantity = erppurchasecontractitemDescQuantity.Default.(float64)
+	// erppurchasecontractitemDescUnitPrice is the schema descriptor for unit_price field.
+	erppurchasecontractitemDescUnitPrice := erppurchasecontractitemFields[7].Descriptor()
+	// erppurchasecontractitem.DefaultUnitPrice holds the default value on creation for the unit_price field.
+	erppurchasecontractitem.DefaultUnitPrice = erppurchasecontractitemDescUnitPrice.Default.(float64)
+	// erppurchasecontractitemDescTotalPrice is the schema descriptor for total_price field.
+	erppurchasecontractitemDescTotalPrice := erppurchasecontractitemFields[8].Descriptor()
+	// erppurchasecontractitem.DefaultTotalPrice holds the default value on creation for the total_price field.
+	erppurchasecontractitem.DefaultTotalPrice = erppurchasecontractitemDescTotalPrice.Default.(float64)
+	// erppurchasecontractitemDescCreatedAt is the schema descriptor for created_at field.
+	erppurchasecontractitemDescCreatedAt := erppurchasecontractitemFields[9].Descriptor()
+	// erppurchasecontractitem.DefaultCreatedAt holds the default value on creation for the created_at field.
+	erppurchasecontractitem.DefaultCreatedAt = erppurchasecontractitemDescCreatedAt.Default.(func() time.Time)
+	// erppurchasecontractitemDescUpdatedAt is the schema descriptor for updated_at field.
+	erppurchasecontractitemDescUpdatedAt := erppurchasecontractitemFields[10].Descriptor()
+	// erppurchasecontractitem.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	erppurchasecontractitem.DefaultUpdatedAt = erppurchasecontractitemDescUpdatedAt.Default.(func() time.Time)
+	// erppurchasecontractitem.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	erppurchasecontractitem.UpdateDefaultUpdatedAt = erppurchasecontractitemDescUpdatedAt.UpdateDefault.(func() time.Time)
+	erpquotationFields := schema.ERPQuotation{}.Fields()
+	_ = erpquotationFields
+	// erpquotationDescCode is the schema descriptor for code field.
+	erpquotationDescCode := erpquotationFields[0].Descriptor()
+	// erpquotation.CodeValidator is a validator for the "code" field. It is called by the builders before save.
+	erpquotation.CodeValidator = func() func(string) error {
+		validators := erpquotationDescCode.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(code string) error {
+			for _, fn := range fns {
+				if err := fn(code); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// erpquotationDescCustomerCode is the schema descriptor for customer_code field.
+	erpquotationDescCustomerCode := erpquotationFields[2].Descriptor()
+	// erpquotation.CustomerCodeValidator is a validator for the "customer_code" field. It is called by the builders before save.
+	erpquotation.CustomerCodeValidator = erpquotationDescCustomerCode.Validators[0].(func(string) error)
+	// erpquotationDescCurrency is the schema descriptor for currency field.
+	erpquotationDescCurrency := erpquotationFields[4].Descriptor()
+	// erpquotation.DefaultCurrency holds the default value on creation for the currency field.
+	erpquotation.DefaultCurrency = erpquotationDescCurrency.Default.(string)
+	// erpquotation.CurrencyValidator is a validator for the "currency" field. It is called by the builders before save.
+	erpquotation.CurrencyValidator = erpquotationDescCurrency.Validators[0].(func(string) error)
+	// erpquotationDescPriceTerm is the schema descriptor for price_term field.
+	erpquotationDescPriceTerm := erpquotationFields[5].Descriptor()
+	// erpquotation.PriceTermValidator is a validator for the "price_term" field. It is called by the builders before save.
+	erpquotation.PriceTermValidator = erpquotationDescPriceTerm.Validators[0].(func(string) error)
+	// erpquotationDescPaymentMethod is the schema descriptor for payment_method field.
+	erpquotationDescPaymentMethod := erpquotationFields[6].Descriptor()
+	// erpquotation.PaymentMethodValidator is a validator for the "payment_method" field. It is called by the builders before save.
+	erpquotation.PaymentMethodValidator = erpquotationDescPaymentMethod.Validators[0].(func(string) error)
+	// erpquotationDescDeliveryMethod is the schema descriptor for delivery_method field.
+	erpquotationDescDeliveryMethod := erpquotationFields[7].Descriptor()
+	// erpquotation.DeliveryMethodValidator is a validator for the "delivery_method" field. It is called by the builders before save.
+	erpquotation.DeliveryMethodValidator = erpquotationDescDeliveryMethod.Validators[0].(func(string) error)
+	// erpquotationDescStartPlace is the schema descriptor for start_place field.
+	erpquotationDescStartPlace := erpquotationFields[8].Descriptor()
+	// erpquotation.StartPlaceValidator is a validator for the "start_place" field. It is called by the builders before save.
+	erpquotation.StartPlaceValidator = erpquotationDescStartPlace.Validators[0].(func(string) error)
+	// erpquotationDescEndPlace is the schema descriptor for end_place field.
+	erpquotationDescEndPlace := erpquotationFields[9].Descriptor()
+	// erpquotation.EndPlaceValidator is a validator for the "end_place" field. It is called by the builders before save.
+	erpquotation.EndPlaceValidator = erpquotationDescEndPlace.Validators[0].(func(string) error)
+	// erpquotationDescTotalAmount is the schema descriptor for total_amount field.
+	erpquotationDescTotalAmount := erpquotationFields[10].Descriptor()
+	// erpquotation.DefaultTotalAmount holds the default value on creation for the total_amount field.
+	erpquotation.DefaultTotalAmount = erpquotationDescTotalAmount.Default.(float64)
+	// erpquotationDescStatus is the schema descriptor for status field.
+	erpquotationDescStatus := erpquotationFields[11].Descriptor()
+	// erpquotation.DefaultStatus holds the default value on creation for the status field.
+	erpquotation.DefaultStatus = erpquotationDescStatus.Default.(string)
+	// erpquotation.StatusValidator is a validator for the "status" field. It is called by the builders before save.
+	erpquotation.StatusValidator = erpquotationDescStatus.Validators[0].(func(string) error)
+	// erpquotationDescAccepted is the schema descriptor for accepted field.
+	erpquotationDescAccepted := erpquotationFields[12].Descriptor()
+	// erpquotation.DefaultAccepted holds the default value on creation for the accepted field.
+	erpquotation.DefaultAccepted = erpquotationDescAccepted.Default.(bool)
+	// erpquotationDescRemark is the schema descriptor for remark field.
+	erpquotationDescRemark := erpquotationFields[14].Descriptor()
+	// erpquotation.RemarkValidator is a validator for the "remark" field. It is called by the builders before save.
+	erpquotation.RemarkValidator = erpquotationDescRemark.Validators[0].(func(string) error)
+	// erpquotationDescCreatedAt is the schema descriptor for created_at field.
+	erpquotationDescCreatedAt := erpquotationFields[17].Descriptor()
+	// erpquotation.DefaultCreatedAt holds the default value on creation for the created_at field.
+	erpquotation.DefaultCreatedAt = erpquotationDescCreatedAt.Default.(func() time.Time)
+	// erpquotationDescUpdatedAt is the schema descriptor for updated_at field.
+	erpquotationDescUpdatedAt := erpquotationFields[18].Descriptor()
+	// erpquotation.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	erpquotation.DefaultUpdatedAt = erpquotationDescUpdatedAt.Default.(func() time.Time)
+	// erpquotation.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	erpquotation.UpdateDefaultUpdatedAt = erpquotationDescUpdatedAt.UpdateDefault.(func() time.Time)
+	erpquotationitemFields := schema.ERPQuotationItem{}.Fields()
+	_ = erpquotationitemFields
+	// erpquotationitemDescQuotationID is the schema descriptor for quotation_id field.
+	erpquotationitemDescQuotationID := erpquotationitemFields[0].Descriptor()
+	// erpquotationitem.QuotationIDValidator is a validator for the "quotation_id" field. It is called by the builders before save.
+	erpquotationitem.QuotationIDValidator = erpquotationitemDescQuotationID.Validators[0].(func(int) error)
+	// erpquotationitemDescLineNo is the schema descriptor for line_no field.
+	erpquotationitemDescLineNo := erpquotationitemFields[1].Descriptor()
+	// erpquotationitem.LineNoValidator is a validator for the "line_no" field. It is called by the builders before save.
+	erpquotationitem.LineNoValidator = erpquotationitemDescLineNo.Validators[0].(func(int) error)
+	// erpquotationitemDescProductCode is the schema descriptor for product_code field.
+	erpquotationitemDescProductCode := erpquotationitemFields[3].Descriptor()
+	// erpquotationitem.ProductCodeValidator is a validator for the "product_code" field. It is called by the builders before save.
+	erpquotationitem.ProductCodeValidator = erpquotationitemDescProductCode.Validators[0].(func(string) error)
+	// erpquotationitemDescProductName is the schema descriptor for product_name field.
+	erpquotationitemDescProductName := erpquotationitemFields[4].Descriptor()
+	// erpquotationitem.ProductNameValidator is a validator for the "product_name" field. It is called by the builders before save.
+	erpquotationitem.ProductNameValidator = erpquotationitemDescProductName.Validators[0].(func(string) error)
+	// erpquotationitemDescQuantity is the schema descriptor for quantity field.
+	erpquotationitemDescQuantity := erpquotationitemFields[5].Descriptor()
+	// erpquotationitem.DefaultQuantity holds the default value on creation for the quantity field.
+	erpquotationitem.DefaultQuantity = erpquotationitemDescQuantity.Default.(float64)
+	// erpquotationitemDescUnitPrice is the schema descriptor for unit_price field.
+	erpquotationitemDescUnitPrice := erpquotationitemFields[6].Descriptor()
+	// erpquotationitem.DefaultUnitPrice holds the default value on creation for the unit_price field.
+	erpquotationitem.DefaultUnitPrice = erpquotationitemDescUnitPrice.Default.(float64)
+	// erpquotationitemDescTotalPrice is the schema descriptor for total_price field.
+	erpquotationitemDescTotalPrice := erpquotationitemFields[7].Descriptor()
+	// erpquotationitem.DefaultTotalPrice holds the default value on creation for the total_price field.
+	erpquotationitem.DefaultTotalPrice = erpquotationitemDescTotalPrice.Default.(float64)
+	// erpquotationitemDescRemark is the schema descriptor for remark field.
+	erpquotationitemDescRemark := erpquotationitemFields[8].Descriptor()
+	// erpquotationitem.RemarkValidator is a validator for the "remark" field. It is called by the builders before save.
+	erpquotationitem.RemarkValidator = erpquotationitemDescRemark.Validators[0].(func(string) error)
+	// erpquotationitemDescCreatedAt is the schema descriptor for created_at field.
+	erpquotationitemDescCreatedAt := erpquotationitemFields[9].Descriptor()
+	// erpquotationitem.DefaultCreatedAt holds the default value on creation for the created_at field.
+	erpquotationitem.DefaultCreatedAt = erpquotationitemDescCreatedAt.Default.(func() time.Time)
+	// erpquotationitemDescUpdatedAt is the schema descriptor for updated_at field.
+	erpquotationitemDescUpdatedAt := erpquotationitemFields[10].Descriptor()
+	// erpquotationitem.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	erpquotationitem.DefaultUpdatedAt = erpquotationitemDescUpdatedAt.Default.(func() time.Time)
+	// erpquotationitem.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	erpquotationitem.UpdateDefaultUpdatedAt = erpquotationitemDescUpdatedAt.UpdateDefault.(func() time.Time)
+	erpsequenceFields := schema.ERPSequence{}.Fields()
+	_ = erpsequenceFields
+	// erpsequenceDescBizType is the schema descriptor for biz_type field.
+	erpsequenceDescBizType := erpsequenceFields[0].Descriptor()
+	// erpsequence.BizTypeValidator is a validator for the "biz_type" field. It is called by the builders before save.
+	erpsequence.BizTypeValidator = func() func(string) error {
+		validators := erpsequenceDescBizType.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(biz_type string) error {
+			for _, fn := range fns {
+				if err := fn(biz_type); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// erpsequenceDescCurrentValue is the schema descriptor for current_value field.
+	erpsequenceDescCurrentValue := erpsequenceFields[1].Descriptor()
+	// erpsequence.DefaultCurrentValue holds the default value on creation for the current_value field.
+	erpsequence.DefaultCurrentValue = erpsequenceDescCurrentValue.Default.(int64)
+	// erpsequenceDescUpdatedAt is the schema descriptor for updated_at field.
+	erpsequenceDescUpdatedAt := erpsequenceFields[2].Descriptor()
+	// erpsequence.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	erpsequence.DefaultUpdatedAt = erpsequenceDescUpdatedAt.Default.(func() time.Time)
+	// erpsequence.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	erpsequence.UpdateDefaultUpdatedAt = erpsequenceDescUpdatedAt.UpdateDefault.(func() time.Time)
+	erpsettlementFields := schema.ERPSettlement{}.Fields()
+	_ = erpsettlementFields
+	// erpsettlementDescCode is the schema descriptor for code field.
+	erpsettlementDescCode := erpsettlementFields[0].Descriptor()
+	// erpsettlement.CodeValidator is a validator for the "code" field. It is called by the builders before save.
+	erpsettlement.CodeValidator = func() func(string) error {
+		validators := erpsettlementDescCode.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(code string) error {
+			for _, fn := range fns {
+				if err := fn(code); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// erpsettlementDescInvoiceNo is the schema descriptor for invoice_no field.
+	erpsettlementDescInvoiceNo := erpsettlementFields[1].Descriptor()
+	// erpsettlement.InvoiceNoValidator is a validator for the "invoice_no" field. It is called by the builders before save.
+	erpsettlement.InvoiceNoValidator = func() func(string) error {
+		validators := erpsettlementDescInvoiceNo.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(invoice_no string) error {
+			for _, fn := range fns {
+				if err := fn(invoice_no); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// erpsettlementDescCustomerName is the schema descriptor for customer_name field.
+	erpsettlementDescCustomerName := erpsettlementFields[2].Descriptor()
+	// erpsettlement.CustomerNameValidator is a validator for the "customer_name" field. It is called by the builders before save.
+	erpsettlement.CustomerNameValidator = func() func(string) error {
+		validators := erpsettlementDescCustomerName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(customer_name string) error {
+			for _, fn := range fns {
+				if err := fn(customer_name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// erpsettlementDescCurrency is the schema descriptor for currency field.
+	erpsettlementDescCurrency := erpsettlementFields[3].Descriptor()
+	// erpsettlement.DefaultCurrency holds the default value on creation for the currency field.
+	erpsettlement.DefaultCurrency = erpsettlementDescCurrency.Default.(string)
+	// erpsettlement.CurrencyValidator is a validator for the "currency" field. It is called by the builders before save.
+	erpsettlement.CurrencyValidator = erpsettlementDescCurrency.Validators[0].(func(string) error)
+	// erpsettlementDescPaymentCycleDays is the schema descriptor for payment_cycle_days field.
+	erpsettlementDescPaymentCycleDays := erpsettlementFields[5].Descriptor()
+	// erpsettlement.DefaultPaymentCycleDays holds the default value on creation for the payment_cycle_days field.
+	erpsettlement.DefaultPaymentCycleDays = erpsettlementDescPaymentCycleDays.Default.(int)
+	// erpsettlementDescReceivedAmount is the schema descriptor for received_amount field.
+	erpsettlementDescReceivedAmount := erpsettlementFields[8].Descriptor()
+	// erpsettlement.DefaultReceivedAmount holds the default value on creation for the received_amount field.
+	erpsettlement.DefaultReceivedAmount = erpsettlementDescReceivedAmount.Default.(float64)
+	// erpsettlementDescOutstandingAmount is the schema descriptor for outstanding_amount field.
+	erpsettlementDescOutstandingAmount := erpsettlementFields[9].Descriptor()
+	// erpsettlement.DefaultOutstandingAmount holds the default value on creation for the outstanding_amount field.
+	erpsettlement.DefaultOutstandingAmount = erpsettlementDescOutstandingAmount.Default.(float64)
+	// erpsettlementDescStatus is the schema descriptor for status field.
+	erpsettlementDescStatus := erpsettlementFields[10].Descriptor()
+	// erpsettlement.DefaultStatus holds the default value on creation for the status field.
+	erpsettlement.DefaultStatus = erpsettlementDescStatus.Default.(string)
+	// erpsettlement.StatusValidator is a validator for the "status" field. It is called by the builders before save.
+	erpsettlement.StatusValidator = erpsettlementDescStatus.Validators[0].(func(string) error)
+	// erpsettlementDescSourceShipmentCode is the schema descriptor for source_shipment_code field.
+	erpsettlementDescSourceShipmentCode := erpsettlementFields[11].Descriptor()
+	// erpsettlement.SourceShipmentCodeValidator is a validator for the "source_shipment_code" field. It is called by the builders before save.
+	erpsettlement.SourceShipmentCodeValidator = erpsettlementDescSourceShipmentCode.Validators[0].(func(string) error)
+	// erpsettlementDescCreatedAt is the schema descriptor for created_at field.
+	erpsettlementDescCreatedAt := erpsettlementFields[14].Descriptor()
+	// erpsettlement.DefaultCreatedAt holds the default value on creation for the created_at field.
+	erpsettlement.DefaultCreatedAt = erpsettlementDescCreatedAt.Default.(func() time.Time)
+	// erpsettlementDescUpdatedAt is the schema descriptor for updated_at field.
+	erpsettlementDescUpdatedAt := erpsettlementFields[15].Descriptor()
+	// erpsettlement.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	erpsettlement.DefaultUpdatedAt = erpsettlementDescUpdatedAt.Default.(func() time.Time)
+	// erpsettlement.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	erpsettlement.UpdateDefaultUpdatedAt = erpsettlementDescUpdatedAt.UpdateDefault.(func() time.Time)
+	erpshipmentdetailFields := schema.ERPShipmentDetail{}.Fields()
+	_ = erpshipmentdetailFields
+	// erpshipmentdetailDescCode is the schema descriptor for code field.
+	erpshipmentdetailDescCode := erpshipmentdetailFields[0].Descriptor()
+	// erpshipmentdetail.CodeValidator is a validator for the "code" field. It is called by the builders before save.
+	erpshipmentdetail.CodeValidator = func() func(string) error {
+		validators := erpshipmentdetailDescCode.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(code string) error {
+			for _, fn := range fns {
+				if err := fn(code); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// erpshipmentdetailDescSourceExportCode is the schema descriptor for source_export_code field.
+	erpshipmentdetailDescSourceExportCode := erpshipmentdetailFields[2].Descriptor()
+	// erpshipmentdetail.SourceExportCodeValidator is a validator for the "source_export_code" field. It is called by the builders before save.
+	erpshipmentdetail.SourceExportCodeValidator = erpshipmentdetailDescSourceExportCode.Validators[0].(func(string) error)
+	// erpshipmentdetailDescCustomerCode is the schema descriptor for customer_code field.
+	erpshipmentdetailDescCustomerCode := erpshipmentdetailFields[4].Descriptor()
+	// erpshipmentdetail.CustomerCodeValidator is a validator for the "customer_code" field. It is called by the builders before save.
+	erpshipmentdetail.CustomerCodeValidator = erpshipmentdetailDescCustomerCode.Validators[0].(func(string) error)
+	// erpshipmentdetailDescStartPort is the schema descriptor for start_port field.
+	erpshipmentdetailDescStartPort := erpshipmentdetailFields[5].Descriptor()
+	// erpshipmentdetail.StartPortValidator is a validator for the "start_port" field. It is called by the builders before save.
+	erpshipmentdetail.StartPortValidator = erpshipmentdetailDescStartPort.Validators[0].(func(string) error)
+	// erpshipmentdetailDescDestPort is the schema descriptor for dest_port field.
+	erpshipmentdetailDescDestPort := erpshipmentdetailFields[6].Descriptor()
+	// erpshipmentdetail.DestPortValidator is a validator for the "dest_port" field. It is called by the builders before save.
+	erpshipmentdetail.DestPortValidator = erpshipmentdetailDescDestPort.Validators[0].(func(string) error)
+	// erpshipmentdetailDescShipToAddress is the schema descriptor for ship_to_address field.
+	erpshipmentdetailDescShipToAddress := erpshipmentdetailFields[7].Descriptor()
+	// erpshipmentdetail.ShipToAddressValidator is a validator for the "ship_to_address" field. It is called by the builders before save.
+	erpshipmentdetail.ShipToAddressValidator = erpshipmentdetailDescShipToAddress.Validators[0].(func(string) error)
+	// erpshipmentdetailDescArriveCountry is the schema descriptor for arrive_country field.
+	erpshipmentdetailDescArriveCountry := erpshipmentdetailFields[8].Descriptor()
+	// erpshipmentdetail.ArriveCountryValidator is a validator for the "arrive_country" field. It is called by the builders before save.
+	erpshipmentdetail.ArriveCountryValidator = erpshipmentdetailDescArriveCountry.Validators[0].(func(string) error)
+	// erpshipmentdetailDescTransportType is the schema descriptor for transport_type field.
+	erpshipmentdetailDescTransportType := erpshipmentdetailFields[9].Descriptor()
+	// erpshipmentdetail.TransportTypeValidator is a validator for the "transport_type" field. It is called by the builders before save.
+	erpshipmentdetail.TransportTypeValidator = erpshipmentdetailDescTransportType.Validators[0].(func(string) error)
+	// erpshipmentdetailDescSalesOwner is the schema descriptor for sales_owner field.
+	erpshipmentdetailDescSalesOwner := erpshipmentdetailFields[10].Descriptor()
+	// erpshipmentdetail.SalesOwnerValidator is a validator for the "sales_owner" field. It is called by the builders before save.
+	erpshipmentdetail.SalesOwnerValidator = erpshipmentdetailDescSalesOwner.Validators[0].(func(string) error)
+	// erpshipmentdetailDescTotalPackages is the schema descriptor for total_packages field.
+	erpshipmentdetailDescTotalPackages := erpshipmentdetailFields[12].Descriptor()
+	// erpshipmentdetail.DefaultTotalPackages holds the default value on creation for the total_packages field.
+	erpshipmentdetail.DefaultTotalPackages = erpshipmentdetailDescTotalPackages.Default.(float64)
+	// erpshipmentdetailDescTotalAmount is the schema descriptor for total_amount field.
+	erpshipmentdetailDescTotalAmount := erpshipmentdetailFields[13].Descriptor()
+	// erpshipmentdetail.DefaultTotalAmount holds the default value on creation for the total_amount field.
+	erpshipmentdetail.DefaultTotalAmount = erpshipmentdetailDescTotalAmount.Default.(float64)
+	// erpshipmentdetailDescStatus is the schema descriptor for status field.
+	erpshipmentdetailDescStatus := erpshipmentdetailFields[14].Descriptor()
+	// erpshipmentdetail.DefaultStatus holds the default value on creation for the status field.
+	erpshipmentdetail.DefaultStatus = erpshipmentdetailDescStatus.Default.(string)
+	// erpshipmentdetail.StatusValidator is a validator for the "status" field. It is called by the builders before save.
+	erpshipmentdetail.StatusValidator = erpshipmentdetailDescStatus.Validators[0].(func(string) error)
+	// erpshipmentdetailDescRemark is the schema descriptor for remark field.
+	erpshipmentdetailDescRemark := erpshipmentdetailFields[15].Descriptor()
+	// erpshipmentdetail.RemarkValidator is a validator for the "remark" field. It is called by the builders before save.
+	erpshipmentdetail.RemarkValidator = erpshipmentdetailDescRemark.Validators[0].(func(string) error)
+	// erpshipmentdetailDescCreatedAt is the schema descriptor for created_at field.
+	erpshipmentdetailDescCreatedAt := erpshipmentdetailFields[18].Descriptor()
+	// erpshipmentdetail.DefaultCreatedAt holds the default value on creation for the created_at field.
+	erpshipmentdetail.DefaultCreatedAt = erpshipmentdetailDescCreatedAt.Default.(func() time.Time)
+	// erpshipmentdetailDescUpdatedAt is the schema descriptor for updated_at field.
+	erpshipmentdetailDescUpdatedAt := erpshipmentdetailFields[19].Descriptor()
+	// erpshipmentdetail.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	erpshipmentdetail.DefaultUpdatedAt = erpshipmentdetailDescUpdatedAt.Default.(func() time.Time)
+	// erpshipmentdetail.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	erpshipmentdetail.UpdateDefaultUpdatedAt = erpshipmentdetailDescUpdatedAt.UpdateDefault.(func() time.Time)
+	erpshipmentdetailitemFields := schema.ERPShipmentDetailItem{}.Fields()
+	_ = erpshipmentdetailitemFields
+	// erpshipmentdetailitemDescShipmentDetailID is the schema descriptor for shipment_detail_id field.
+	erpshipmentdetailitemDescShipmentDetailID := erpshipmentdetailitemFields[0].Descriptor()
+	// erpshipmentdetailitem.ShipmentDetailIDValidator is a validator for the "shipment_detail_id" field. It is called by the builders before save.
+	erpshipmentdetailitem.ShipmentDetailIDValidator = erpshipmentdetailitemDescShipmentDetailID.Validators[0].(func(int) error)
+	// erpshipmentdetailitemDescLineNo is the schema descriptor for line_no field.
+	erpshipmentdetailitemDescLineNo := erpshipmentdetailitemFields[1].Descriptor()
+	// erpshipmentdetailitem.LineNoValidator is a validator for the "line_no" field. It is called by the builders before save.
+	erpshipmentdetailitem.LineNoValidator = erpshipmentdetailitemDescLineNo.Validators[0].(func(int) error)
+	// erpshipmentdetailitemDescProductCode is the schema descriptor for product_code field.
+	erpshipmentdetailitemDescProductCode := erpshipmentdetailitemFields[3].Descriptor()
+	// erpshipmentdetailitem.ProductCodeValidator is a validator for the "product_code" field. It is called by the builders before save.
+	erpshipmentdetailitem.ProductCodeValidator = erpshipmentdetailitemDescProductCode.Validators[0].(func(string) error)
+	// erpshipmentdetailitemDescProductModel is the schema descriptor for product_model field.
+	erpshipmentdetailitemDescProductModel := erpshipmentdetailitemFields[4].Descriptor()
+	// erpshipmentdetailitem.ProductModelValidator is a validator for the "product_model" field. It is called by the builders before save.
+	erpshipmentdetailitem.ProductModelValidator = erpshipmentdetailitemDescProductModel.Validators[0].(func(string) error)
+	// erpshipmentdetailitemDescPackDetail is the schema descriptor for pack_detail field.
+	erpshipmentdetailitemDescPackDetail := erpshipmentdetailitemFields[5].Descriptor()
+	// erpshipmentdetailitem.PackDetailValidator is a validator for the "pack_detail" field. It is called by the builders before save.
+	erpshipmentdetailitem.PackDetailValidator = erpshipmentdetailitemDescPackDetail.Validators[0].(func(string) error)
+	// erpshipmentdetailitemDescQuantity is the schema descriptor for quantity field.
+	erpshipmentdetailitemDescQuantity := erpshipmentdetailitemFields[6].Descriptor()
+	// erpshipmentdetailitem.DefaultQuantity holds the default value on creation for the quantity field.
+	erpshipmentdetailitem.DefaultQuantity = erpshipmentdetailitemDescQuantity.Default.(float64)
+	// erpshipmentdetailitemDescUnitPrice is the schema descriptor for unit_price field.
+	erpshipmentdetailitemDescUnitPrice := erpshipmentdetailitemFields[7].Descriptor()
+	// erpshipmentdetailitem.DefaultUnitPrice holds the default value on creation for the unit_price field.
+	erpshipmentdetailitem.DefaultUnitPrice = erpshipmentdetailitemDescUnitPrice.Default.(float64)
+	// erpshipmentdetailitemDescTotalPrice is the schema descriptor for total_price field.
+	erpshipmentdetailitemDescTotalPrice := erpshipmentdetailitemFields[8].Descriptor()
+	// erpshipmentdetailitem.DefaultTotalPrice holds the default value on creation for the total_price field.
+	erpshipmentdetailitem.DefaultTotalPrice = erpshipmentdetailitemDescTotalPrice.Default.(float64)
+	// erpshipmentdetailitemDescNetWeight is the schema descriptor for net_weight field.
+	erpshipmentdetailitemDescNetWeight := erpshipmentdetailitemFields[9].Descriptor()
+	// erpshipmentdetailitem.DefaultNetWeight holds the default value on creation for the net_weight field.
+	erpshipmentdetailitem.DefaultNetWeight = erpshipmentdetailitemDescNetWeight.Default.(float64)
+	// erpshipmentdetailitemDescGrossWeight is the schema descriptor for gross_weight field.
+	erpshipmentdetailitemDescGrossWeight := erpshipmentdetailitemFields[10].Descriptor()
+	// erpshipmentdetailitem.DefaultGrossWeight holds the default value on creation for the gross_weight field.
+	erpshipmentdetailitem.DefaultGrossWeight = erpshipmentdetailitemDescGrossWeight.Default.(float64)
+	// erpshipmentdetailitemDescVolume is the schema descriptor for volume field.
+	erpshipmentdetailitemDescVolume := erpshipmentdetailitemFields[11].Descriptor()
+	// erpshipmentdetailitem.DefaultVolume holds the default value on creation for the volume field.
+	erpshipmentdetailitem.DefaultVolume = erpshipmentdetailitemDescVolume.Default.(float64)
+	// erpshipmentdetailitemDescCreatedAt is the schema descriptor for created_at field.
+	erpshipmentdetailitemDescCreatedAt := erpshipmentdetailitemFields[12].Descriptor()
+	// erpshipmentdetailitem.DefaultCreatedAt holds the default value on creation for the created_at field.
+	erpshipmentdetailitem.DefaultCreatedAt = erpshipmentdetailitemDescCreatedAt.Default.(func() time.Time)
+	// erpshipmentdetailitemDescUpdatedAt is the schema descriptor for updated_at field.
+	erpshipmentdetailitemDescUpdatedAt := erpshipmentdetailitemFields[13].Descriptor()
+	// erpshipmentdetailitem.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	erpshipmentdetailitem.DefaultUpdatedAt = erpshipmentdetailitemDescUpdatedAt.Default.(func() time.Time)
+	// erpshipmentdetailitem.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	erpshipmentdetailitem.UpdateDefaultUpdatedAt = erpshipmentdetailitemDescUpdatedAt.UpdateDefault.(func() time.Time)
+	erpstockbalanceFields := schema.ERPStockBalance{}.Fields()
+	_ = erpstockbalanceFields
+	// erpstockbalanceDescProductCode is the schema descriptor for product_code field.
+	erpstockbalanceDescProductCode := erpstockbalanceFields[0].Descriptor()
+	// erpstockbalance.ProductCodeValidator is a validator for the "product_code" field. It is called by the builders before save.
+	erpstockbalance.ProductCodeValidator = func() func(string) error {
+		validators := erpstockbalanceDescProductCode.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(product_code string) error {
+			for _, fn := range fns {
+				if err := fn(product_code); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// erpstockbalanceDescWarehouseID is the schema descriptor for warehouse_id field.
+	erpstockbalanceDescWarehouseID := erpstockbalanceFields[1].Descriptor()
+	// erpstockbalance.WarehouseIDValidator is a validator for the "warehouse_id" field. It is called by the builders before save.
+	erpstockbalance.WarehouseIDValidator = erpstockbalanceDescWarehouseID.Validators[0].(func(int) error)
+	// erpstockbalanceDescLocationID is the schema descriptor for location_id field.
+	erpstockbalanceDescLocationID := erpstockbalanceFields[2].Descriptor()
+	// erpstockbalance.LocationIDValidator is a validator for the "location_id" field. It is called by the builders before save.
+	erpstockbalance.LocationIDValidator = erpstockbalanceDescLocationID.Validators[0].(func(int) error)
+	// erpstockbalanceDescLotNo is the schema descriptor for lot_no field.
+	erpstockbalanceDescLotNo := erpstockbalanceFields[3].Descriptor()
+	// erpstockbalance.DefaultLotNo holds the default value on creation for the lot_no field.
+	erpstockbalance.DefaultLotNo = erpstockbalanceDescLotNo.Default.(string)
+	// erpstockbalance.LotNoValidator is a validator for the "lot_no" field. It is called by the builders before save.
+	erpstockbalance.LotNoValidator = erpstockbalanceDescLotNo.Validators[0].(func(string) error)
+	// erpstockbalanceDescAvailableQty is the schema descriptor for available_qty field.
+	erpstockbalanceDescAvailableQty := erpstockbalanceFields[4].Descriptor()
+	// erpstockbalance.DefaultAvailableQty holds the default value on creation for the available_qty field.
+	erpstockbalance.DefaultAvailableQty = erpstockbalanceDescAvailableQty.Default.(float64)
+	// erpstockbalanceDescLockedQty is the schema descriptor for locked_qty field.
+	erpstockbalanceDescLockedQty := erpstockbalanceFields[5].Descriptor()
+	// erpstockbalance.DefaultLockedQty holds the default value on creation for the locked_qty field.
+	erpstockbalance.DefaultLockedQty = erpstockbalanceDescLockedQty.Default.(float64)
+	// erpstockbalanceDescVersion is the schema descriptor for version field.
+	erpstockbalanceDescVersion := erpstockbalanceFields[6].Descriptor()
+	// erpstockbalance.DefaultVersion holds the default value on creation for the version field.
+	erpstockbalance.DefaultVersion = erpstockbalanceDescVersion.Default.(int64)
+	// erpstockbalanceDescCreatedAt is the schema descriptor for created_at field.
+	erpstockbalanceDescCreatedAt := erpstockbalanceFields[7].Descriptor()
+	// erpstockbalance.DefaultCreatedAt holds the default value on creation for the created_at field.
+	erpstockbalance.DefaultCreatedAt = erpstockbalanceDescCreatedAt.Default.(func() time.Time)
+	// erpstockbalanceDescUpdatedAt is the schema descriptor for updated_at field.
+	erpstockbalanceDescUpdatedAt := erpstockbalanceFields[8].Descriptor()
+	// erpstockbalance.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	erpstockbalance.DefaultUpdatedAt = erpstockbalanceDescUpdatedAt.Default.(func() time.Time)
+	// erpstockbalance.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	erpstockbalance.UpdateDefaultUpdatedAt = erpstockbalanceDescUpdatedAt.UpdateDefault.(func() time.Time)
+	erpstocktransactionFields := schema.ERPStockTransaction{}.Fields()
+	_ = erpstocktransactionFields
+	// erpstocktransactionDescBizType is the schema descriptor for biz_type field.
+	erpstocktransactionDescBizType := erpstocktransactionFields[0].Descriptor()
+	// erpstocktransaction.BizTypeValidator is a validator for the "biz_type" field. It is called by the builders before save.
+	erpstocktransaction.BizTypeValidator = func() func(string) error {
+		validators := erpstocktransactionDescBizType.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(biz_type string) error {
+			for _, fn := range fns {
+				if err := fn(biz_type); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// erpstocktransactionDescBizCode is the schema descriptor for biz_code field.
+	erpstocktransactionDescBizCode := erpstocktransactionFields[1].Descriptor()
+	// erpstocktransaction.BizCodeValidator is a validator for the "biz_code" field. It is called by the builders before save.
+	erpstocktransaction.BizCodeValidator = func() func(string) error {
+		validators := erpstocktransactionDescBizCode.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(biz_code string) error {
+			for _, fn := range fns {
+				if err := fn(biz_code); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// erpstocktransactionDescBizLineNo is the schema descriptor for biz_line_no field.
+	erpstocktransactionDescBizLineNo := erpstocktransactionFields[2].Descriptor()
+	// erpstocktransaction.DefaultBizLineNo holds the default value on creation for the biz_line_no field.
+	erpstocktransaction.DefaultBizLineNo = erpstocktransactionDescBizLineNo.Default.(int)
+	// erpstocktransactionDescProductCode is the schema descriptor for product_code field.
+	erpstocktransactionDescProductCode := erpstocktransactionFields[3].Descriptor()
+	// erpstocktransaction.ProductCodeValidator is a validator for the "product_code" field. It is called by the builders before save.
+	erpstocktransaction.ProductCodeValidator = func() func(string) error {
+		validators := erpstocktransactionDescProductCode.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(product_code string) error {
+			for _, fn := range fns {
+				if err := fn(product_code); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// erpstocktransactionDescWarehouseID is the schema descriptor for warehouse_id field.
+	erpstocktransactionDescWarehouseID := erpstocktransactionFields[4].Descriptor()
+	// erpstocktransaction.WarehouseIDValidator is a validator for the "warehouse_id" field. It is called by the builders before save.
+	erpstocktransaction.WarehouseIDValidator = erpstocktransactionDescWarehouseID.Validators[0].(func(int) error)
+	// erpstocktransactionDescLocationID is the schema descriptor for location_id field.
+	erpstocktransactionDescLocationID := erpstocktransactionFields[5].Descriptor()
+	// erpstocktransaction.LocationIDValidator is a validator for the "location_id" field. It is called by the builders before save.
+	erpstocktransaction.LocationIDValidator = erpstocktransactionDescLocationID.Validators[0].(func(int) error)
+	// erpstocktransactionDescLotNo is the schema descriptor for lot_no field.
+	erpstocktransactionDescLotNo := erpstocktransactionFields[6].Descriptor()
+	// erpstocktransaction.DefaultLotNo holds the default value on creation for the lot_no field.
+	erpstocktransaction.DefaultLotNo = erpstocktransactionDescLotNo.Default.(string)
+	// erpstocktransaction.LotNoValidator is a validator for the "lot_no" field. It is called by the builders before save.
+	erpstocktransaction.LotNoValidator = erpstocktransactionDescLotNo.Validators[0].(func(string) error)
+	// erpstocktransactionDescBeforeAvailableQty is the schema descriptor for before_available_qty field.
+	erpstocktransactionDescBeforeAvailableQty := erpstocktransactionFields[8].Descriptor()
+	// erpstocktransaction.DefaultBeforeAvailableQty holds the default value on creation for the before_available_qty field.
+	erpstocktransaction.DefaultBeforeAvailableQty = erpstocktransactionDescBeforeAvailableQty.Default.(float64)
+	// erpstocktransactionDescAfterAvailableQty is the schema descriptor for after_available_qty field.
+	erpstocktransactionDescAfterAvailableQty := erpstocktransactionFields[9].Descriptor()
+	// erpstocktransaction.DefaultAfterAvailableQty holds the default value on creation for the after_available_qty field.
+	erpstocktransaction.DefaultAfterAvailableQty = erpstocktransactionDescAfterAvailableQty.Default.(float64)
+	// erpstocktransactionDescOccurredAt is the schema descriptor for occurred_at field.
+	erpstocktransactionDescOccurredAt := erpstocktransactionFields[11].Descriptor()
+	// erpstocktransaction.DefaultOccurredAt holds the default value on creation for the occurred_at field.
+	erpstocktransaction.DefaultOccurredAt = erpstocktransactionDescOccurredAt.Default.(func() time.Time)
+	// erpstocktransactionDescCreatedAt is the schema descriptor for created_at field.
+	erpstocktransactionDescCreatedAt := erpstocktransactionFields[12].Descriptor()
+	// erpstocktransaction.DefaultCreatedAt holds the default value on creation for the created_at field.
+	erpstocktransaction.DefaultCreatedAt = erpstocktransactionDescCreatedAt.Default.(func() time.Time)
+	erpwarehouseFields := schema.ERPWarehouse{}.Fields()
+	_ = erpwarehouseFields
+	// erpwarehouseDescCode is the schema descriptor for code field.
+	erpwarehouseDescCode := erpwarehouseFields[0].Descriptor()
+	// erpwarehouse.CodeValidator is a validator for the "code" field. It is called by the builders before save.
+	erpwarehouse.CodeValidator = func() func(string) error {
+		validators := erpwarehouseDescCode.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(code string) error {
+			for _, fn := range fns {
+				if err := fn(code); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// erpwarehouseDescName is the schema descriptor for name field.
+	erpwarehouseDescName := erpwarehouseFields[1].Descriptor()
+	// erpwarehouse.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	erpwarehouse.NameValidator = func() func(string) error {
+		validators := erpwarehouseDescName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(name string) error {
+			for _, fn := range fns {
+				if err := fn(name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// erpwarehouseDescDisabled is the schema descriptor for disabled field.
+	erpwarehouseDescDisabled := erpwarehouseFields[2].Descriptor()
+	// erpwarehouse.DefaultDisabled holds the default value on creation for the disabled field.
+	erpwarehouse.DefaultDisabled = erpwarehouseDescDisabled.Default.(bool)
+	// erpwarehouseDescCreatedAt is the schema descriptor for created_at field.
+	erpwarehouseDescCreatedAt := erpwarehouseFields[3].Descriptor()
+	// erpwarehouse.DefaultCreatedAt holds the default value on creation for the created_at field.
+	erpwarehouse.DefaultCreatedAt = erpwarehouseDescCreatedAt.Default.(func() time.Time)
+	// erpwarehouseDescUpdatedAt is the schema descriptor for updated_at field.
+	erpwarehouseDescUpdatedAt := erpwarehouseFields[4].Descriptor()
+	// erpwarehouse.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	erpwarehouse.DefaultUpdatedAt = erpwarehouseDescUpdatedAt.Default.(func() time.Time)
+	// erpwarehouse.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	erpwarehouse.UpdateDefaultUpdatedAt = erpwarehouseDescUpdatedAt.UpdateDefault.(func() time.Time)
+	erpworkflowactionlogFields := schema.ERPWorkflowActionLog{}.Fields()
+	_ = erpworkflowactionlogFields
+	// erpworkflowactionlogDescWorkflowInstanceID is the schema descriptor for workflow_instance_id field.
+	erpworkflowactionlogDescWorkflowInstanceID := erpworkflowactionlogFields[0].Descriptor()
+	// erpworkflowactionlog.WorkflowInstanceIDValidator is a validator for the "workflow_instance_id" field. It is called by the builders before save.
+	erpworkflowactionlog.WorkflowInstanceIDValidator = erpworkflowactionlogDescWorkflowInstanceID.Validators[0].(func(int) error)
+	// erpworkflowactionlogDescAction is the schema descriptor for action field.
+	erpworkflowactionlogDescAction := erpworkflowactionlogFields[2].Descriptor()
+	// erpworkflowactionlog.ActionValidator is a validator for the "action" field. It is called by the builders before save.
+	erpworkflowactionlog.ActionValidator = func() func(string) error {
+		validators := erpworkflowactionlogDescAction.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(action string) error {
+			for _, fn := range fns {
+				if err := fn(action); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// erpworkflowactionlogDescFromStatus is the schema descriptor for from_status field.
+	erpworkflowactionlogDescFromStatus := erpworkflowactionlogFields[3].Descriptor()
+	// erpworkflowactionlog.FromStatusValidator is a validator for the "from_status" field. It is called by the builders before save.
+	erpworkflowactionlog.FromStatusValidator = erpworkflowactionlogDescFromStatus.Validators[0].(func(string) error)
+	// erpworkflowactionlogDescToStatus is the schema descriptor for to_status field.
+	erpworkflowactionlogDescToStatus := erpworkflowactionlogFields[4].Descriptor()
+	// erpworkflowactionlog.ToStatusValidator is a validator for the "to_status" field. It is called by the builders before save.
+	erpworkflowactionlog.ToStatusValidator = erpworkflowactionlogDescToStatus.Validators[0].(func(string) error)
+	// erpworkflowactionlogDescRemark is the schema descriptor for remark field.
+	erpworkflowactionlogDescRemark := erpworkflowactionlogFields[6].Descriptor()
+	// erpworkflowactionlog.RemarkValidator is a validator for the "remark" field. It is called by the builders before save.
+	erpworkflowactionlog.RemarkValidator = erpworkflowactionlogDescRemark.Validators[0].(func(string) error)
+	// erpworkflowactionlogDescCreatedAt is the schema descriptor for created_at field.
+	erpworkflowactionlogDescCreatedAt := erpworkflowactionlogFields[7].Descriptor()
+	// erpworkflowactionlog.DefaultCreatedAt holds the default value on creation for the created_at field.
+	erpworkflowactionlog.DefaultCreatedAt = erpworkflowactionlogDescCreatedAt.Default.(func() time.Time)
+	erpworkflowinstanceFields := schema.ERPWorkflowInstance{}.Fields()
+	_ = erpworkflowinstanceFields
+	// erpworkflowinstanceDescBizModule is the schema descriptor for biz_module field.
+	erpworkflowinstanceDescBizModule := erpworkflowinstanceFields[0].Descriptor()
+	// erpworkflowinstance.BizModuleValidator is a validator for the "biz_module" field. It is called by the builders before save.
+	erpworkflowinstance.BizModuleValidator = func() func(string) error {
+		validators := erpworkflowinstanceDescBizModule.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(biz_module string) error {
+			for _, fn := range fns {
+				if err := fn(biz_module); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// erpworkflowinstanceDescBizCode is the schema descriptor for biz_code field.
+	erpworkflowinstanceDescBizCode := erpworkflowinstanceFields[1].Descriptor()
+	// erpworkflowinstance.BizCodeValidator is a validator for the "biz_code" field. It is called by the builders before save.
+	erpworkflowinstance.BizCodeValidator = func() func(string) error {
+		validators := erpworkflowinstanceDescBizCode.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(biz_code string) error {
+			for _, fn := range fns {
+				if err := fn(biz_code); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// erpworkflowinstanceDescCurrentStatus is the schema descriptor for current_status field.
+	erpworkflowinstanceDescCurrentStatus := erpworkflowinstanceFields[2].Descriptor()
+	// erpworkflowinstance.DefaultCurrentStatus holds the default value on creation for the current_status field.
+	erpworkflowinstance.DefaultCurrentStatus = erpworkflowinstanceDescCurrentStatus.Default.(string)
+	// erpworkflowinstance.CurrentStatusValidator is a validator for the "current_status" field. It is called by the builders before save.
+	erpworkflowinstance.CurrentStatusValidator = erpworkflowinstanceDescCurrentStatus.Validators[0].(func(string) error)
+	// erpworkflowinstanceDescCreatedAt is the schema descriptor for created_at field.
+	erpworkflowinstanceDescCreatedAt := erpworkflowinstanceFields[6].Descriptor()
+	// erpworkflowinstance.DefaultCreatedAt holds the default value on creation for the created_at field.
+	erpworkflowinstance.DefaultCreatedAt = erpworkflowinstanceDescCreatedAt.Default.(func() time.Time)
+	// erpworkflowinstanceDescUpdatedAt is the schema descriptor for updated_at field.
+	erpworkflowinstanceDescUpdatedAt := erpworkflowinstanceFields[7].Descriptor()
+	// erpworkflowinstance.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	erpworkflowinstance.DefaultUpdatedAt = erpworkflowinstanceDescUpdatedAt.Default.(func() time.Time)
+	// erpworkflowinstance.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	erpworkflowinstance.UpdateDefaultUpdatedAt = erpworkflowinstanceDescUpdatedAt.UpdateDefault.(func() time.Time)
+	erpworkflowtaskFields := schema.ERPWorkflowTask{}.Fields()
+	_ = erpworkflowtaskFields
+	// erpworkflowtaskDescWorkflowInstanceID is the schema descriptor for workflow_instance_id field.
+	erpworkflowtaskDescWorkflowInstanceID := erpworkflowtaskFields[0].Descriptor()
+	// erpworkflowtask.WorkflowInstanceIDValidator is a validator for the "workflow_instance_id" field. It is called by the builders before save.
+	erpworkflowtask.WorkflowInstanceIDValidator = erpworkflowtaskDescWorkflowInstanceID.Validators[0].(func(int) error)
+	// erpworkflowtaskDescNodeName is the schema descriptor for node_name field.
+	erpworkflowtaskDescNodeName := erpworkflowtaskFields[1].Descriptor()
+	// erpworkflowtask.NodeNameValidator is a validator for the "node_name" field. It is called by the builders before save.
+	erpworkflowtask.NodeNameValidator = func() func(string) error {
+		validators := erpworkflowtaskDescNodeName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(node_name string) error {
+			for _, fn := range fns {
+				if err := fn(node_name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// erpworkflowtaskDescNodeOrder is the schema descriptor for node_order field.
+	erpworkflowtaskDescNodeOrder := erpworkflowtaskFields[2].Descriptor()
+	// erpworkflowtask.DefaultNodeOrder holds the default value on creation for the node_order field.
+	erpworkflowtask.DefaultNodeOrder = erpworkflowtaskDescNodeOrder.Default.(int)
+	// erpworkflowtaskDescDecision is the schema descriptor for decision field.
+	erpworkflowtaskDescDecision := erpworkflowtaskFields[4].Descriptor()
+	// erpworkflowtask.DefaultDecision holds the default value on creation for the decision field.
+	erpworkflowtask.DefaultDecision = erpworkflowtaskDescDecision.Default.(string)
+	// erpworkflowtask.DecisionValidator is a validator for the "decision" field. It is called by the builders before save.
+	erpworkflowtask.DecisionValidator = erpworkflowtaskDescDecision.Validators[0].(func(string) error)
+	// erpworkflowtaskDescComment is the schema descriptor for comment field.
+	erpworkflowtaskDescComment := erpworkflowtaskFields[5].Descriptor()
+	// erpworkflowtask.CommentValidator is a validator for the "comment" field. It is called by the builders before save.
+	erpworkflowtask.CommentValidator = erpworkflowtaskDescComment.Validators[0].(func(string) error)
+	// erpworkflowtaskDescCreatedAt is the schema descriptor for created_at field.
+	erpworkflowtaskDescCreatedAt := erpworkflowtaskFields[7].Descriptor()
+	// erpworkflowtask.DefaultCreatedAt holds the default value on creation for the created_at field.
+	erpworkflowtask.DefaultCreatedAt = erpworkflowtaskDescCreatedAt.Default.(func() time.Time)
+	// erpworkflowtaskDescUpdatedAt is the schema descriptor for updated_at field.
+	erpworkflowtaskDescUpdatedAt := erpworkflowtaskFields[8].Descriptor()
+	// erpworkflowtask.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	erpworkflowtask.DefaultUpdatedAt = erpworkflowtaskDescUpdatedAt.Default.(func() time.Time)
+	// erpworkflowtask.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	erpworkflowtask.UpdateDefaultUpdatedAt = erpworkflowtaskDescUpdatedAt.UpdateDefault.(func() time.Time)
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescUsername is the schema descriptor for username field.

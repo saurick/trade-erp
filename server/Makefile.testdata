@@ -1,0 +1,43 @@
+ARGS ?=
+
+ENV_FILE := .env
+
+ifneq ("$(wildcard $(ENV_FILE))","")
+  include $(ENV_FILE)
+  export
+endif
+
+.PHONY: help
+help:
+	@echo ''
+	@echo 'Usage:'
+	@echo ' make -f Makefile.testdata [target] [ARGS=...]'
+	@echo ''
+	@echo 'Env:'
+	@echo '  优先 MYSQL_DSN，其次 .env 中 DB_URL，最后 configs/dev/config.yaml(data.mysql.dsn)'
+	@echo ''
+	@echo 'Targets:'
+	@echo '  testdata_erp_sql_up      生成 ERP 全菜单联调测试数据 SQL（up）'
+	@echo '  testdata_erp_sql_down    生成 ERP 全菜单联调测试数据 SQL（down）'
+	@echo '  testdata_erp_up          直接执行 ERP 测试数据插入（幂等）'
+	@echo '  testdata_erp_down        直接执行 ERP 测试数据撤销'
+
+.PHONY: testdata_erp_sql_up
+testdata_erp_sql_up:
+	go run ./cmd/testdata_erp -action up-sql $(ARGS)
+
+.PHONY: testdata_erp_sql_down
+testdata_erp_sql_down:
+	go run ./cmd/testdata_erp -action down-sql $(ARGS)
+
+.PHONY: testdata_erp_up
+testdata_erp_up:
+	@DSN="$${MYSQL_DSN:-$${DB_URL}}"; \
+	go run ./cmd/testdata_erp -action up -dsn "$$DSN" $(ARGS)
+
+.PHONY: testdata_erp_down
+testdata_erp_down:
+	@DSN="$${MYSQL_DSN:-$${DB_URL}}"; \
+	go run ./cmd/testdata_erp -action down -dsn "$$DSN" $(ARGS)
+
+.DEFAULT_GOAL := help

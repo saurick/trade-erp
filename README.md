@@ -53,8 +53,8 @@ make db_schema_check
 - 默认超级管理员：读取 `server/configs/dev/config.yaml` 的 `data.auth.admin`
 - 进入系统后按菜单权限显示可访问菜单（超级管理员默认全部菜单）
 - 前端仅展示后端真实数据，已移除演示/假数据 seed
-- 打印模板支持上传原始 Excel 后按模板全字段编辑再打印（开票信息、外销形式发票 PI、采购合同已切换为固定版式，左右字段双向同步，右侧文字可编辑；固定模板的 logo/水印/示意图锁定，不支持上传覆盖）
-- 已内置 `外销形式发票模版.xls`、采购合同固定模板（源自 `采购合同模版.pdf` 坐标重建）、开票信息固定模板（源自 `杭州科森磁材开票信息.pdf`）
+- 打印模板当前仅保留 3 项：开票信息、外销形式发票 PI、采购合同
+- 上述 3 项均为固定版式，左右字段双向同步，右侧文字可编辑；采购合同“其他条款”为整体多行编辑区；固定模板的 logo/水印/示意图锁定，不支持上传覆盖
 
 ## 一期预需求实现
 
@@ -63,6 +63,12 @@ make db_schema_check
 登录与权限接口说明：`/Users/simon/projects/trade-erp/docs/erp-auth-permission-api.md`
 
 全模块核查清单：`/Users/simon/projects/trade-erp/docs/erp-module-implementation-check-20260210.md`
+
+长期表结构方案：`/Users/simon/projects/trade-erp/docs/erp-longterm-schema-plan-20260211.md`
+
+`erp_module_records` 单表评估：`/Users/simon/projects/trade-erp/docs/erp-module-records-assessment-20260211.md`
+
+ERP 联调测试数据说明：`/Users/simon/projects/trade-erp/docs/erp-testdata.md`
 
 ## 数据库迁移约束
 

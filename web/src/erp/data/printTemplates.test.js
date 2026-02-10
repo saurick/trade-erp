@@ -36,6 +36,9 @@ describe('printTemplates', () => {
     expect(html).toContain('/templates/purchase-contract-logo.png')
     expect(html).toContain('/templates/purchase-contract-stamp.png')
     expect(html).toContain('/templates/purchase-contract-spec.png')
+    expect(html).toContain('purchase-title purchase-center')
+    expect(html).toContain('contenteditable="true" spellcheck="false">采购合同</div>')
+    expect(html).toContain('contenteditable="true" spellcheck="false" data-multiline="true">其他条款:<br />1.')
   })
 
   it('非 billingInfo 遇到 PDF 时抛出错误', () => {
@@ -66,6 +69,12 @@ describe('printTemplates', () => {
   it('purchase 不支持上传覆盖', async () => {
     await expect(uploadTemplateFile('purchase', new Blob(['test']))).rejects.toThrow(
       '采购合同模板为固定版式，不支持上传覆盖'
+    )
+  })
+
+  it('未启用模板不支持上传覆盖', async () => {
+    await expect(uploadTemplateFile('invoice', new Blob(['test']))).rejects.toThrow(
+      '当前仅保留 PI、采购合同、开票信息模板'
     )
   })
 

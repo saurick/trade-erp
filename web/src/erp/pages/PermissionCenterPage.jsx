@@ -159,7 +159,7 @@ const PermissionCenterPage = () => {
 
   return (
     <Space direction="vertical" size={16} style={{ width: '100%' }}>
-      <Card className="erp-page-card" bordered={false}>
+      <Card className="erp-page-card" variant="borderless">
         <Title level={4} style={{ margin: 0 }}>
           权限管理
         </Title>
@@ -177,7 +177,7 @@ const PermissionCenterPage = () => {
         />
       ) : null}
 
-      <Card className="erp-page-card" bordered={false}>
+      <Card className="erp-page-card" variant="borderless">
         <Table
           rowKey="id"
           columns={columns}
@@ -195,7 +195,7 @@ const PermissionCenterPage = () => {
         onCancel={closeEditModal}
         onOk={savePermissions}
         confirmLoading={saving}
-        destroyOnClose
+        destroyOnHidden
       >
         <Space direction="vertical" size={12} style={{ width: '100%' }}>
           <Text type="secondary">勾选后该管理员可在菜单看到对应页面入口。</Text>
@@ -219,4 +219,3 @@ const PermissionCenterPage = () => {
 }
 
 export default PermissionCenterPage
-

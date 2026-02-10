@@ -14,8 +14,62 @@ type Tx struct {
 	config
 	// AdminUser is the client for interacting with the AdminUser builders.
 	AdminUser *AdminUserClient
+	// ERPAttachment is the client for interacting with the ERPAttachment builders.
+	ERPAttachment *ERPAttachmentClient
+	// ERPBankReceipt is the client for interacting with the ERPBankReceipt builders.
+	ERPBankReceipt *ERPBankReceiptClient
+	// ERPBankReceiptClaim is the client for interacting with the ERPBankReceiptClaim builders.
+	ERPBankReceiptClaim *ERPBankReceiptClaimClient
+	// ERPDocLink is the client for interacting with the ERPDocLink builders.
+	ERPDocLink *ERPDocLinkClient
+	// ERPExportSale is the client for interacting with the ERPExportSale builders.
+	ERPExportSale *ERPExportSaleClient
+	// ERPExportSaleItem is the client for interacting with the ERPExportSaleItem builders.
+	ERPExportSaleItem *ERPExportSaleItemClient
+	// ERPInboundNotice is the client for interacting with the ERPInboundNotice builders.
+	ERPInboundNotice *ERPInboundNoticeClient
+	// ERPInboundNoticeItem is the client for interacting with the ERPInboundNoticeItem builders.
+	ERPInboundNoticeItem *ERPInboundNoticeItemClient
+	// ERPLocation is the client for interacting with the ERPLocation builders.
+	ERPLocation *ERPLocationClient
 	// ERPModuleRecord is the client for interacting with the ERPModuleRecord builders.
 	ERPModuleRecord *ERPModuleRecordClient
+	// ERPOutboundOrder is the client for interacting with the ERPOutboundOrder builders.
+	ERPOutboundOrder *ERPOutboundOrderClient
+	// ERPOutboundOrderItem is the client for interacting with the ERPOutboundOrderItem builders.
+	ERPOutboundOrderItem *ERPOutboundOrderItemClient
+	// ERPPartner is the client for interacting with the ERPPartner builders.
+	ERPPartner *ERPPartnerClient
+	// ERPProduct is the client for interacting with the ERPProduct builders.
+	ERPProduct *ERPProductClient
+	// ERPPurchaseContract is the client for interacting with the ERPPurchaseContract builders.
+	ERPPurchaseContract *ERPPurchaseContractClient
+	// ERPPurchaseContractItem is the client for interacting with the ERPPurchaseContractItem builders.
+	ERPPurchaseContractItem *ERPPurchaseContractItemClient
+	// ERPQuotation is the client for interacting with the ERPQuotation builders.
+	ERPQuotation *ERPQuotationClient
+	// ERPQuotationItem is the client for interacting with the ERPQuotationItem builders.
+	ERPQuotationItem *ERPQuotationItemClient
+	// ERPSequence is the client for interacting with the ERPSequence builders.
+	ERPSequence *ERPSequenceClient
+	// ERPSettlement is the client for interacting with the ERPSettlement builders.
+	ERPSettlement *ERPSettlementClient
+	// ERPShipmentDetail is the client for interacting with the ERPShipmentDetail builders.
+	ERPShipmentDetail *ERPShipmentDetailClient
+	// ERPShipmentDetailItem is the client for interacting with the ERPShipmentDetailItem builders.
+	ERPShipmentDetailItem *ERPShipmentDetailItemClient
+	// ERPStockBalance is the client for interacting with the ERPStockBalance builders.
+	ERPStockBalance *ERPStockBalanceClient
+	// ERPStockTransaction is the client for interacting with the ERPStockTransaction builders.
+	ERPStockTransaction *ERPStockTransactionClient
+	// ERPWarehouse is the client for interacting with the ERPWarehouse builders.
+	ERPWarehouse *ERPWarehouseClient
+	// ERPWorkflowActionLog is the client for interacting with the ERPWorkflowActionLog builders.
+	ERPWorkflowActionLog *ERPWorkflowActionLogClient
+	// ERPWorkflowInstance is the client for interacting with the ERPWorkflowInstance builders.
+	ERPWorkflowInstance *ERPWorkflowInstanceClient
+	// ERPWorkflowTask is the client for interacting with the ERPWorkflowTask builders.
+	ERPWorkflowTask *ERPWorkflowTaskClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 
@@ -150,7 +204,34 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.AdminUser = NewAdminUserClient(tx.config)
+	tx.ERPAttachment = NewERPAttachmentClient(tx.config)
+	tx.ERPBankReceipt = NewERPBankReceiptClient(tx.config)
+	tx.ERPBankReceiptClaim = NewERPBankReceiptClaimClient(tx.config)
+	tx.ERPDocLink = NewERPDocLinkClient(tx.config)
+	tx.ERPExportSale = NewERPExportSaleClient(tx.config)
+	tx.ERPExportSaleItem = NewERPExportSaleItemClient(tx.config)
+	tx.ERPInboundNotice = NewERPInboundNoticeClient(tx.config)
+	tx.ERPInboundNoticeItem = NewERPInboundNoticeItemClient(tx.config)
+	tx.ERPLocation = NewERPLocationClient(tx.config)
 	tx.ERPModuleRecord = NewERPModuleRecordClient(tx.config)
+	tx.ERPOutboundOrder = NewERPOutboundOrderClient(tx.config)
+	tx.ERPOutboundOrderItem = NewERPOutboundOrderItemClient(tx.config)
+	tx.ERPPartner = NewERPPartnerClient(tx.config)
+	tx.ERPProduct = NewERPProductClient(tx.config)
+	tx.ERPPurchaseContract = NewERPPurchaseContractClient(tx.config)
+	tx.ERPPurchaseContractItem = NewERPPurchaseContractItemClient(tx.config)
+	tx.ERPQuotation = NewERPQuotationClient(tx.config)
+	tx.ERPQuotationItem = NewERPQuotationItemClient(tx.config)
+	tx.ERPSequence = NewERPSequenceClient(tx.config)
+	tx.ERPSettlement = NewERPSettlementClient(tx.config)
+	tx.ERPShipmentDetail = NewERPShipmentDetailClient(tx.config)
+	tx.ERPShipmentDetailItem = NewERPShipmentDetailItemClient(tx.config)
+	tx.ERPStockBalance = NewERPStockBalanceClient(tx.config)
+	tx.ERPStockTransaction = NewERPStockTransactionClient(tx.config)
+	tx.ERPWarehouse = NewERPWarehouseClient(tx.config)
+	tx.ERPWorkflowActionLog = NewERPWorkflowActionLogClient(tx.config)
+	tx.ERPWorkflowInstance = NewERPWorkflowInstanceClient(tx.config)
+	tx.ERPWorkflowTask = NewERPWorkflowTaskClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 }
 

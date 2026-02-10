@@ -57,7 +57,7 @@ const DashboardPage = () => {
 
   return (
     <Space direction="vertical" size={16} style={{ width: '100%' }}>
-      <Card className="erp-page-card" bordered={false}>
+      <Card className="erp-page-card" variant="borderless">
         <Title level={4} style={{ marginTop: 0 }}>
           外销 ERP 管理后台
         </Title>
@@ -68,28 +68,28 @@ const DashboardPage = () => {
 
       <Row gutter={[12, 12]}>
         <Col xs={24} sm={12} lg={6}>
-          <Card className="erp-page-card" bordered={false}>
+          <Card className="erp-page-card" variant="borderless">
             <Statistic title="业务记录总数" value={summary.totalRecords} />
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
-          <Card className="erp-page-card" bordered={false}>
+          <Card className="erp-page-card" variant="borderless">
             <Statistic title="待批箱" value={summary.boxCount[BOX_STATUS.PENDING]} valueStyle={{ color: '#d46b08' }} />
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
-          <Card className="erp-page-card" bordered={false}>
+          <Card className="erp-page-card" variant="borderless">
             <Statistic title="招领箱" value={summary.boxCount[BOX_STATUS.CLAIM]} valueStyle={{ color: '#ad6800' }} />
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
-          <Card className="erp-page-card" bordered={false}>
+          <Card className="erp-page-card" variant="borderless">
             <Statistic title="已完成（已批+免批）" value={completionRatio} suffix="%" valueStyle={{ color: '#389e0d' }} />
           </Card>
         </Col>
       </Row>
 
-      <Card className="erp-page-card" bordered={false}>
+      <Card className="erp-page-card" variant="borderless">
         <Space direction="vertical" style={{ width: '100%' }}>
           <Title level={5} style={{ margin: 0 }}>
             状态箱分布
@@ -97,7 +97,7 @@ const DashboardPage = () => {
           <Row gutter={[12, 12]}>
             {Object.entries(summary.boxCount).map(([status, count]) => (
               <Col xs={24} md={12} lg={8} key={status}>
-                <Card size="small" bordered={false} style={{ background: '#f7faf7' }}>
+                <Card size="small" variant="borderless" style={{ background: '#f7faf7' }}>
                   <Space direction="vertical" style={{ width: '100%' }} size={6}>
                     <Tag>{status}</Tag>
                     <Progress percent={summary.totalRecords ? Math.round((count / summary.totalRecords) * 100) : 0} />
@@ -109,7 +109,7 @@ const DashboardPage = () => {
         </Space>
       </Card>
 
-      <Card className="erp-page-card" bordered={false}>
+      <Card className="erp-page-card" variant="borderless">
         <Table
           size="middle"
           pagination={false}

@@ -8,7 +8,34 @@ import (
 	"fmt"
 	"reflect"
 	"server/internal/data/model/ent/adminuser"
+	"server/internal/data/model/ent/erpattachment"
+	"server/internal/data/model/ent/erpbankreceipt"
+	"server/internal/data/model/ent/erpbankreceiptclaim"
+	"server/internal/data/model/ent/erpdoclink"
+	"server/internal/data/model/ent/erpexportsale"
+	"server/internal/data/model/ent/erpexportsaleitem"
+	"server/internal/data/model/ent/erpinboundnotice"
+	"server/internal/data/model/ent/erpinboundnoticeitem"
+	"server/internal/data/model/ent/erplocation"
 	"server/internal/data/model/ent/erpmodulerecord"
+	"server/internal/data/model/ent/erpoutboundorder"
+	"server/internal/data/model/ent/erpoutboundorderitem"
+	"server/internal/data/model/ent/erppartner"
+	"server/internal/data/model/ent/erpproduct"
+	"server/internal/data/model/ent/erppurchasecontract"
+	"server/internal/data/model/ent/erppurchasecontractitem"
+	"server/internal/data/model/ent/erpquotation"
+	"server/internal/data/model/ent/erpquotationitem"
+	"server/internal/data/model/ent/erpsequence"
+	"server/internal/data/model/ent/erpsettlement"
+	"server/internal/data/model/ent/erpshipmentdetail"
+	"server/internal/data/model/ent/erpshipmentdetailitem"
+	"server/internal/data/model/ent/erpstockbalance"
+	"server/internal/data/model/ent/erpstocktransaction"
+	"server/internal/data/model/ent/erpwarehouse"
+	"server/internal/data/model/ent/erpworkflowactionlog"
+	"server/internal/data/model/ent/erpworkflowinstance"
+	"server/internal/data/model/ent/erpworkflowtask"
 	"server/internal/data/model/ent/user"
 	"sync"
 
@@ -75,9 +102,36 @@ var (
 func checkColumn(t, c string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			adminuser.Table:       adminuser.ValidColumn,
-			erpmodulerecord.Table: erpmodulerecord.ValidColumn,
-			user.Table:            user.ValidColumn,
+			adminuser.Table:               adminuser.ValidColumn,
+			erpattachment.Table:           erpattachment.ValidColumn,
+			erpbankreceipt.Table:          erpbankreceipt.ValidColumn,
+			erpbankreceiptclaim.Table:     erpbankreceiptclaim.ValidColumn,
+			erpdoclink.Table:              erpdoclink.ValidColumn,
+			erpexportsale.Table:           erpexportsale.ValidColumn,
+			erpexportsaleitem.Table:       erpexportsaleitem.ValidColumn,
+			erpinboundnotice.Table:        erpinboundnotice.ValidColumn,
+			erpinboundnoticeitem.Table:    erpinboundnoticeitem.ValidColumn,
+			erplocation.Table:             erplocation.ValidColumn,
+			erpmodulerecord.Table:         erpmodulerecord.ValidColumn,
+			erpoutboundorder.Table:        erpoutboundorder.ValidColumn,
+			erpoutboundorderitem.Table:    erpoutboundorderitem.ValidColumn,
+			erppartner.Table:              erppartner.ValidColumn,
+			erpproduct.Table:              erpproduct.ValidColumn,
+			erppurchasecontract.Table:     erppurchasecontract.ValidColumn,
+			erppurchasecontractitem.Table: erppurchasecontractitem.ValidColumn,
+			erpquotation.Table:            erpquotation.ValidColumn,
+			erpquotationitem.Table:        erpquotationitem.ValidColumn,
+			erpsequence.Table:             erpsequence.ValidColumn,
+			erpsettlement.Table:           erpsettlement.ValidColumn,
+			erpshipmentdetail.Table:       erpshipmentdetail.ValidColumn,
+			erpshipmentdetailitem.Table:   erpshipmentdetailitem.ValidColumn,
+			erpstockbalance.Table:         erpstockbalance.ValidColumn,
+			erpstocktransaction.Table:     erpstocktransaction.ValidColumn,
+			erpwarehouse.Table:            erpwarehouse.ValidColumn,
+			erpworkflowactionlog.Table:    erpworkflowactionlog.ValidColumn,
+			erpworkflowinstance.Table:     erpworkflowinstance.ValidColumn,
+			erpworkflowtask.Table:         erpworkflowtask.ValidColumn,
+			user.Table:                    user.ValidColumn,
 		})
 	})
 	return columnCheck(t, c)

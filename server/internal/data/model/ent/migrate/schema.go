@@ -44,6 +44,356 @@ var (
 			},
 		},
 	}
+	// ErpAttachmentsColumns holds the columns for the "erp_attachments" table.
+	ErpAttachmentsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "category", Type: field.TypeString, Size: 64, Default: "attachments"},
+		{Name: "biz_module", Type: field.TypeString, Size: 64},
+		{Name: "biz_code", Type: field.TypeString, Size: 128},
+		{Name: "file_name", Type: field.TypeString, Size: 255},
+		{Name: "file_url", Type: field.TypeString, Size: 1024},
+		{Name: "mime_type", Type: field.TypeString, Nullable: true, Size: 128},
+		{Name: "file_size", Type: field.TypeInt64, Default: 0},
+		{Name: "uploaded_by_admin_id", Type: field.TypeInt, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime},
+	}
+	// ErpAttachmentsTable holds the schema information for the "erp_attachments" table.
+	ErpAttachmentsTable = &schema.Table{
+		Name:       "erp_attachments",
+		Columns:    ErpAttachmentsColumns,
+		PrimaryKey: []*schema.Column{ErpAttachmentsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "erpattachment_biz_module_biz_code_category",
+				Unique:  false,
+				Columns: []*schema.Column{ErpAttachmentsColumns[2], ErpAttachmentsColumns[3], ErpAttachmentsColumns[1]},
+			},
+			{
+				Name:    "erpattachment_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{ErpAttachmentsColumns[9]},
+			},
+		},
+	}
+	// ErpBankReceiptsColumns holds the columns for the "erp_bank_receipts" table.
+	ErpBankReceiptsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "code", Type: field.TypeString, Size: 128},
+		{Name: "register_date", Type: field.TypeTime},
+		{Name: "fund_type", Type: field.TypeString, Size: 64},
+		{Name: "currency", Type: field.TypeString, Size: 16, Default: "USD"},
+		{Name: "received_amount", Type: field.TypeFloat64, SchemaType: map[string]string{"mysql": "decimal(20,6)"}},
+		{Name: "bank_fee", Type: field.TypeFloat64, Default: 0, SchemaType: map[string]string{"mysql": "decimal(20,6)"}},
+		{Name: "net_amount", Type: field.TypeFloat64, Default: 0, SchemaType: map[string]string{"mysql": "decimal(20,6)"}},
+		{Name: "ref_no", Type: field.TypeString, Nullable: true, Size: 128},
+		{Name: "status", Type: field.TypeString, Size: 32, Default: "claim"},
+		{Name: "created_by_admin_id", Type: field.TypeInt, Nullable: true},
+		{Name: "updated_by_admin_id", Type: field.TypeInt, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// ErpBankReceiptsTable holds the schema information for the "erp_bank_receipts" table.
+	ErpBankReceiptsTable = &schema.Table{
+		Name:       "erp_bank_receipts",
+		Columns:    ErpBankReceiptsColumns,
+		PrimaryKey: []*schema.Column{ErpBankReceiptsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "erpbankreceipt_code",
+				Unique:  true,
+				Columns: []*schema.Column{ErpBankReceiptsColumns[1]},
+			},
+			{
+				Name:    "erpbankreceipt_status_register_date",
+				Unique:  false,
+				Columns: []*schema.Column{ErpBankReceiptsColumns[9], ErpBankReceiptsColumns[2]},
+			},
+			{
+				Name:    "erpbankreceipt_ref_no",
+				Unique:  false,
+				Columns: []*schema.Column{ErpBankReceiptsColumns[8]},
+			},
+		},
+	}
+	// ErpBankReceiptClaimsColumns holds the columns for the "erp_bank_receipt_claims" table.
+	ErpBankReceiptClaimsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "receipt_id", Type: field.TypeInt},
+		{Name: "settlement_id", Type: field.TypeInt, Nullable: true},
+		{Name: "claim_type", Type: field.TypeString, Size: 32},
+		{Name: "claim_amount", Type: field.TypeFloat64, SchemaType: map[string]string{"mysql": "decimal(20,6)"}},
+		{Name: "confirmed", Type: field.TypeBool, Default: false},
+		{Name: "confirmed_at", Type: field.TypeTime, Nullable: true},
+		{Name: "claimed_by_admin_id", Type: field.TypeInt, Nullable: true},
+		{Name: "confirmed_by_admin_id", Type: field.TypeInt, Nullable: true},
+		{Name: "remark", Type: field.TypeString, Nullable: true, Size: 512},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// ErpBankReceiptClaimsTable holds the schema information for the "erp_bank_receipt_claims" table.
+	ErpBankReceiptClaimsTable = &schema.Table{
+		Name:       "erp_bank_receipt_claims",
+		Columns:    ErpBankReceiptClaimsColumns,
+		PrimaryKey: []*schema.Column{ErpBankReceiptClaimsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "erpbankreceiptclaim_receipt_id",
+				Unique:  false,
+				Columns: []*schema.Column{ErpBankReceiptClaimsColumns[1]},
+			},
+			{
+				Name:    "erpbankreceiptclaim_settlement_id",
+				Unique:  false,
+				Columns: []*schema.Column{ErpBankReceiptClaimsColumns[2]},
+			},
+			{
+				Name:    "erpbankreceiptclaim_confirmed_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{ErpBankReceiptClaimsColumns[5], ErpBankReceiptClaimsColumns[10]},
+			},
+		},
+	}
+	// ErpDocLinksColumns holds the columns for the "erp_doc_links" table.
+	ErpDocLinksColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "from_module", Type: field.TypeString, Size: 64},
+		{Name: "from_code", Type: field.TypeString, Size: 128},
+		{Name: "to_module", Type: field.TypeString, Size: 64},
+		{Name: "to_code", Type: field.TypeString, Size: 128},
+		{Name: "relation_type", Type: field.TypeString, Size: 64, Default: "derived"},
+		{Name: "created_at", Type: field.TypeTime},
+	}
+	// ErpDocLinksTable holds the schema information for the "erp_doc_links" table.
+	ErpDocLinksTable = &schema.Table{
+		Name:       "erp_doc_links",
+		Columns:    ErpDocLinksColumns,
+		PrimaryKey: []*schema.Column{ErpDocLinksColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "erpdoclink_from_module_from_code_to_module_to_code_relation_type",
+				Unique:  true,
+				Columns: []*schema.Column{ErpDocLinksColumns[1], ErpDocLinksColumns[2], ErpDocLinksColumns[3], ErpDocLinksColumns[4], ErpDocLinksColumns[5]},
+			},
+			{
+				Name:    "erpdoclink_from_module_from_code",
+				Unique:  false,
+				Columns: []*schema.Column{ErpDocLinksColumns[1], ErpDocLinksColumns[2]},
+			},
+			{
+				Name:    "erpdoclink_to_module_to_code",
+				Unique:  false,
+				Columns: []*schema.Column{ErpDocLinksColumns[3], ErpDocLinksColumns[4]},
+			},
+		},
+	}
+	// ErpExportSalesColumns holds the columns for the "erp_export_sales" table.
+	ErpExportSalesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "code", Type: field.TypeString, Size: 128},
+		{Name: "quotation_id", Type: field.TypeInt, Nullable: true},
+		{Name: "source_quotation_code", Type: field.TypeString, Nullable: true, Size: 128},
+		{Name: "customer_partner_id", Type: field.TypeInt, Nullable: true},
+		{Name: "customer_code", Type: field.TypeString, Nullable: true, Size: 64},
+		{Name: "customer_contract_no", Type: field.TypeString, Nullable: true, Size: 128},
+		{Name: "order_no", Type: field.TypeString, Nullable: true, Size: 128},
+		{Name: "order_date", Type: field.TypeTime},
+		{Name: "sign_date", Type: field.TypeTime},
+		{Name: "delivery_date", Type: field.TypeTime},
+		{Name: "transport_type", Type: field.TypeString, Nullable: true, Size: 32},
+		{Name: "payment_method", Type: field.TypeString, Nullable: true, Size: 32},
+		{Name: "price_term", Type: field.TypeString, Nullable: true, Size: 32},
+		{Name: "start_place", Type: field.TypeString, Nullable: true, Size: 64},
+		{Name: "end_place", Type: field.TypeString, Nullable: true, Size: 64},
+		{Name: "order_flow", Type: field.TypeString, Nullable: true, Size: 32},
+		{Name: "total_amount", Type: field.TypeFloat64, Default: 0, SchemaType: map[string]string{"mysql": "decimal(20,6)"}},
+		{Name: "status", Type: field.TypeString, Size: 32, Default: "draft"},
+		{Name: "remark", Type: field.TypeString, Nullable: true, Size: 512},
+		{Name: "created_by_admin_id", Type: field.TypeInt, Nullable: true},
+		{Name: "updated_by_admin_id", Type: field.TypeInt, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// ErpExportSalesTable holds the schema information for the "erp_export_sales" table.
+	ErpExportSalesTable = &schema.Table{
+		Name:       "erp_export_sales",
+		Columns:    ErpExportSalesColumns,
+		PrimaryKey: []*schema.Column{ErpExportSalesColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "erpexportsale_code",
+				Unique:  true,
+				Columns: []*schema.Column{ErpExportSalesColumns[1]},
+			},
+			{
+				Name:    "erpexportsale_quotation_id",
+				Unique:  false,
+				Columns: []*schema.Column{ErpExportSalesColumns[2]},
+			},
+			{
+				Name:    "erpexportsale_customer_partner_id",
+				Unique:  false,
+				Columns: []*schema.Column{ErpExportSalesColumns[4]},
+			},
+			{
+				Name:    "erpexportsale_status_sign_date",
+				Unique:  false,
+				Columns: []*schema.Column{ErpExportSalesColumns[18], ErpExportSalesColumns[9]},
+			},
+		},
+	}
+	// ErpExportSaleItemsColumns holds the columns for the "erp_export_sale_items" table.
+	ErpExportSaleItemsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "export_sale_id", Type: field.TypeInt},
+		{Name: "line_no", Type: field.TypeInt},
+		{Name: "product_id", Type: field.TypeInt, Nullable: true},
+		{Name: "product_code", Type: field.TypeString, Nullable: true, Size: 128},
+		{Name: "product_name", Type: field.TypeString, Nullable: true, Size: 255},
+		{Name: "cn_desc", Type: field.TypeString, Nullable: true, Size: 255},
+		{Name: "en_desc", Type: field.TypeString, Nullable: true, Size: 255},
+		{Name: "quantity", Type: field.TypeFloat64, Default: 0, SchemaType: map[string]string{"mysql": "decimal(20,6)"}},
+		{Name: "unit_price", Type: field.TypeFloat64, Default: 0, SchemaType: map[string]string{"mysql": "decimal(20,6)"}},
+		{Name: "total_price", Type: field.TypeFloat64, Default: 0, SchemaType: map[string]string{"mysql": "decimal(20,6)"}},
+		{Name: "pack_detail", Type: field.TypeString, Nullable: true, Size: 255},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// ErpExportSaleItemsTable holds the schema information for the "erp_export_sale_items" table.
+	ErpExportSaleItemsTable = &schema.Table{
+		Name:       "erp_export_sale_items",
+		Columns:    ErpExportSaleItemsColumns,
+		PrimaryKey: []*schema.Column{ErpExportSaleItemsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "erpexportsaleitem_export_sale_id_line_no",
+				Unique:  true,
+				Columns: []*schema.Column{ErpExportSaleItemsColumns[1], ErpExportSaleItemsColumns[2]},
+			},
+			{
+				Name:    "erpexportsaleitem_product_id",
+				Unique:  false,
+				Columns: []*schema.Column{ErpExportSaleItemsColumns[3]},
+			},
+			{
+				Name:    "erpexportsaleitem_product_code",
+				Unique:  false,
+				Columns: []*schema.Column{ErpExportSaleItemsColumns[4]},
+			},
+		},
+	}
+	// ErpInboundNoticesColumns holds the columns for the "erp_inbound_notices" table.
+	ErpInboundNoticesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "code", Type: field.TypeString, Size: 128},
+		{Name: "purchase_contract_id", Type: field.TypeInt, Nullable: true},
+		{Name: "source_purchase_code", Type: field.TypeString, Nullable: true, Size: 128},
+		{Name: "entry_no", Type: field.TypeString, Nullable: true, Size: 128},
+		{Name: "warehouse_id", Type: field.TypeInt, Nullable: true},
+		{Name: "location_id", Type: field.TypeInt, Nullable: true},
+		{Name: "qc_status", Type: field.TypeString, Size: 32, Default: "pending"},
+		{Name: "inbound_status", Type: field.TypeString, Size: 32, Default: "pending"},
+		{Name: "allow_inbound_at", Type: field.TypeTime, Nullable: true},
+		{Name: "remark", Type: field.TypeString, Nullable: true, Size: 512},
+		{Name: "created_by_admin_id", Type: field.TypeInt, Nullable: true},
+		{Name: "updated_by_admin_id", Type: field.TypeInt, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// ErpInboundNoticesTable holds the schema information for the "erp_inbound_notices" table.
+	ErpInboundNoticesTable = &schema.Table{
+		Name:       "erp_inbound_notices",
+		Columns:    ErpInboundNoticesColumns,
+		PrimaryKey: []*schema.Column{ErpInboundNoticesColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "erpinboundnotice_code",
+				Unique:  true,
+				Columns: []*schema.Column{ErpInboundNoticesColumns[1]},
+			},
+			{
+				Name:    "erpinboundnotice_purchase_contract_id",
+				Unique:  false,
+				Columns: []*schema.Column{ErpInboundNoticesColumns[2]},
+			},
+			{
+				Name:    "erpinboundnotice_qc_status_inbound_status",
+				Unique:  false,
+				Columns: []*schema.Column{ErpInboundNoticesColumns[7], ErpInboundNoticesColumns[8]},
+			},
+			{
+				Name:    "erpinboundnotice_inbound_status_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{ErpInboundNoticesColumns[8], ErpInboundNoticesColumns[13]},
+			},
+		},
+	}
+	// ErpInboundNoticeItemsColumns holds the columns for the "erp_inbound_notice_items" table.
+	ErpInboundNoticeItemsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "inbound_notice_id", Type: field.TypeInt},
+		{Name: "line_no", Type: field.TypeInt},
+		{Name: "product_id", Type: field.TypeInt, Nullable: true},
+		{Name: "product_code", Type: field.TypeString, Nullable: true, Size: 128},
+		{Name: "product_name", Type: field.TypeString, Nullable: true, Size: 255},
+		{Name: "lot_no", Type: field.TypeString, Nullable: true, Size: 64},
+		{Name: "quantity", Type: field.TypeFloat64, Default: 0, SchemaType: map[string]string{"mysql": "decimal(20,6)"}},
+		{Name: "passed_qty", Type: field.TypeFloat64, Default: 0, SchemaType: map[string]string{"mysql": "decimal(20,6)"}},
+		{Name: "rejected_qty", Type: field.TypeFloat64, Default: 0, SchemaType: map[string]string{"mysql": "decimal(20,6)"}},
+		{Name: "report_attachment_id", Type: field.TypeInt, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// ErpInboundNoticeItemsTable holds the schema information for the "erp_inbound_notice_items" table.
+	ErpInboundNoticeItemsTable = &schema.Table{
+		Name:       "erp_inbound_notice_items",
+		Columns:    ErpInboundNoticeItemsColumns,
+		PrimaryKey: []*schema.Column{ErpInboundNoticeItemsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "erpinboundnoticeitem_inbound_notice_id_line_no",
+				Unique:  true,
+				Columns: []*schema.Column{ErpInboundNoticeItemsColumns[1], ErpInboundNoticeItemsColumns[2]},
+			},
+			{
+				Name:    "erpinboundnoticeitem_product_id",
+				Unique:  false,
+				Columns: []*schema.Column{ErpInboundNoticeItemsColumns[3]},
+			},
+			{
+				Name:    "erpinboundnoticeitem_product_code",
+				Unique:  false,
+				Columns: []*schema.Column{ErpInboundNoticeItemsColumns[4]},
+			},
+		},
+	}
+	// ErpLocationsColumns holds the columns for the "erp_locations" table.
+	ErpLocationsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "warehouse_id", Type: field.TypeInt},
+		{Name: "code", Type: field.TypeString, Size: 64},
+		{Name: "name", Type: field.TypeString, Nullable: true, Size: 128},
+		{Name: "disabled", Type: field.TypeBool, Default: false},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// ErpLocationsTable holds the schema information for the "erp_locations" table.
+	ErpLocationsTable = &schema.Table{
+		Name:       "erp_locations",
+		Columns:    ErpLocationsColumns,
+		PrimaryKey: []*schema.Column{ErpLocationsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "erplocation_warehouse_id_code",
+				Unique:  true,
+				Columns: []*schema.Column{ErpLocationsColumns[1], ErpLocationsColumns[2]},
+			},
+			{
+				Name:    "erplocation_warehouse_id",
+				Unique:  false,
+				Columns: []*schema.Column{ErpLocationsColumns[1]},
+			},
+		},
+	}
 	// ErpModuleRecordsColumns holds the columns for the "erp_module_records" table.
 	ErpModuleRecordsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -71,6 +421,698 @@ var (
 				Name:    "erpmodulerecord_module_key_code",
 				Unique:  false,
 				Columns: []*schema.Column{ErpModuleRecordsColumns[1], ErpModuleRecordsColumns[2]},
+			},
+		},
+	}
+	// ErpOutboundOrdersColumns holds the columns for the "erp_outbound_orders" table.
+	ErpOutboundOrdersColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "code", Type: field.TypeString, Size: 128},
+		{Name: "shipment_detail_id", Type: field.TypeInt, Nullable: true},
+		{Name: "source_shipment_code", Type: field.TypeString, Nullable: true, Size: 128},
+		{Name: "warehouse_id", Type: field.TypeInt, Nullable: true},
+		{Name: "location_id", Type: field.TypeInt, Nullable: true},
+		{Name: "outbound_date", Type: field.TypeTime},
+		{Name: "total_quantity", Type: field.TypeFloat64, Default: 0, SchemaType: map[string]string{"mysql": "decimal(20,6)"}},
+		{Name: "status", Type: field.TypeString, Size: 32, Default: "draft"},
+		{Name: "remark", Type: field.TypeString, Nullable: true, Size: 512},
+		{Name: "created_by_admin_id", Type: field.TypeInt, Nullable: true},
+		{Name: "updated_by_admin_id", Type: field.TypeInt, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// ErpOutboundOrdersTable holds the schema information for the "erp_outbound_orders" table.
+	ErpOutboundOrdersTable = &schema.Table{
+		Name:       "erp_outbound_orders",
+		Columns:    ErpOutboundOrdersColumns,
+		PrimaryKey: []*schema.Column{ErpOutboundOrdersColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "erpoutboundorder_code",
+				Unique:  true,
+				Columns: []*schema.Column{ErpOutboundOrdersColumns[1]},
+			},
+			{
+				Name:    "erpoutboundorder_shipment_detail_id",
+				Unique:  false,
+				Columns: []*schema.Column{ErpOutboundOrdersColumns[2]},
+			},
+			{
+				Name:    "erpoutboundorder_warehouse_id_location_id",
+				Unique:  false,
+				Columns: []*schema.Column{ErpOutboundOrdersColumns[4], ErpOutboundOrdersColumns[5]},
+			},
+			{
+				Name:    "erpoutboundorder_status_outbound_date",
+				Unique:  false,
+				Columns: []*schema.Column{ErpOutboundOrdersColumns[8], ErpOutboundOrdersColumns[6]},
+			},
+		},
+	}
+	// ErpOutboundOrderItemsColumns holds the columns for the "erp_outbound_order_items" table.
+	ErpOutboundOrderItemsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "outbound_order_id", Type: field.TypeInt},
+		{Name: "line_no", Type: field.TypeInt},
+		{Name: "product_id", Type: field.TypeInt, Nullable: true},
+		{Name: "product_code", Type: field.TypeString, Nullable: true, Size: 128},
+		{Name: "lot_no", Type: field.TypeString, Nullable: true, Size: 64},
+		{Name: "quantity", Type: field.TypeFloat64, Default: 0, SchemaType: map[string]string{"mysql": "decimal(20,6)"}},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// ErpOutboundOrderItemsTable holds the schema information for the "erp_outbound_order_items" table.
+	ErpOutboundOrderItemsTable = &schema.Table{
+		Name:       "erp_outbound_order_items",
+		Columns:    ErpOutboundOrderItemsColumns,
+		PrimaryKey: []*schema.Column{ErpOutboundOrderItemsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "erpoutboundorderitem_outbound_order_id_line_no",
+				Unique:  true,
+				Columns: []*schema.Column{ErpOutboundOrderItemsColumns[1], ErpOutboundOrderItemsColumns[2]},
+			},
+			{
+				Name:    "erpoutboundorderitem_product_id",
+				Unique:  false,
+				Columns: []*schema.Column{ErpOutboundOrderItemsColumns[3]},
+			},
+			{
+				Name:    "erpoutboundorderitem_product_code",
+				Unique:  false,
+				Columns: []*schema.Column{ErpOutboundOrderItemsColumns[4]},
+			},
+		},
+	}
+	// ErpPartnersColumns holds the columns for the "erp_partners" table.
+	ErpPartnersColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "code", Type: field.TypeString, Size: 64},
+		{Name: "partner_type", Type: field.TypeString, Size: 32},
+		{Name: "name", Type: field.TypeString, Size: 128},
+		{Name: "short_name", Type: field.TypeString, Nullable: true, Size: 128},
+		{Name: "tax_no", Type: field.TypeString, Nullable: true, Size: 64},
+		{Name: "currency", Type: field.TypeString, Size: 16, Default: "USD"},
+		{Name: "payment_cycle_days", Type: field.TypeInt, Default: 0},
+		{Name: "address", Type: field.TypeString, Nullable: true, Size: 255},
+		{Name: "contact", Type: field.TypeString, Nullable: true, Size: 64},
+		{Name: "contact_phone", Type: field.TypeString, Nullable: true, Size: 64},
+		{Name: "email", Type: field.TypeString, Nullable: true, Size: 128},
+		{Name: "disabled", Type: field.TypeBool, Default: false},
+		{Name: "extra_json", Type: field.TypeString, Nullable: true, Size: 2147483647},
+		{Name: "created_by_admin_id", Type: field.TypeInt, Nullable: true},
+		{Name: "updated_by_admin_id", Type: field.TypeInt, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// ErpPartnersTable holds the schema information for the "erp_partners" table.
+	ErpPartnersTable = &schema.Table{
+		Name:       "erp_partners",
+		Columns:    ErpPartnersColumns,
+		PrimaryKey: []*schema.Column{ErpPartnersColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "erppartner_code",
+				Unique:  true,
+				Columns: []*schema.Column{ErpPartnersColumns[1]},
+			},
+			{
+				Name:    "erppartner_partner_type",
+				Unique:  false,
+				Columns: []*schema.Column{ErpPartnersColumns[2]},
+			},
+			{
+				Name:    "erppartner_name",
+				Unique:  false,
+				Columns: []*schema.Column{ErpPartnersColumns[3]},
+			},
+		},
+	}
+	// ErpProductsColumns holds the columns for the "erp_products" table.
+	ErpProductsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "code", Type: field.TypeString, Size: 128},
+		{Name: "hs_code", Type: field.TypeString, Nullable: true, Size: 64},
+		{Name: "spec_code", Type: field.TypeString, Nullable: true, Size: 128},
+		{Name: "drawing_no", Type: field.TypeString, Nullable: true, Size: 128},
+		{Name: "cn_desc", Type: field.TypeString, Nullable: true, Size: 255},
+		{Name: "en_desc", Type: field.TypeString, Nullable: true, Size: 255},
+		{Name: "unit", Type: field.TypeString, Size: 32, Default: "pcs"},
+		{Name: "disabled", Type: field.TypeBool, Default: false},
+		{Name: "extra_json", Type: field.TypeString, Nullable: true, Size: 2147483647},
+		{Name: "created_by_admin_id", Type: field.TypeInt, Nullable: true},
+		{Name: "updated_by_admin_id", Type: field.TypeInt, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// ErpProductsTable holds the schema information for the "erp_products" table.
+	ErpProductsTable = &schema.Table{
+		Name:       "erp_products",
+		Columns:    ErpProductsColumns,
+		PrimaryKey: []*schema.Column{ErpProductsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "erpproduct_code",
+				Unique:  true,
+				Columns: []*schema.Column{ErpProductsColumns[1]},
+			},
+			{
+				Name:    "erpproduct_hs_code",
+				Unique:  false,
+				Columns: []*schema.Column{ErpProductsColumns[2]},
+			},
+			{
+				Name:    "erpproduct_spec_code",
+				Unique:  false,
+				Columns: []*schema.Column{ErpProductsColumns[3]},
+			},
+		},
+	}
+	// ErpPurchaseContractsColumns holds the columns for the "erp_purchase_contracts" table.
+	ErpPurchaseContractsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "code", Type: field.TypeString, Size: 128},
+		{Name: "export_sale_id", Type: field.TypeInt, Nullable: true},
+		{Name: "source_export_code", Type: field.TypeString, Nullable: true, Size: 128},
+		{Name: "supplier_partner_id", Type: field.TypeInt, Nullable: true},
+		{Name: "supplier_code", Type: field.TypeString, Nullable: true, Size: 64},
+		{Name: "sign_date", Type: field.TypeTime},
+		{Name: "sales_no", Type: field.TypeString, Nullable: true, Size: 64},
+		{Name: "delivery_date", Type: field.TypeTime},
+		{Name: "delivery_address", Type: field.TypeString, Nullable: true, Size: 255},
+		{Name: "follower", Type: field.TypeString, Nullable: true, Size: 64},
+		{Name: "buyer", Type: field.TypeString, Nullable: true, Size: 64},
+		{Name: "invoice_required", Type: field.TypeBool, Default: false},
+		{Name: "total_amount", Type: field.TypeFloat64, Default: 0, SchemaType: map[string]string{"mysql": "decimal(20,6)"}},
+		{Name: "status", Type: field.TypeString, Size: 32, Default: "draft"},
+		{Name: "remark", Type: field.TypeString, Nullable: true, Size: 512},
+		{Name: "created_by_admin_id", Type: field.TypeInt, Nullable: true},
+		{Name: "updated_by_admin_id", Type: field.TypeInt, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// ErpPurchaseContractsTable holds the schema information for the "erp_purchase_contracts" table.
+	ErpPurchaseContractsTable = &schema.Table{
+		Name:       "erp_purchase_contracts",
+		Columns:    ErpPurchaseContractsColumns,
+		PrimaryKey: []*schema.Column{ErpPurchaseContractsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "erppurchasecontract_code",
+				Unique:  true,
+				Columns: []*schema.Column{ErpPurchaseContractsColumns[1]},
+			},
+			{
+				Name:    "erppurchasecontract_export_sale_id",
+				Unique:  false,
+				Columns: []*schema.Column{ErpPurchaseContractsColumns[2]},
+			},
+			{
+				Name:    "erppurchasecontract_supplier_partner_id",
+				Unique:  false,
+				Columns: []*schema.Column{ErpPurchaseContractsColumns[4]},
+			},
+			{
+				Name:    "erppurchasecontract_status_sign_date",
+				Unique:  false,
+				Columns: []*schema.Column{ErpPurchaseContractsColumns[14], ErpPurchaseContractsColumns[6]},
+			},
+		},
+	}
+	// ErpPurchaseContractItemsColumns holds the columns for the "erp_purchase_contract_items" table.
+	ErpPurchaseContractItemsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "purchase_contract_id", Type: field.TypeInt},
+		{Name: "line_no", Type: field.TypeInt},
+		{Name: "product_id", Type: field.TypeInt, Nullable: true},
+		{Name: "product_code", Type: field.TypeString, Nullable: true, Size: 128},
+		{Name: "product_name", Type: field.TypeString, Nullable: true, Size: 255},
+		{Name: "spec_code", Type: field.TypeString, Nullable: true, Size: 128},
+		{Name: "quantity", Type: field.TypeFloat64, Default: 0, SchemaType: map[string]string{"mysql": "decimal(20,6)"}},
+		{Name: "unit_price", Type: field.TypeFloat64, Default: 0, SchemaType: map[string]string{"mysql": "decimal(20,6)"}},
+		{Name: "total_price", Type: field.TypeFloat64, Default: 0, SchemaType: map[string]string{"mysql": "decimal(20,6)"}},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// ErpPurchaseContractItemsTable holds the schema information for the "erp_purchase_contract_items" table.
+	ErpPurchaseContractItemsTable = &schema.Table{
+		Name:       "erp_purchase_contract_items",
+		Columns:    ErpPurchaseContractItemsColumns,
+		PrimaryKey: []*schema.Column{ErpPurchaseContractItemsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "erppurchasecontractitem_purchase_contract_id_line_no",
+				Unique:  true,
+				Columns: []*schema.Column{ErpPurchaseContractItemsColumns[1], ErpPurchaseContractItemsColumns[2]},
+			},
+			{
+				Name:    "erppurchasecontractitem_product_id",
+				Unique:  false,
+				Columns: []*schema.Column{ErpPurchaseContractItemsColumns[3]},
+			},
+			{
+				Name:    "erppurchasecontractitem_product_code",
+				Unique:  false,
+				Columns: []*schema.Column{ErpPurchaseContractItemsColumns[4]},
+			},
+		},
+	}
+	// ErpQuotationsColumns holds the columns for the "erp_quotations" table.
+	ErpQuotationsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "code", Type: field.TypeString, Size: 128},
+		{Name: "customer_partner_id", Type: field.TypeInt, Nullable: true},
+		{Name: "customer_code", Type: field.TypeString, Nullable: true, Size: 64},
+		{Name: "quoted_date", Type: field.TypeTime},
+		{Name: "currency", Type: field.TypeString, Size: 16, Default: "USD"},
+		{Name: "price_term", Type: field.TypeString, Nullable: true, Size: 32},
+		{Name: "payment_method", Type: field.TypeString, Nullable: true, Size: 32},
+		{Name: "delivery_method", Type: field.TypeString, Nullable: true, Size: 32},
+		{Name: "start_place", Type: field.TypeString, Nullable: true, Size: 64},
+		{Name: "end_place", Type: field.TypeString, Nullable: true, Size: 64},
+		{Name: "total_amount", Type: field.TypeFloat64, Default: 0, SchemaType: map[string]string{"mysql": "decimal(20,6)"}},
+		{Name: "status", Type: field.TypeString, Size: 32, Default: "draft"},
+		{Name: "accepted", Type: field.TypeBool, Default: false},
+		{Name: "accepted_at", Type: field.TypeTime, Nullable: true},
+		{Name: "remark", Type: field.TypeString, Nullable: true, Size: 512},
+		{Name: "created_by_admin_id", Type: field.TypeInt, Nullable: true},
+		{Name: "updated_by_admin_id", Type: field.TypeInt, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// ErpQuotationsTable holds the schema information for the "erp_quotations" table.
+	ErpQuotationsTable = &schema.Table{
+		Name:       "erp_quotations",
+		Columns:    ErpQuotationsColumns,
+		PrimaryKey: []*schema.Column{ErpQuotationsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "erpquotation_code",
+				Unique:  true,
+				Columns: []*schema.Column{ErpQuotationsColumns[1]},
+			},
+			{
+				Name:    "erpquotation_customer_partner_id",
+				Unique:  false,
+				Columns: []*schema.Column{ErpQuotationsColumns[2]},
+			},
+			{
+				Name:    "erpquotation_status_quoted_date",
+				Unique:  false,
+				Columns: []*schema.Column{ErpQuotationsColumns[12], ErpQuotationsColumns[4]},
+			},
+		},
+	}
+	// ErpQuotationItemsColumns holds the columns for the "erp_quotation_items" table.
+	ErpQuotationItemsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "quotation_id", Type: field.TypeInt},
+		{Name: "line_no", Type: field.TypeInt},
+		{Name: "product_id", Type: field.TypeInt, Nullable: true},
+		{Name: "product_code", Type: field.TypeString, Nullable: true, Size: 128},
+		{Name: "product_name", Type: field.TypeString, Nullable: true, Size: 255},
+		{Name: "quantity", Type: field.TypeFloat64, Default: 0, SchemaType: map[string]string{"mysql": "decimal(20,6)"}},
+		{Name: "unit_price", Type: field.TypeFloat64, Default: 0, SchemaType: map[string]string{"mysql": "decimal(20,6)"}},
+		{Name: "total_price", Type: field.TypeFloat64, Default: 0, SchemaType: map[string]string{"mysql": "decimal(20,6)"}},
+		{Name: "remark", Type: field.TypeString, Nullable: true, Size: 255},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// ErpQuotationItemsTable holds the schema information for the "erp_quotation_items" table.
+	ErpQuotationItemsTable = &schema.Table{
+		Name:       "erp_quotation_items",
+		Columns:    ErpQuotationItemsColumns,
+		PrimaryKey: []*schema.Column{ErpQuotationItemsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "erpquotationitem_quotation_id_line_no",
+				Unique:  true,
+				Columns: []*schema.Column{ErpQuotationItemsColumns[1], ErpQuotationItemsColumns[2]},
+			},
+			{
+				Name:    "erpquotationitem_product_id",
+				Unique:  false,
+				Columns: []*schema.Column{ErpQuotationItemsColumns[3]},
+			},
+			{
+				Name:    "erpquotationitem_product_code",
+				Unique:  false,
+				Columns: []*schema.Column{ErpQuotationItemsColumns[4]},
+			},
+		},
+	}
+	// ErpSequencesColumns holds the columns for the "erp_sequences" table.
+	ErpSequencesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "biz_type", Type: field.TypeString, Size: 64},
+		{Name: "current_value", Type: field.TypeInt64, Default: 0},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// ErpSequencesTable holds the schema information for the "erp_sequences" table.
+	ErpSequencesTable = &schema.Table{
+		Name:       "erp_sequences",
+		Columns:    ErpSequencesColumns,
+		PrimaryKey: []*schema.Column{ErpSequencesColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "erpsequence_biz_type",
+				Unique:  true,
+				Columns: []*schema.Column{ErpSequencesColumns[1]},
+			},
+		},
+	}
+	// ErpSettlementsColumns holds the columns for the "erp_settlements" table.
+	ErpSettlementsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "code", Type: field.TypeString, Size: 128},
+		{Name: "invoice_no", Type: field.TypeString, Size: 128},
+		{Name: "customer_name", Type: field.TypeString, Size: 128},
+		{Name: "currency", Type: field.TypeString, Size: 16, Default: "USD"},
+		{Name: "ship_date", Type: field.TypeTime},
+		{Name: "payment_cycle_days", Type: field.TypeInt, Default: 0},
+		{Name: "receivable_date", Type: field.TypeTime},
+		{Name: "amount", Type: field.TypeFloat64, SchemaType: map[string]string{"mysql": "decimal(20,6)"}},
+		{Name: "received_amount", Type: field.TypeFloat64, Default: 0, SchemaType: map[string]string{"mysql": "decimal(20,6)"}},
+		{Name: "outstanding_amount", Type: field.TypeFloat64, Default: 0, SchemaType: map[string]string{"mysql": "decimal(20,6)"}},
+		{Name: "status", Type: field.TypeString, Size: 32, Default: "pending"},
+		{Name: "source_shipment_code", Type: field.TypeString, Nullable: true, Size: 128},
+		{Name: "created_by_admin_id", Type: field.TypeInt, Nullable: true},
+		{Name: "updated_by_admin_id", Type: field.TypeInt, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// ErpSettlementsTable holds the schema information for the "erp_settlements" table.
+	ErpSettlementsTable = &schema.Table{
+		Name:       "erp_settlements",
+		Columns:    ErpSettlementsColumns,
+		PrimaryKey: []*schema.Column{ErpSettlementsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "erpsettlement_code",
+				Unique:  true,
+				Columns: []*schema.Column{ErpSettlementsColumns[1]},
+			},
+			{
+				Name:    "erpsettlement_invoice_no",
+				Unique:  false,
+				Columns: []*schema.Column{ErpSettlementsColumns[2]},
+			},
+			{
+				Name:    "erpsettlement_status_receivable_date",
+				Unique:  false,
+				Columns: []*schema.Column{ErpSettlementsColumns[11], ErpSettlementsColumns[7]},
+			},
+			{
+				Name:    "erpsettlement_source_shipment_code",
+				Unique:  false,
+				Columns: []*schema.Column{ErpSettlementsColumns[12]},
+			},
+		},
+	}
+	// ErpShipmentDetailsColumns holds the columns for the "erp_shipment_details" table.
+	ErpShipmentDetailsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "code", Type: field.TypeString, Size: 128},
+		{Name: "export_sale_id", Type: field.TypeInt, Nullable: true},
+		{Name: "source_export_code", Type: field.TypeString, Nullable: true, Size: 128},
+		{Name: "customer_partner_id", Type: field.TypeInt, Nullable: true},
+		{Name: "customer_code", Type: field.TypeString, Nullable: true, Size: 64},
+		{Name: "start_port", Type: field.TypeString, Nullable: true, Size: 64},
+		{Name: "dest_port", Type: field.TypeString, Nullable: true, Size: 64},
+		{Name: "ship_to_address", Type: field.TypeString, Nullable: true, Size: 255},
+		{Name: "arrive_country", Type: field.TypeString, Nullable: true, Size: 64},
+		{Name: "transport_type", Type: field.TypeString, Nullable: true, Size: 32},
+		{Name: "sales_owner", Type: field.TypeString, Nullable: true, Size: 64},
+		{Name: "warehouse_ship_date", Type: field.TypeTime},
+		{Name: "total_packages", Type: field.TypeFloat64, Default: 0, SchemaType: map[string]string{"mysql": "decimal(20,6)"}},
+		{Name: "total_amount", Type: field.TypeFloat64, Default: 0, SchemaType: map[string]string{"mysql": "decimal(20,6)"}},
+		{Name: "status", Type: field.TypeString, Size: 32, Default: "draft"},
+		{Name: "remark", Type: field.TypeString, Nullable: true, Size: 512},
+		{Name: "created_by_admin_id", Type: field.TypeInt, Nullable: true},
+		{Name: "updated_by_admin_id", Type: field.TypeInt, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// ErpShipmentDetailsTable holds the schema information for the "erp_shipment_details" table.
+	ErpShipmentDetailsTable = &schema.Table{
+		Name:       "erp_shipment_details",
+		Columns:    ErpShipmentDetailsColumns,
+		PrimaryKey: []*schema.Column{ErpShipmentDetailsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "erpshipmentdetail_code",
+				Unique:  true,
+				Columns: []*schema.Column{ErpShipmentDetailsColumns[1]},
+			},
+			{
+				Name:    "erpshipmentdetail_export_sale_id",
+				Unique:  false,
+				Columns: []*schema.Column{ErpShipmentDetailsColumns[2]},
+			},
+			{
+				Name:    "erpshipmentdetail_customer_partner_id",
+				Unique:  false,
+				Columns: []*schema.Column{ErpShipmentDetailsColumns[4]},
+			},
+			{
+				Name:    "erpshipmentdetail_status_warehouse_ship_date",
+				Unique:  false,
+				Columns: []*schema.Column{ErpShipmentDetailsColumns[15], ErpShipmentDetailsColumns[12]},
+			},
+		},
+	}
+	// ErpShipmentDetailItemsColumns holds the columns for the "erp_shipment_detail_items" table.
+	ErpShipmentDetailItemsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "shipment_detail_id", Type: field.TypeInt},
+		{Name: "line_no", Type: field.TypeInt},
+		{Name: "product_id", Type: field.TypeInt, Nullable: true},
+		{Name: "product_code", Type: field.TypeString, Nullable: true, Size: 128},
+		{Name: "product_model", Type: field.TypeString, Nullable: true, Size: 255},
+		{Name: "pack_detail", Type: field.TypeString, Nullable: true, Size: 255},
+		{Name: "quantity", Type: field.TypeFloat64, Default: 0, SchemaType: map[string]string{"mysql": "decimal(20,6)"}},
+		{Name: "unit_price", Type: field.TypeFloat64, Default: 0, SchemaType: map[string]string{"mysql": "decimal(20,6)"}},
+		{Name: "total_price", Type: field.TypeFloat64, Default: 0, SchemaType: map[string]string{"mysql": "decimal(20,6)"}},
+		{Name: "net_weight", Type: field.TypeFloat64, Default: 0, SchemaType: map[string]string{"mysql": "decimal(20,6)"}},
+		{Name: "gross_weight", Type: field.TypeFloat64, Default: 0, SchemaType: map[string]string{"mysql": "decimal(20,6)"}},
+		{Name: "volume", Type: field.TypeFloat64, Default: 0, SchemaType: map[string]string{"mysql": "decimal(20,6)"}},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// ErpShipmentDetailItemsTable holds the schema information for the "erp_shipment_detail_items" table.
+	ErpShipmentDetailItemsTable = &schema.Table{
+		Name:       "erp_shipment_detail_items",
+		Columns:    ErpShipmentDetailItemsColumns,
+		PrimaryKey: []*schema.Column{ErpShipmentDetailItemsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "erpshipmentdetailitem_shipment_detail_id_line_no",
+				Unique:  true,
+				Columns: []*schema.Column{ErpShipmentDetailItemsColumns[1], ErpShipmentDetailItemsColumns[2]},
+			},
+			{
+				Name:    "erpshipmentdetailitem_product_id",
+				Unique:  false,
+				Columns: []*schema.Column{ErpShipmentDetailItemsColumns[3]},
+			},
+			{
+				Name:    "erpshipmentdetailitem_product_code",
+				Unique:  false,
+				Columns: []*schema.Column{ErpShipmentDetailItemsColumns[4]},
+			},
+		},
+	}
+	// ErpStockBalancesColumns holds the columns for the "erp_stock_balances" table.
+	ErpStockBalancesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "product_code", Type: field.TypeString, Size: 128},
+		{Name: "warehouse_id", Type: field.TypeInt},
+		{Name: "location_id", Type: field.TypeInt},
+		{Name: "lot_no", Type: field.TypeString, Size: 64, Default: ""},
+		{Name: "available_qty", Type: field.TypeFloat64, Default: 0, SchemaType: map[string]string{"mysql": "decimal(20,6)"}},
+		{Name: "locked_qty", Type: field.TypeFloat64, Default: 0, SchemaType: map[string]string{"mysql": "decimal(20,6)"}},
+		{Name: "version", Type: field.TypeInt64, Default: 0},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// ErpStockBalancesTable holds the schema information for the "erp_stock_balances" table.
+	ErpStockBalancesTable = &schema.Table{
+		Name:       "erp_stock_balances",
+		Columns:    ErpStockBalancesColumns,
+		PrimaryKey: []*schema.Column{ErpStockBalancesColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "erpstockbalance_product_code_warehouse_id_location_id_lot_no",
+				Unique:  true,
+				Columns: []*schema.Column{ErpStockBalancesColumns[1], ErpStockBalancesColumns[2], ErpStockBalancesColumns[3], ErpStockBalancesColumns[4]},
+			},
+			{
+				Name:    "erpstockbalance_warehouse_id_location_id",
+				Unique:  false,
+				Columns: []*schema.Column{ErpStockBalancesColumns[2], ErpStockBalancesColumns[3]},
+			},
+			{
+				Name:    "erpstockbalance_product_code",
+				Unique:  false,
+				Columns: []*schema.Column{ErpStockBalancesColumns[1]},
+			},
+		},
+	}
+	// ErpStockTransactionsColumns holds the columns for the "erp_stock_transactions" table.
+	ErpStockTransactionsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "biz_type", Type: field.TypeString, Size: 32},
+		{Name: "biz_code", Type: field.TypeString, Size: 128},
+		{Name: "biz_line_no", Type: field.TypeInt, Default: 0},
+		{Name: "product_code", Type: field.TypeString, Size: 128},
+		{Name: "warehouse_id", Type: field.TypeInt},
+		{Name: "location_id", Type: field.TypeInt},
+		{Name: "lot_no", Type: field.TypeString, Size: 64, Default: ""},
+		{Name: "delta_qty", Type: field.TypeFloat64, SchemaType: map[string]string{"mysql": "decimal(20,6)"}},
+		{Name: "before_available_qty", Type: field.TypeFloat64, Default: 0, SchemaType: map[string]string{"mysql": "decimal(20,6)"}},
+		{Name: "after_available_qty", Type: field.TypeFloat64, Default: 0, SchemaType: map[string]string{"mysql": "decimal(20,6)"}},
+		{Name: "operator_admin_id", Type: field.TypeInt, Nullable: true},
+		{Name: "occurred_at", Type: field.TypeTime},
+		{Name: "created_at", Type: field.TypeTime},
+	}
+	// ErpStockTransactionsTable holds the schema information for the "erp_stock_transactions" table.
+	ErpStockTransactionsTable = &schema.Table{
+		Name:       "erp_stock_transactions",
+		Columns:    ErpStockTransactionsColumns,
+		PrimaryKey: []*schema.Column{ErpStockTransactionsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "erpstocktransaction_biz_type_biz_code_biz_line_no",
+				Unique:  false,
+				Columns: []*schema.Column{ErpStockTransactionsColumns[1], ErpStockTransactionsColumns[2], ErpStockTransactionsColumns[3]},
+			},
+			{
+				Name:    "erpstocktransaction_product_code_warehouse_id_location_id",
+				Unique:  false,
+				Columns: []*schema.Column{ErpStockTransactionsColumns[4], ErpStockTransactionsColumns[5], ErpStockTransactionsColumns[6]},
+			},
+			{
+				Name:    "erpstocktransaction_occurred_at",
+				Unique:  false,
+				Columns: []*schema.Column{ErpStockTransactionsColumns[12]},
+			},
+		},
+	}
+	// ErpWarehousesColumns holds the columns for the "erp_warehouses" table.
+	ErpWarehousesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "code", Type: field.TypeString, Size: 64},
+		{Name: "name", Type: field.TypeString, Size: 128},
+		{Name: "disabled", Type: field.TypeBool, Default: false},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// ErpWarehousesTable holds the schema information for the "erp_warehouses" table.
+	ErpWarehousesTable = &schema.Table{
+		Name:       "erp_warehouses",
+		Columns:    ErpWarehousesColumns,
+		PrimaryKey: []*schema.Column{ErpWarehousesColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "erpwarehouse_code",
+				Unique:  true,
+				Columns: []*schema.Column{ErpWarehousesColumns[1]},
+			},
+			{
+				Name:    "erpwarehouse_name",
+				Unique:  false,
+				Columns: []*schema.Column{ErpWarehousesColumns[2]},
+			},
+		},
+	}
+	// ErpWorkflowActionLogsColumns holds the columns for the "erp_workflow_action_logs" table.
+	ErpWorkflowActionLogsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "workflow_instance_id", Type: field.TypeInt},
+		{Name: "workflow_task_id", Type: field.TypeInt, Nullable: true},
+		{Name: "action", Type: field.TypeString, Size: 32},
+		{Name: "from_status", Type: field.TypeString, Nullable: true, Size: 32},
+		{Name: "to_status", Type: field.TypeString, Nullable: true, Size: 32},
+		{Name: "operator_admin_id", Type: field.TypeInt, Nullable: true},
+		{Name: "remark", Type: field.TypeString, Nullable: true, Size: 512},
+		{Name: "created_at", Type: field.TypeTime},
+	}
+	// ErpWorkflowActionLogsTable holds the schema information for the "erp_workflow_action_logs" table.
+	ErpWorkflowActionLogsTable = &schema.Table{
+		Name:       "erp_workflow_action_logs",
+		Columns:    ErpWorkflowActionLogsColumns,
+		PrimaryKey: []*schema.Column{ErpWorkflowActionLogsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "erpworkflowactionlog_workflow_instance_id_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{ErpWorkflowActionLogsColumns[1], ErpWorkflowActionLogsColumns[8]},
+			},
+			{
+				Name:    "erpworkflowactionlog_operator_admin_id",
+				Unique:  false,
+				Columns: []*schema.Column{ErpWorkflowActionLogsColumns[6]},
+			},
+		},
+	}
+	// ErpWorkflowInstancesColumns holds the columns for the "erp_workflow_instances" table.
+	ErpWorkflowInstancesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "biz_module", Type: field.TypeString, Size: 64},
+		{Name: "biz_code", Type: field.TypeString, Size: 128},
+		{Name: "current_status", Type: field.TypeString, Size: 32, Default: "draft"},
+		{Name: "starter_admin_id", Type: field.TypeInt, Nullable: true},
+		{Name: "submitted_at", Type: field.TypeTime, Nullable: true},
+		{Name: "finished_at", Type: field.TypeTime, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// ErpWorkflowInstancesTable holds the schema information for the "erp_workflow_instances" table.
+	ErpWorkflowInstancesTable = &schema.Table{
+		Name:       "erp_workflow_instances",
+		Columns:    ErpWorkflowInstancesColumns,
+		PrimaryKey: []*schema.Column{ErpWorkflowInstancesColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "erpworkflowinstance_biz_module_biz_code",
+				Unique:  true,
+				Columns: []*schema.Column{ErpWorkflowInstancesColumns[1], ErpWorkflowInstancesColumns[2]},
+			},
+			{
+				Name:    "erpworkflowinstance_current_status",
+				Unique:  false,
+				Columns: []*schema.Column{ErpWorkflowInstancesColumns[3]},
+			},
+		},
+	}
+	// ErpWorkflowTasksColumns holds the columns for the "erp_workflow_tasks" table.
+	ErpWorkflowTasksColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "workflow_instance_id", Type: field.TypeInt},
+		{Name: "node_name", Type: field.TypeString, Size: 64},
+		{Name: "node_order", Type: field.TypeInt, Default: 0},
+		{Name: "assignee_admin_id", Type: field.TypeInt, Nullable: true},
+		{Name: "decision", Type: field.TypeString, Size: 32, Default: "pending"},
+		{Name: "comment", Type: field.TypeString, Nullable: true, Size: 512},
+		{Name: "acted_at", Type: field.TypeTime, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// ErpWorkflowTasksTable holds the schema information for the "erp_workflow_tasks" table.
+	ErpWorkflowTasksTable = &schema.Table{
+		Name:       "erp_workflow_tasks",
+		Columns:    ErpWorkflowTasksColumns,
+		PrimaryKey: []*schema.Column{ErpWorkflowTasksColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "erpworkflowtask_workflow_instance_id_node_order",
+				Unique:  true,
+				Columns: []*schema.Column{ErpWorkflowTasksColumns[1], ErpWorkflowTasksColumns[3]},
+			},
+			{
+				Name:    "erpworkflowtask_assignee_admin_id_decision",
+				Unique:  false,
+				Columns: []*schema.Column{ErpWorkflowTasksColumns[4], ErpWorkflowTasksColumns[5]},
 			},
 		},
 	}
@@ -109,7 +1151,34 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		AdminUsersTable,
+		ErpAttachmentsTable,
+		ErpBankReceiptsTable,
+		ErpBankReceiptClaimsTable,
+		ErpDocLinksTable,
+		ErpExportSalesTable,
+		ErpExportSaleItemsTable,
+		ErpInboundNoticesTable,
+		ErpInboundNoticeItemsTable,
+		ErpLocationsTable,
 		ErpModuleRecordsTable,
+		ErpOutboundOrdersTable,
+		ErpOutboundOrderItemsTable,
+		ErpPartnersTable,
+		ErpProductsTable,
+		ErpPurchaseContractsTable,
+		ErpPurchaseContractItemsTable,
+		ErpQuotationsTable,
+		ErpQuotationItemsTable,
+		ErpSequencesTable,
+		ErpSettlementsTable,
+		ErpShipmentDetailsTable,
+		ErpShipmentDetailItemsTable,
+		ErpStockBalancesTable,
+		ErpStockTransactionsTable,
+		ErpWarehousesTable,
+		ErpWorkflowActionLogsTable,
+		ErpWorkflowInstancesTable,
+		ErpWorkflowTasksTable,
 		UsersTable,
 	}
 )

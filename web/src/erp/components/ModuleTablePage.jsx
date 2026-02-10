@@ -330,7 +330,7 @@ const ModuleTablePage = ({ moduleItem }) => {
 
   return (
     <Space direction="vertical" size={16} style={{ width: '100%' }}>
-      <Card className="erp-page-card" bordered={false}>
+      <Card className="erp-page-card" variant="borderless">
         <Space direction="vertical" size={4}>
           <Title level={4} style={{ margin: 0 }}>
             {moduleItem.title}
@@ -342,7 +342,7 @@ const ModuleTablePage = ({ moduleItem }) => {
         </Space>
       </Card>
 
-      <Card className="erp-page-card" bordered={false}>
+      <Card className="erp-page-card" variant="borderless">
         <Row gutter={[12, 12]} align="middle">
           <Col xs={24} sm={24} md={10} lg={8}>
             <Input
@@ -371,7 +371,7 @@ const ModuleTablePage = ({ moduleItem }) => {
         </Row>
       </Card>
 
-      <Card className="erp-page-card" bordered={false}>
+      <Card className="erp-page-card" variant="borderless">
         <Table
           rowKey="id"
           size="middle"
@@ -390,7 +390,7 @@ const ModuleTablePage = ({ moduleItem }) => {
         onCancel={closeModal}
         onOk={submitForm}
         width={720}
-        destroyOnClose
+        destroyOnHidden
       >
         <Form
           form={form}
