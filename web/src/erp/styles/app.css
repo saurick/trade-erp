@@ -33,14 +33,20 @@ body {
 }
 
 .erp-sider-brand {
-  height: 64px;
+  height: 88px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  letter-spacing: 0.3px;
-  color: #135c25;
+  padding: 10px 16px;
   border-bottom: 1px dashed var(--erp-border);
+}
+
+.erp-sider-brand-logo {
+  width: 176px;
+  max-width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
 }
 
 .erp-menu {

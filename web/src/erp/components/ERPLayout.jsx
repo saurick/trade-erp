@@ -150,10 +150,7 @@ const ERPLayout = () => {
     <Layout className="erp-app-shell">
       <Sider breakpoint="lg" collapsedWidth="0" width={260} className="erp-sider">
         <div className="erp-sider-brand">
-          <Space>
-            <SwapOutlined />
-            <span>Trade ERP</span>
-          </Space>
+          <img src="/templates/billing-info-logo.png" alt="KS Magnetics" className="erp-sider-brand-logo" />
         </div>
         <Menu
           mode="inline"
