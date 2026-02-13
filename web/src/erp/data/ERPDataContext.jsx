@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { message } from 'antd'
 import { useLocation } from 'react-router-dom'
 import { JsonRpc } from '@/common/utils/jsonRpc'
@@ -19,7 +19,11 @@ const toRecordID = (value) => {
 export const ERPDataProvider = ({ children }) => {
   const location = useLocation()
   const [moduleRecords, setModuleRecords] = useState({})
-  const [loading, setLoading] = useState(true)
+  const [moduleLoadingMap, setModuleLoadingMap] = useState({})
+  const [moduleLoadedMap, setModuleLoadedMap] = useState({})
+  const inflightMapRef = useRef(new Map())
+  const moduleRecordsRef = useRef({})
+  const moduleLoadedMapRef = useRef({})
 
   const erpRpc = useMemo(
     () => new JsonRpc({ url: 'erp', authScope: AUTH_SCOPE.ADMIN }),
@@ -30,6 +34,14 @@ export const ERPDataProvider = ({ children }) => {
     (moduleKey) => moduleRecords[moduleKey] || [],
     [moduleRecords]
   )
+
+  useEffect(() => {
+    moduleRecordsRef.current = moduleRecords
+  }, [moduleRecords])
+
+  useEffect(() => {
+    moduleLoadedMapRef.current = moduleLoadedMap
+  }, [moduleLoadedMap])
 
   const applyModuleUpdate = useCallback((moduleKey, updater) => {
     setModuleRecords((prev) => {
@@ -51,36 +63,163 @@ export const ERPDataProvider = ({ children }) => {
     [erpRpc]
   )
 
-  const reloadAllModules = useCallback(async () => {
-    setLoading(true)
-    try {
-      const moduleEntries = await Promise.all(
-        moduleDefinitions.map(async (moduleItem) => {
-          const records = await fetchModuleList(moduleItem.key)
-          return [moduleItem.key, records]
-        })
+  const setModuleLoading = useCallback((moduleKey, loading) => {
+    setModuleLoadingMap((prev) => {
+      const isLoading = Boolean(loading)
+      const hasCurrent = Boolean(prev[moduleKey])
+      if (isLoading === hasCurrent) {
+        return prev
+      }
+      const next = { ...prev }
+      if (isLoading) {
+        next[moduleKey] = true
+      } else {
+        delete next[moduleKey]
+      }
+      return next
+    })
+  }, [])
+
+  const ensureModuleLoaded = useCallback(
+    async (moduleKey, options = {}) => {
+      const key = String(moduleKey || '').trim()
+      if (!key) {
+        return []
+      }
+
+      const force = Boolean(options.force)
+      if (!force && moduleLoadedMapRef.current[key]) {
+        return moduleRecordsRef.current[key] || []
+      }
+
+      if (!force) {
+        const inflight = inflightMapRef.current.get(key)
+        if (inflight) {
+          return inflight
+        }
+      }
+
+      const task = (async () => {
+        setModuleLoading(key, true)
+        try {
+          const records = await fetchModuleList(key)
+          setModuleRecords((prev) => ({
+            ...prev,
+            [key]: records,
+          }))
+          setModuleLoadedMap((prev) => ({
+            ...prev,
+            [key]: true,
+          }))
+          return records
+        } finally {
+          setModuleLoading(key, false)
+          if (inflightMapRef.current.get(key) === task) {
+            inflightMapRef.current.delete(key)
+          }
+        }
+      })()
+
+      inflightMapRef.current.set(key, task)
+      return task
+    },
+    [fetchModuleList, setModuleLoading]
+  )
+
+  const ensureModulesLoaded = useCallback(
+    async (moduleKeys, options = {}) => {
+      const uniqueKeys = Array.from(new Set((moduleKeys || []).filter(Boolean)))
+      if (uniqueKeys.length === 0) {
+        return {}
+      }
+
+      const settled = await Promise.allSettled(
+        uniqueKeys.map((key) => ensureModuleLoaded(key, options))
       )
-      setModuleRecords(Object.fromEntries(moduleEntries))
+
+      const firstError = settled.find((item) => item.status === 'rejected')
+      if (firstError?.status === 'rejected') {
+        throw firstError.reason
+      }
+
+      return uniqueKeys.reduce((acc, key, idx) => {
+        const result = settled[idx]
+        acc[key] = result.status === 'fulfilled' ? result.value : []
+        return acc
+      }, {})
+    },
+    [ensureModuleLoaded]
+  )
+
+  const reloadAllModules = useCallback(async () => {
+    try {
+      await ensureModulesLoaded(
+        moduleDefinitions.map((moduleItem) => moduleItem.key),
+        { force: true }
+      )
     } catch (err) {
       if ([10005, 10006, 40302].includes(Number(err?.code))) {
         return
       }
       message.error(err?.message || '加载 ERP 数据失败')
-    } finally {
-      setLoading(false)
     }
-  }, [fetchModuleList])
+  }, [ensureModulesLoaded])
+
+  const routePrefetchMap = useMemo(() => {
+    const map = {}
+    moduleDefinitions.forEach((moduleItem) => {
+      const refModules = Array.from(
+        new Set(
+          (moduleItem.formFields || [])
+            .filter((field) => field?.type === 'select-ref' && field.refModule)
+            .map((field) => field.refModule)
+        )
+      )
+      map[moduleItem.path] = Array.from(new Set([moduleItem.key, ...refModules]))
+    })
+
+    map['/dashboard'] = moduleDefinitions.map((moduleItem) => moduleItem.key)
+    map['/docs/print-center'] = ['exportSales', 'purchaseContracts', 'partners']
+    return map
+  }, [])
 
   useEffect(() => {
     const isAdminLoginPage = location.pathname === '/admin-login'
     const hasAdminToken = Boolean(getToken(AUTH_SCOPE.ADMIN))
     if (isAdminLoginPage || !hasAdminToken) {
       setModuleRecords({})
-      setLoading(false)
+      setModuleLoadedMap({})
+      setModuleLoadingMap({})
+      inflightMapRef.current.clear()
       return
     }
-    void reloadAllModules()
-  }, [location.pathname, reloadAllModules])
+
+    const needModules = routePrefetchMap[location.pathname] || []
+    if (needModules.length === 0) {
+      return
+    }
+
+    void (async () => {
+      try {
+        await ensureModulesLoaded(needModules)
+      } catch (err) {
+        if ([10005, 10006, 40302].includes(Number(err?.code))) {
+          return
+        }
+        message.error(err?.message || '加载 ERP 数据失败')
+      }
+    })()
+  }, [ensureModulesLoaded, location.pathname, routePrefetchMap])
+
+  const loading = useMemo(
+    () => Object.values(moduleLoadingMap).some(Boolean),
+    [moduleLoadingMap]
+  )
+
+  const isModuleLoading = useCallback(
+    (moduleKey) => Boolean(moduleLoadingMap[moduleKey]),
+    [moduleLoadingMap]
+  )
 
   const buildCode = (moduleItem, values, currentList) => {
     if (typeof moduleItem.codeBuilder === 'function') {
@@ -117,7 +256,10 @@ export const ERPDataProvider = ({ children }) => {
 
   const addRecord = useCallback(
     async (moduleItem, values) => {
-      const currentList = getModuleRecords(moduleItem.key)
+      let currentList = getModuleRecords(moduleItem.key)
+      if (!moduleLoadedMapRef.current[moduleItem.key]) {
+        currentList = await ensureModuleLoaded(moduleItem.key)
+      }
       const code = values.code || buildCode(moduleItem, values, currentList)
       const record = {
         code,
@@ -129,7 +271,7 @@ export const ERPDataProvider = ({ children }) => {
       applyModuleUpdate(moduleItem.key, (list) => [created, ...list])
       return created
     },
-    [applyModuleUpdate, createRemoteRecord, getModuleRecords]
+    [applyModuleUpdate, createRemoteRecord, ensureModuleLoaded, getModuleRecords]
   )
 
   const updateRecord = useCallback(
@@ -192,7 +334,7 @@ export const ERPDataProvider = ({ children }) => {
       }
 
       const inventoryModule = moduleMap.inventory
-      const records = getModuleRecords('inventory')
+      const records = await ensureModuleLoaded('inventory')
       const current = records.find(
         (item) =>
           item.productName === productName &&
@@ -215,7 +357,7 @@ export const ERPDataProvider = ({ children }) => {
       })
       return null
     },
-    [addRecord, getModuleRecords, updateRecord]
+    [addRecord, ensureModuleLoaded, updateRecord]
   )
 
   const createLinkedRecord = useCallback(
@@ -284,9 +426,12 @@ export const ERPDataProvider = ({ children }) => {
   const value = useMemo(
     () => ({
       loading,
+      isModuleLoading,
       moduleRecords,
       getModuleRecords,
       reloadAllModules,
+      ensureModuleLoaded,
+      ensureModulesLoaded,
       addRecord,
       updateRecord,
       deleteRecord,
@@ -296,9 +441,12 @@ export const ERPDataProvider = ({ children }) => {
     }),
     [
       loading,
+      isModuleLoading,
       moduleRecords,
       getModuleRecords,
       reloadAllModules,
+      ensureModuleLoaded,
+      ensureModulesLoaded,
       addRecord,
       updateRecord,
       deleteRecord,

@@ -149,7 +149,7 @@ const normalizeValues = (values) => {
 
 const ModuleTablePage = ({ moduleItem }) => {
   const {
-    loading,
+    isModuleLoading,
     moduleRecords,
     addRecord,
     updateRecord,
@@ -166,6 +166,7 @@ const ModuleTablePage = ({ moduleItem }) => {
   const [boxFilter, setBoxFilter] = useState('')
 
   const records = moduleRecords[moduleItem.key] || []
+  const tableLoading = isModuleLoading(moduleItem.key)
 
   const filteredRecords = useMemo(() => {
     return records.filter((record) => {
@@ -375,7 +376,7 @@ const ModuleTablePage = ({ moduleItem }) => {
         <Table
           rowKey="id"
           size="middle"
-          loading={loading}
+          loading={tableLoading}
           pagination={{ pageSize: 8 }}
           locale={{ emptyText: <Empty description="暂无数据" /> }}
           columns={columnDefs}
