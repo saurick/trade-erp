@@ -57,6 +57,32 @@ make db_schema_check
 - 打印模板当前仅保留 3 项：开票信息、外销形式发票 PI、采购合同
 - 上述 3 项均为固定版式，左右字段双向同步，右侧文字可编辑；采购合同“其他条款”为整体多行编辑区；固定模板的 logo/水印/示意图锁定，不支持上传覆盖
 
+## 本地 Git Hooks（无 CI 场景）
+
+首次启用：
+
+```bash
+cd /Users/simon/projects/trade-erp
+bash scripts/setup-git-hooks.sh
+```
+
+启用后默认行为：
+
+- `pre-commit`：仅对暂存的 `web/` 文件执行 `Prettier`，并对 `web/src/**/*.js|jsx` 执行 `ESLint --fix`
+- `pre-push`：执行全量质量检查  
+  `web: pnpm lint && pnpm css && pnpm test && pnpm build`  
+  `server: go test ./... && make build`
+
+常用命令：
+
+```bash
+# 查看当前 hooks 路径
+git config --get core.hooksPath
+
+# 临时跳过 pre-push（紧急场景）
+SKIP_PRE_PUSH=1 git push
+```
+
 ## 一期预需求实现
 
 详见：`/Users/simon/projects/trade-erp/docs/erp-phase1-requirements.md`

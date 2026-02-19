@@ -103,7 +103,11 @@ body {
   inset: 0;
   background:
     radial-gradient(circle at 12% 18%, rgb(13 70 110 / 14%) 0, transparent 40%),
-    radial-gradient(circle at 90% 84%, rgb(229 169 47 / 22%) 0, transparent 36%),
+    radial-gradient(
+      circle at 90% 84%,
+      rgb(229 169 47 / 22%) 0,
+      transparent 36%
+    ),
     linear-gradient(130deg, #eef5fa 0%, #f8fbfd 45%, #f6faf7 100%);
 }
 

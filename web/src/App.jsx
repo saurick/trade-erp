@@ -11,7 +11,8 @@ const App = () => {
         token: {
           colorPrimary: '#2b8a3e',
           borderRadius: 10,
-          fontFamily: '"Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif',
+          fontFamily:
+            '"Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif',
         },
       }}
     >

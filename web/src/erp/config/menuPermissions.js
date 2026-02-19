@@ -15,7 +15,9 @@ export const ERP_MENU_PERMISSION_OPTIONS = [
   { key: '/system/permissions', label: '权限管理' },
 ]
 
-const permissionSet = new Set(ERP_MENU_PERMISSION_OPTIONS.map((item) => item.key))
+const permissionSet = new Set(
+  ERP_MENU_PERMISSION_OPTIONS.map((item) => item.key)
+)
 
 export const normalizeMenuPermissions = (permissions = []) => {
   if (!Array.isArray(permissions)) {
@@ -34,16 +36,17 @@ export const normalizeMenuPermissions = (permissions = []) => {
     selected.add(key)
   })
 
-  return ERP_MENU_PERMISSION_OPTIONS
-    .map((item) => item.key)
-    .filter((key) => selected.has(key))
+  return ERP_MENU_PERMISSION_OPTIONS.map((item) => item.key).filter((key) =>
+    selected.has(key)
+  )
 }
 
 export const defaultMenuPermissions = () =>
-  ERP_MENU_PERMISSION_OPTIONS.filter((item) => item.key !== '/system/permissions').map((item) => item.key)
+  ERP_MENU_PERMISSION_OPTIONS.filter(
+    (item) => item.key !== '/system/permissions'
+  ).map((item) => item.key)
 
 export const getPermissionLabel = (key) => {
   const matched = ERP_MENU_PERMISSION_OPTIONS.find((item) => item.key === key)
   return matched?.label || key
 }
-

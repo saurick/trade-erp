@@ -12,8 +12,14 @@ const toArrayBuffer = (text) => new TextEncoder().encode(text).buffer
 
 describe('printTemplates', () => {
   it('billingInfo 遇到 PDF 时返回固定版式模板', () => {
-    const pdfHeader = Uint8Array.from([0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e, 0x33]).buffer
-    const html = buildTemplateHTMLFromResponse('billingInfo', pdfHeader, 'application/pdf')
+    const pdfHeader = Uint8Array.from([
+      0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e, 0x33,
+    ]).buffer
+    const html = buildTemplateHTMLFromResponse(
+      'billingInfo',
+      pdfHeader,
+      'application/pdf'
+    )
     expect(html).toContain('billing-info-template')
     expect(html).toContain('billing-info-canvas')
     expect(html).toContain('/templates/billing-info-logo.png')
@@ -21,43 +27,68 @@ describe('printTemplates', () => {
   })
 
   it('pi 使用固定版式模板', () => {
-    const pdfHeader = Uint8Array.from([0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e, 0x33]).buffer
-    const html = buildTemplateHTMLFromResponse('pi', pdfHeader, 'application/pdf')
+    const pdfHeader = Uint8Array.from([
+      0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e, 0x33,
+    ]).buffer
+    const html = buildTemplateHTMLFromResponse(
+      'pi',
+      pdfHeader,
+      'application/pdf'
+    )
     expect(html).toContain('proforma-template')
     expect(html).toContain('PROFORMA INVOICE')
     expect(html).toContain('/templates/billing-info-logo.png')
   })
 
   it('purchase 使用固定版式模板', () => {
-    const pdfHeader = Uint8Array.from([0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e, 0x33]).buffer
-    const html = buildTemplateHTMLFromResponse('purchase', pdfHeader, 'application/pdf')
+    const pdfHeader = Uint8Array.from([
+      0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e, 0x33,
+    ]).buffer
+    const html = buildTemplateHTMLFromResponse(
+      'purchase',
+      pdfHeader,
+      'application/pdf'
+    )
     expect(html).toContain('purchase-contract-template')
     expect(html).toContain('purchase-contract-grid')
     expect(html).toContain('/templates/purchase-contract-logo.png')
     expect(html).toContain('/templates/purchase-contract-stamp.png')
     expect(html).toContain('/templates/purchase-contract-spec.png')
     expect(html).toContain('purchase-title purchase-center')
-    expect(html).toContain('contenteditable="true" spellcheck="false">采购合同</div>')
-    expect(html).toContain('contenteditable="true" spellcheck="false" data-multiline="true">其他条款:<br />1.')
+    expect(html).toContain(
+      'contenteditable="true" spellcheck="false">采购合同</div>'
+    )
+    expect(html).toContain(
+      'contenteditable="true" spellcheck="false" data-multiline="true">其他条款:<br />1.'
+    )
   })
 
   it('非 billingInfo 遇到 PDF 时抛出错误', () => {
-    const pdfHeader = Uint8Array.from([0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e, 0x33]).buffer
-    expect(() => buildTemplateHTMLFromResponse('invoice', pdfHeader, 'application/pdf')).toThrow(
-      '当前模板是 PDF'
-    )
+    const pdfHeader = Uint8Array.from([
+      0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e, 0x33,
+    ]).buffer
+    expect(() =>
+      buildTemplateHTMLFromResponse('invoice', pdfHeader, 'application/pdf')
+    ).toThrow('当前模板是 PDF')
   })
 
   it('HTML 模板会自动给单元格加可编辑属性', () => {
-    const rawHTML = '<!doctype html><html><body><table><tbody><tr><td>1</td></tr></tbody></table></body></html>'
-    const html = buildTemplateHTMLFromResponse('invoice', toArrayBuffer(rawHTML), 'text/html')
-    expect(html).toContain('<td contenteditable="true" spellcheck="false">1</td>')
+    const rawHTML =
+      '<!doctype html><html><body><table><tbody><tr><td>1</td></tr></tbody></table></body></html>'
+    const html = buildTemplateHTMLFromResponse(
+      'invoice',
+      toArrayBuffer(rawHTML),
+      'text/html'
+    )
+    expect(html).toContain(
+      '<td contenteditable="true" spellcheck="false">1</td>'
+    )
   })
 
   it('billingInfo 不支持上传覆盖', async () => {
-    await expect(uploadTemplateFile('billingInfo', new Blob(['test']))).rejects.toThrow(
-      '开票信息模板为固定版式，不支持上传覆盖'
-    )
+    await expect(
+      uploadTemplateFile('billingInfo', new Blob(['test']))
+    ).rejects.toThrow('开票信息模板为固定版式，不支持上传覆盖')
   })
 
   it('pi 不支持上传覆盖', async () => {
@@ -67,15 +98,15 @@ describe('printTemplates', () => {
   })
 
   it('purchase 不支持上传覆盖', async () => {
-    await expect(uploadTemplateFile('purchase', new Blob(['test']))).rejects.toThrow(
-      '采购合同模板为固定版式，不支持上传覆盖'
-    )
+    await expect(
+      uploadTemplateFile('purchase', new Blob(['test']))
+    ).rejects.toThrow('采购合同模板为固定版式，不支持上传覆盖')
   })
 
   it('未启用模板不支持上传覆盖', async () => {
-    await expect(uploadTemplateFile('invoice', new Blob(['test']))).rejects.toThrow(
-      '当前仅保留 PI、采购合同、开票信息模板'
-    )
+    await expect(
+      uploadTemplateFile('invoice', new Blob(['test']))
+    ).rejects.toThrow('当前仅保留 PI、采购合同、开票信息模板')
   })
 
   it('billingInfo 字段会从记录里映射并格式化日期', () => {

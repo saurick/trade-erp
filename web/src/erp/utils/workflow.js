@@ -5,4 +5,5 @@ export const canTransitStatus = (from, to, transitions = BOX_TRANSITIONS) => {
   return nextList.includes(to)
 }
 
-export const getNextStatuses = (status, transitions = BOX_TRANSITIONS) => transitions[status] || []
+export const getNextStatuses = (status, transitions = BOX_TRANSITIONS) =>
+  transitions[status] || []

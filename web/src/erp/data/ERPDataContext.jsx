@@ -1,4 +1,12 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import { message } from 'antd'
 import { useLocation } from 'react-router-dom'
 import { JsonRpc } from '@/common/utils/jsonRpc'
@@ -175,7 +183,9 @@ export const ERPDataProvider = ({ children }) => {
             .map((field) => field.refModule)
         )
       )
-      map[moduleItem.path] = Array.from(new Set([moduleItem.key, ...refModules]))
+      map[moduleItem.path] = Array.from(
+        new Set([moduleItem.key, ...refModules])
+      )
     })
 
     map['/dashboard'] = moduleDefinitions.map((moduleItem) => moduleItem.key)
@@ -199,7 +209,7 @@ export const ERPDataProvider = ({ children }) => {
       return
     }
 
-    void (async () => {
+    const prefetchModules = async () => {
       try {
         await ensureModulesLoaded(needModules)
       } catch (err) {
@@ -208,7 +218,8 @@ export const ERPDataProvider = ({ children }) => {
         }
         message.error(err?.message || '加载 ERP 数据失败')
       }
-    })()
+    }
+    prefetchModules()
   }, [ensureModulesLoaded, location.pathname, routePrefetchMap])
 
   const loading = useMemo(
@@ -271,13 +282,20 @@ export const ERPDataProvider = ({ children }) => {
       applyModuleUpdate(moduleItem.key, (list) => [created, ...list])
       return created
     },
-    [applyModuleUpdate, createRemoteRecord, ensureModuleLoaded, getModuleRecords]
+    [
+      applyModuleUpdate,
+      createRemoteRecord,
+      ensureModuleLoaded,
+      getModuleRecords,
+    ]
   )
 
   const updateRecord = useCallback(
     async (moduleItem, recordId, values) => {
       const currentList = getModuleRecords(moduleItem.key)
-      const target = currentList.find((item) => String(item.id) === String(recordId))
+      const target = currentList.find(
+        (item) => String(item.id) === String(recordId)
+      )
       if (!target) {
         throw new Error('记录不存在或已被删除')
       }
@@ -294,7 +312,9 @@ export const ERPDataProvider = ({ children }) => {
 
       const updated = await updateRemoteRecord(moduleItem.key, recordID, merged)
       applyModuleUpdate(moduleItem.key, (list) =>
-        list.map((item) => (String(item.id) === String(recordId) ? updated : item))
+        list.map((item) =>
+          String(item.id) === String(recordId) ? updated : item
+        )
       )
       return updated
     },
@@ -343,8 +363,11 @@ export const ERPDataProvider = ({ children }) => {
       )
 
       if (current) {
-        const nextQty = Number(current.availableQty || 0) + Number(deltaQty || 0)
-        await updateRecord(inventoryModule, current.id, { availableQty: nextQty })
+        const nextQty =
+          Number(current.availableQty || 0) + Number(deltaQty || 0)
+        await updateRecord(inventoryModule, current.id, {
+          availableQty: nextQty,
+        })
         return null
       }
 
@@ -402,7 +425,10 @@ export const ERPDataProvider = ({ children }) => {
         record.quantity
 
       if (!record.entryNo) {
-        const entryNo = createAutoCode('RKD', getModuleRecords('inbound').length)
+        const entryNo = createAutoCode(
+          'RKD',
+          getModuleRecords('inbound').length
+        )
         await updateRecord(inboundModule, record.id, {
           entryNo,
         })
@@ -456,7 +482,9 @@ export const ERPDataProvider = ({ children }) => {
     ]
   )
 
-  return <ERPDataContext.Provider value={value}>{children}</ERPDataContext.Provider>
+  return (
+    <ERPDataContext.Provider value={value}>{children}</ERPDataContext.Provider>
+  )
 }
 
 export const useERPData = () => {

@@ -1,7 +1,22 @@
 import React, { useMemo, useState } from 'react'
-import { Button, Card, Col, Row, Space, Tabs, Tag, Typography, Upload, message } from 'antd'
+import {
+  Button,
+  Card,
+  Col,
+  Row,
+  Space,
+  Tabs,
+  Tag,
+  Typography,
+  Upload,
+  message,
+} from 'antd'
 import { PrinterOutlined, UploadOutlined } from '@ant-design/icons'
-import { openPrintWindow, templateList, uploadTemplateFile } from '../data/printTemplates'
+import {
+  openPrintWindow,
+  templateList,
+  uploadTemplateFile,
+} from '../data/printTemplates'
 import { useERPData } from '../data/ERPDataContext'
 
 const { Paragraph, Text, Title } = Typography
@@ -30,7 +45,10 @@ const PrintCenterPage = () => {
     () => templateList.find((item) => item.key === activeKey),
     [activeKey]
   )
-  const uploadDisabled = activeKey === 'billingInfo' || activeKey === 'pi' || activeKey === 'purchase'
+  const uploadDisabled =
+    activeKey === 'billingInfo' ||
+    activeKey === 'pi' ||
+    activeKey === 'purchase'
 
   const handleOpenEditablePrint = async () => {
     if (!hasActiveRecord) {
@@ -59,7 +77,9 @@ const PrintCenterPage = () => {
   }
 
   const activeRecordFields = Object.entries(activeRecord || {})
-    .filter(([key]) => !['id', 'module_key', 'created_at', 'updated_at'].includes(key))
+    .filter(
+      ([key]) => !['id', 'module_key', 'created_at', 'updated_at'].includes(key)
+    )
     .slice(0, 10)
 
   return (
@@ -69,7 +89,8 @@ const PrintCenterPage = () => {
           打印模板中心
         </Title>
         <Paragraph type="secondary" style={{ marginBottom: 0, marginTop: 8 }}>
-          打印会加载原始模板。Excel 模板单元格支持编辑后再打印；开票信息、外销形式发票、采购合同为固定版式模板（参考原始文件坐标），支持左右字段双向同步并可编辑（logo/水印/示意图除外）。已接入：外销形式发票模版、采购合同模版、杭州科森磁材开票信息模板。
+          打印会加载原始模板。Excel
+          模板单元格支持编辑后再打印；开票信息、外销形式发票、采购合同为固定版式模板（参考原始文件坐标），支持左右字段双向同步并可编辑（logo/水印/示意图除外）。已接入：外销形式发票模版、采购合同模版、杭州科森磁材开票信息模板。
         </Paragraph>
       </Card>
 
@@ -112,7 +133,11 @@ const PrintCenterPage = () => {
                     customRequest={handleUploadTemplate}
                     disabled={uploading || uploadDisabled}
                   >
-                    <Button icon={<UploadOutlined />} loading={uploading} disabled={uploadDisabled}>
+                    <Button
+                      icon={<UploadOutlined />}
+                      loading={uploading}
+                      disabled={uploadDisabled}
+                    >
                       上传当前模板（覆盖）
                     </Button>
                   </Upload>
@@ -140,12 +165,17 @@ const PrintCenterPage = () => {
                   <Text strong>当前记录字段预览（前 10 项）：</Text>
                   <div style={{ marginTop: 8 }}>
                     {activeRecordFields.length === 0 ? (
-                      <Text type="secondary">暂无记录，可先在对应业务模块新增数据。</Text>
+                      <Text type="secondary">
+                        暂无记录，可先在对应业务模块新增数据。
+                      </Text>
                     ) : (
                       <Space direction="vertical" size={4}>
                         {activeRecordFields.map(([key, value]) => (
                           <Text key={key} type="secondary">
-                            {key}: {typeof value === 'object' ? JSON.stringify(value) : String(value)}
+                            {key}:{' '}
+                            {typeof value === 'object'
+                              ? JSON.stringify(value)
+                              : String(value)}
                           </Text>
                         ))}
                       </Space>

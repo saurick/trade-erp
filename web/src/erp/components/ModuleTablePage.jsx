@@ -19,7 +19,13 @@ import {
   Upload,
   message,
 } from 'antd'
-import { DeleteOutlined, DownOutlined, EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons'
+import {
+  DeleteOutlined,
+  DownOutlined,
+  EditOutlined,
+  PlusOutlined,
+  SearchOutlined,
+} from '@ant-design/icons'
 import { AUTH_SCOPE, getToken } from '@/common/auth/auth'
 import { BOX_STATUS } from '../constants/workflow'
 import { getNextStatuses } from '../utils/workflow'
@@ -39,13 +45,16 @@ const uploadAttachment = async (file, category = 'attachments') => {
   const formData = new FormData()
   formData.append('file', file)
 
-  const resp = await fetch(`/files/upload?category=${encodeURIComponent(category)}`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    body: formData,
-  })
+  const resp = await fetch(
+    `/files/upload?category=${encodeURIComponent(category)}`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    }
+  )
   const payload = await resp.json().catch(() => ({}))
   if (!resp.ok || Number(payload?.code) !== 0) {
     throw new Error(payload?.message || '附件上传失败')
@@ -53,7 +62,12 @@ const uploadAttachment = async (file, category = 'attachments') => {
   return payload?.data?.url || ''
 }
 
-const UploadFieldInput = ({ value, onChange, multiple = false, category = 'attachments' }) => {
+const UploadFieldInput = ({
+  value,
+  onChange,
+  multiple = false,
+  category = 'attachments',
+}) => {
   const textValue = typeof value === 'string' ? value : ''
 
   const handleUpload = async ({ file, onSuccess, onError }) => {
@@ -94,7 +108,13 @@ const UploadFieldInput = ({ value, onChange, multiple = false, category = 'attac
 
 const renderField = (field, options = {}) => {
   if (field.type === 'items') {
-    return <ItemsFormList name={field.name} label={field.label} fields={field.itemFields || []} />
+    return (
+      <ItemsFormList
+        name={field.name}
+        label={field.label}
+        fields={field.itemFields || []}
+      />
+    )
   }
 
   if (field.type === 'select-ref') {
@@ -137,7 +157,11 @@ const normalizeValues = (values) => {
   const normalized = {}
 
   Object.entries(values).forEach(([key, value]) => {
-    if (value && typeof value === 'object' && typeof value.format === 'function') {
+    if (
+      value &&
+      typeof value === 'object' &&
+      typeof value.format === 'function'
+    ) {
       normalized[key] = value.format('YYYY-MM-DD')
       return
     }
@@ -171,7 +195,9 @@ const ModuleTablePage = ({ moduleItem }) => {
   const filteredRecords = useMemo(() => {
     return records.filter((record) => {
       const keywordMatched = keyword.trim()
-        ? JSON.stringify(record).toLowerCase().includes(keyword.trim().toLowerCase())
+        ? JSON.stringify(record)
+            .toLowerCase()
+            .includes(keyword.trim().toLowerCase())
         : true
       const boxMatched = boxFilter ? record.box === boxFilter : true
       return keywordMatched && boxMatched
@@ -244,7 +270,9 @@ const ModuleTablePage = ({ moduleItem }) => {
       width: 260,
       render: (_, record) => {
         const transitions = moduleItem.transitions || null
-        const nextStatuses = transitions ? getNextStatuses(record.box, transitions) : getNextStatuses(record.box)
+        const nextStatuses = transitions
+          ? getNextStatuses(record.box, transitions)
+          : getNextStatuses(record.box)
         const statusMenuItems = nextStatuses.map((status) => ({
           key: status,
           label: status,
@@ -278,7 +306,11 @@ const ModuleTablePage = ({ moduleItem }) => {
 
         return (
           <Space>
-            <Button icon={<EditOutlined />} size="small" onClick={() => openEditModal(record)}>
+            <Button
+              icon={<EditOutlined />}
+              size="small"
+              onClick={() => openEditModal(record)}
+            >
               编辑
             </Button>
             <Dropdown
@@ -296,7 +328,9 @@ const ModuleTablePage = ({ moduleItem }) => {
                 size="small"
                 type={action.type === 'primary' ? 'primary' : 'default'}
                 onClick={() => {
-                  Promise.resolve(action.onRun(record, actionHelpers, moduleItem)).catch((err) => {
+                  Promise.resolve(
+                    action.onRun(record, actionHelpers, moduleItem)
+                  ).catch((err) => {
                     message.error(err?.message || '操作失败')
                   })
                 }}
@@ -327,7 +361,16 @@ const ModuleTablePage = ({ moduleItem }) => {
     })
 
     return baseColumns
-  }, [moduleItem, addRecord, updateRecord, deleteRecord, moveStatus, createLinkedRecord, receiveInbound, getModuleRecords])
+  }, [
+    moduleItem,
+    addRecord,
+    updateRecord,
+    deleteRecord,
+    moveStatus,
+    createLinkedRecord,
+    receiveInbound,
+    getModuleRecords,
+  ])
 
   return (
     <Space direction="vertical" size={16} style={{ width: '100%' }}>
@@ -339,7 +382,9 @@ const ModuleTablePage = ({ moduleItem }) => {
           <Paragraph type="secondary" style={{ margin: 0 }}>
             {moduleItem.description}
           </Paragraph>
-          <Text type="secondary">状态箱流程：草稿箱 → 待批箱 → 已批箱，或按场景直接免批/招领确认。</Text>
+          <Text type="secondary">
+            状态箱流程：草稿箱 → 待批箱 → 已批箱，或按场景直接免批/招领确认。
+          </Text>
         </Space>
       </Card>
 
@@ -361,11 +406,18 @@ const ModuleTablePage = ({ moduleItem }) => {
               allowClear
               value={boxFilter || undefined}
               onChange={(value) => setBoxFilter(value || '')}
-              options={Object.values(BOX_STATUS).map((box) => ({ label: box, value: box }))}
+              options={Object.values(BOX_STATUS).map((box) => ({
+                label: box,
+                value: box,
+              }))}
             />
           </Col>
           <Col xs={24} sm={12} md={8} lg={11} style={{ textAlign: 'right' }}>
-            <Button type="primary" icon={<PlusOutlined />} onClick={openCreateModal}>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={openCreateModal}
+            >
               新建记录
             </Button>
           </Col>
@@ -386,7 +438,11 @@ const ModuleTablePage = ({ moduleItem }) => {
       </Card>
 
       <Modal
-        title={editingRecord ? `编辑：${moduleItem.title}` : `新建：${moduleItem.title}`}
+        title={
+          editingRecord
+            ? `编辑：${moduleItem.title}`
+            : `新建：${moduleItem.title}`
+        }
         open={modalVisible}
         onCancel={closeModal}
         onOk={submitForm}
@@ -423,21 +479,34 @@ const ModuleTablePage = ({ moduleItem }) => {
 
               let refOptions = null
               if (field.type === 'select-ref') {
-                const list = getModuleRecords(field.refModule).filter((record) =>
-                  field.filter ? field.filter(record) : true
+                const list = getModuleRecords(field.refModule).filter(
+                  (record) => (field.filter ? field.filter(record) : true)
                 )
                 refOptions = list.map((record) => ({
-                  label: record[field.labelKey || 'name'] || record.name || record.code,
-                  value: record[field.valueKey || 'name'] || record.name || record.code,
+                  label:
+                    record[field.labelKey || 'name'] ||
+                    record.name ||
+                    record.code,
+                  value:
+                    record[field.valueKey || 'name'] ||
+                    record.name ||
+                    record.code,
                 }))
               }
 
               return (
-                <Col span={field.span || (field.type === 'textarea' ? 24 : 12)} key={field.name}>
+                <Col
+                  span={field.span || (field.type === 'textarea' ? 24 : 12)}
+                  key={field.name}
+                >
                   <Form.Item
                     name={field.name}
                     label={field.label}
-                    rules={field.required ? [{ required: true, message: `请输入${field.label}` }] : []}
+                    rules={
+                      field.required
+                        ? [{ required: true, message: `请输入${field.label}` }]
+                        : []
+                    }
                   >
                     {renderField(field, { refOptions })}
                   </Form.Item>
@@ -446,7 +515,12 @@ const ModuleTablePage = ({ moduleItem }) => {
             })}
             <Col span={12}>
               <Form.Item name="box" label="状态箱">
-                <Select options={Object.values(BOX_STATUS).map((box) => ({ label: box, value: box }))} />
+                <Select
+                  options={Object.values(BOX_STATUS).map((box) => ({
+                    label: box,
+                    value: box,
+                  }))}
+                />
               </Form.Item>
             </Col>
           </Row>

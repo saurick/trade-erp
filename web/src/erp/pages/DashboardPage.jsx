@@ -1,5 +1,15 @@
 import React, { useMemo } from 'react'
-import { Card, Col, Progress, Row, Space, Statistic, Table, Tag, Typography } from 'antd'
+import {
+  Card,
+  Col,
+  Progress,
+  Row,
+  Space,
+  Statistic,
+  Table,
+  Tag,
+  Typography,
+} from 'antd'
 import { moduleDefinitions } from '../config/moduleDefinitions'
 import { BOX_STATUS } from '../constants/workflow'
 import { useERPData } from '../data/ERPDataContext'
@@ -43,16 +53,24 @@ const DashboardPage = () => {
       module: moduleItem.title,
       count: records.length,
       draft: records.filter((record) => record.box === BOX_STATUS.DRAFT).length,
-      pending: records.filter((record) => record.box === BOX_STATUS.PENDING).length,
-      approved: records.filter((record) => record.box === BOX_STATUS.APPROVED).length,
+      pending: records.filter((record) => record.box === BOX_STATUS.PENDING)
+        .length,
+      approved: records.filter((record) => record.box === BOX_STATUS.APPROVED)
+        .length,
       auto: records.filter((record) => record.box === BOX_STATUS.AUTO).length,
       claim: records.filter((record) => record.box === BOX_STATUS.CLAIM).length,
-      confirmed: records.filter((record) => record.box === BOX_STATUS.CONFIRMED).length,
+      confirmed: records.filter((record) => record.box === BOX_STATUS.CONFIRMED)
+        .length,
     }
   })
 
   const completionRatio = summary.totalRecords
-    ? Math.round(((summary.boxCount[BOX_STATUS.APPROVED] + summary.boxCount[BOX_STATUS.AUTO]) / summary.totalRecords) * 100)
+    ? Math.round(
+        ((summary.boxCount[BOX_STATUS.APPROVED] +
+          summary.boxCount[BOX_STATUS.AUTO]) /
+          summary.totalRecords) *
+          100
+      )
     : 0
 
   return (
@@ -74,17 +92,30 @@ const DashboardPage = () => {
         </Col>
         <Col xs={24} sm={12} lg={6}>
           <Card className="erp-page-card" variant="borderless">
-            <Statistic title="待批箱" value={summary.boxCount[BOX_STATUS.PENDING]} valueStyle={{ color: '#d46b08' }} />
+            <Statistic
+              title="待批箱"
+              value={summary.boxCount[BOX_STATUS.PENDING]}
+              valueStyle={{ color: '#d46b08' }}
+            />
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
           <Card className="erp-page-card" variant="borderless">
-            <Statistic title="招领箱" value={summary.boxCount[BOX_STATUS.CLAIM]} valueStyle={{ color: '#ad6800' }} />
+            <Statistic
+              title="招领箱"
+              value={summary.boxCount[BOX_STATUS.CLAIM]}
+              valueStyle={{ color: '#ad6800' }}
+            />
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
           <Card className="erp-page-card" variant="borderless">
-            <Statistic title="已完成（已批+免批）" value={completionRatio} suffix="%" valueStyle={{ color: '#389e0d' }} />
+            <Statistic
+              title="已完成（已批+免批）"
+              value={completionRatio}
+              suffix="%"
+              valueStyle={{ color: '#389e0d' }}
+            />
           </Card>
         </Col>
       </Row>
@@ -97,10 +128,24 @@ const DashboardPage = () => {
           <Row gutter={[12, 12]}>
             {Object.entries(summary.boxCount).map(([status, count]) => (
               <Col xs={24} md={12} lg={8} key={status}>
-                <Card size="small" variant="borderless" style={{ background: '#f7faf7' }}>
-                  <Space direction="vertical" style={{ width: '100%' }} size={6}>
+                <Card
+                  size="small"
+                  variant="borderless"
+                  style={{ background: '#f7faf7' }}
+                >
+                  <Space
+                    direction="vertical"
+                    style={{ width: '100%' }}
+                    size={6}
+                  >
                     <Tag>{status}</Tag>
-                    <Progress percent={summary.totalRecords ? Math.round((count / summary.totalRecords) * 100) : 0} />
+                    <Progress
+                      percent={
+                        summary.totalRecords
+                          ? Math.round((count / summary.totalRecords) * 100)
+                          : 0
+                      }
+                    />
                   </Space>
                 </Card>
               </Col>

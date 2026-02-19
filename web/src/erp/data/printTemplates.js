@@ -50,7 +50,10 @@ const flattenRecord = (record = {}) => {
   return out
 }
 
-const normalizeFieldKey = (raw) => String(raw || '').trim().toLowerCase()
+const normalizeFieldKey = (raw) =>
+  String(raw || '')
+    .trim()
+    .toLowerCase()
 
 const normalizeBillingDateValue = (raw) => {
   const text = String(raw || '').trim()
@@ -179,7 +182,18 @@ const SMALL_NUMBER_WORDS = [
   'NINETEEN',
 ]
 
-const TENS_NUMBER_WORDS = ['', '', 'TWENTY', 'THIRTY', 'FORTY', 'FIFTY', 'SIXTY', 'SEVENTY', 'EIGHTY', 'NINETY']
+const TENS_NUMBER_WORDS = [
+  '',
+  '',
+  'TWENTY',
+  'THIRTY',
+  'FORTY',
+  'FIFTY',
+  'SIXTY',
+  'SEVENTY',
+  'EIGHTY',
+  'NINETY',
+]
 
 const numberToWordsUnder1000 = (value) => {
   const numeric = Math.floor(Math.abs(value))
@@ -189,7 +203,9 @@ const numberToWordsUnder1000 = (value) => {
   if (numeric < 100) {
     const tens = Math.floor(numeric / 10)
     const ones = numeric % 10
-    return ones ? `${TENS_NUMBER_WORDS[tens]} ${SMALL_NUMBER_WORDS[ones]}` : TENS_NUMBER_WORDS[tens]
+    return ones
+      ? `${TENS_NUMBER_WORDS[tens]} ${SMALL_NUMBER_WORDS[ones]}`
+      : TENS_NUMBER_WORDS[tens]
   }
   const hundreds = Math.floor(numeric / 100)
   const rest = numeric % 100
@@ -269,7 +285,13 @@ const BILLING_INFO_FIELD_SCHEMA = [
     key: 'headerCompanyEn',
     label: '顶部公司英文',
     defaultValue: 'HANGZHOU KESEN MAGNETICS CO., LTD.',
-    aliases: ['headercompanyen', 'companyenname', 'company_name_en', 'name_en', 'englishname'],
+    aliases: [
+      'headercompanyen',
+      'companyenname',
+      'company_name_en',
+      'name_en',
+      'englishname',
+    ],
   },
   {
     key: 'headerAddressLine1',
@@ -395,7 +417,14 @@ const BILLING_INFO_FIELD_SCHEMA = [
     key: 'date',
     label: '落款日期',
     defaultValue: '2022年5月8日',
-    aliases: ['date', 'invoice_date', 'invoicedate', '开票日期', 'created_at', 'updated_at'],
+    aliases: [
+      'date',
+      'invoice_date',
+      'invoicedate',
+      '开票日期',
+      'created_at',
+      'updated_at',
+    ],
   },
 ]
 
@@ -446,7 +475,12 @@ const PROFORMA_INVOICE_FIELD_SCHEMA = [
     key: 'buyerAddressTel',
     label: '买方地址电话',
     defaultValue: '(Address & Tel.)',
-    aliases: ['buyer_address_tel', 'customer_address_tel', 'customeraddress', 'address'],
+    aliases: [
+      'buyer_address_tel',
+      'customer_address_tel',
+      'customeraddress',
+      'address',
+    ],
   },
   {
     key: 'invoiceNo',
@@ -458,13 +492,26 @@ const PROFORMA_INVOICE_FIELD_SCHEMA = [
     key: 'orderNo',
     label: 'Order No.',
     defaultValue: 'KSMPI20260115001',
-    aliases: ['order_no', 'orderno', 'customer_contract_no', 'customercontractno'],
+    aliases: [
+      'order_no',
+      'orderno',
+      'customer_contract_no',
+      'customercontractno',
+    ],
   },
   {
     key: 'date',
     label: 'Date',
     defaultValue: 'January 15, 2026',
-    aliases: ['date', 'sign_date', 'signdate', 'order_date', 'orderdate', 'quoteddate', 'created_at'],
+    aliases: [
+      'date',
+      'sign_date',
+      'signdate',
+      'order_date',
+      'orderdate',
+      'quoteddate',
+      'created_at',
+    ],
   },
   {
     key: 'email',
@@ -472,28 +519,80 @@ const PROFORMA_INVOICE_FIELD_SCHEMA = [
     defaultValue: 'info@ksmagnetic.com',
     aliases: ['email', 'contact_email', 'contactemail'],
   },
-  { key: 'item1No', label: '条目1-序号', defaultValue: '1', aliases: ['item1_no', 'line1_no'] },
-  { key: 'item1Ref', label: '条目1-Ref', defaultValue: 'I1001I', aliases: ['item1_ref', 'line1_ref'] },
+  {
+    key: 'item1No',
+    label: '条目1-序号',
+    defaultValue: '1',
+    aliases: ['item1_no', 'line1_no'],
+  },
+  {
+    key: 'item1Ref',
+    label: '条目1-Ref',
+    defaultValue: 'I1001I',
+    aliases: ['item1_ref', 'line1_ref'],
+  },
   {
     key: 'item1Desc',
     label: '条目1-品名',
-    defaultValue: 'NDFEB DISC MAGNET, N35, D9,5X1,5MM, NICKEL COATING, PLASTIC TUBE PACKING, 10PCS/TUBE',
+    defaultValue:
+      'NDFEB DISC MAGNET, N35, D9,5X1,5MM, NICKEL COATING, PLASTIC TUBE PACKING, 10PCS/TUBE',
     aliases: ['item1_desc', 'line1_desc'],
   },
-  { key: 'item1Qty', label: '条目1-数量', defaultValue: '1', aliases: ['item1_qty', 'line1_qty'] },
-  { key: 'item1NetPrice', label: '条目1-单价', defaultValue: '$1.0000', aliases: ['item1_net_price', 'line1_net_price'] },
-  { key: 'item1NetValue', label: '条目1-金额', defaultValue: 'US$1.00', aliases: ['item1_net_value', 'line1_net_value'] },
-  { key: 'item2No', label: '条目2-序号', defaultValue: '2', aliases: ['item2_no', 'line2_no'] },
-  { key: 'item2Ref', label: '条目2-Ref', defaultValue: 'I1002I', aliases: ['item2_ref', 'line2_ref'] },
+  {
+    key: 'item1Qty',
+    label: '条目1-数量',
+    defaultValue: '1',
+    aliases: ['item1_qty', 'line1_qty'],
+  },
+  {
+    key: 'item1NetPrice',
+    label: '条目1-单价',
+    defaultValue: '$1.0000',
+    aliases: ['item1_net_price', 'line1_net_price'],
+  },
+  {
+    key: 'item1NetValue',
+    label: '条目1-金额',
+    defaultValue: 'US$1.00',
+    aliases: ['item1_net_value', 'line1_net_value'],
+  },
+  {
+    key: 'item2No',
+    label: '条目2-序号',
+    defaultValue: '2',
+    aliases: ['item2_no', 'line2_no'],
+  },
+  {
+    key: 'item2Ref',
+    label: '条目2-Ref',
+    defaultValue: 'I1002I',
+    aliases: ['item2_ref', 'line2_ref'],
+  },
   {
     key: 'item2Desc',
     label: '条目2-品名',
-    defaultValue: 'NDFEB DISC MAGNET, N35, D10X3MM, NICKEL COATING, PLASTIC TUBE PACKING, 10PCS/TUBE',
+    defaultValue:
+      'NDFEB DISC MAGNET, N35, D10X3MM, NICKEL COATING, PLASTIC TUBE PACKING, 10PCS/TUBE',
     aliases: ['item2_desc', 'line2_desc'],
   },
-  { key: 'item2Qty', label: '条目2-数量', defaultValue: '1', aliases: ['item2_qty', 'line2_qty'] },
-  { key: 'item2NetPrice', label: '条目2-单价', defaultValue: '$1.0000', aliases: ['item2_net_price', 'line2_net_price'] },
-  { key: 'item2NetValue', label: '条目2-金额', defaultValue: 'US$1.00', aliases: ['item2_net_value', 'line2_net_value'] },
+  {
+    key: 'item2Qty',
+    label: '条目2-数量',
+    defaultValue: '1',
+    aliases: ['item2_qty', 'line2_qty'],
+  },
+  {
+    key: 'item2NetPrice',
+    label: '条目2-单价',
+    defaultValue: '$1.0000',
+    aliases: ['item2_net_price', 'line2_net_price'],
+  },
+  {
+    key: 'item2NetValue',
+    label: '条目2-金额',
+    defaultValue: 'US$1.00',
+    aliases: ['item2_net_value', 'line2_net_value'],
+  },
   {
     key: 'totalNetValue',
     label: '合计金额',
@@ -516,7 +615,12 @@ const PROFORMA_INVOICE_FIELD_SCHEMA = [
     key: 'deliveryMethod',
     label: 'Delivery Method',
     defaultValue: 'By FedEx',
-    aliases: ['delivery_method', 'transport_type', 'transporttype', 'deliverymethod'],
+    aliases: [
+      'delivery_method',
+      'transport_type',
+      'transporttype',
+      'deliverymethod',
+    ],
   },
   {
     key: 'leadTime',
@@ -528,9 +632,19 @@ const PROFORMA_INVOICE_FIELD_SCHEMA = [
     key: 'paymentTerms',
     label: 'Payment Terms',
     defaultValue: 'T/T 30% deposit and 70% against the copy of B/L',
-    aliases: ['payment_terms', 'paymentterms', 'payment_method', 'paymentmethod'],
+    aliases: [
+      'payment_terms',
+      'paymentterms',
+      'payment_method',
+      'paymentmethod',
+    ],
   },
-  { key: 'notes', label: 'Notes', defaultValue: '', aliases: ['notes', 'remark'] },
+  {
+    key: 'notes',
+    label: 'Notes',
+    defaultValue: '',
+    aliases: ['notes', 'remark'],
+  },
   {
     key: 'authorizedBuyer',
     label: '买方签章标题',
@@ -615,7 +729,8 @@ const DEFAULT_PROFORMA_INVOICE_ITEMS = [
   {
     no: '1',
     ref: 'I1001I',
-    description: 'NDFEB DISC MAGNET, N35, D9,5X1,5MM, NICKEL COATING, PLASTIC TUBE PACKING, 10PCS/TUBE',
+    description:
+      'NDFEB DISC MAGNET, N35, D9,5X1,5MM, NICKEL COATING, PLASTIC TUBE PACKING, 10PCS/TUBE',
     quantity: 1,
     netPrice: 1,
     netValue: 1,
@@ -623,7 +738,8 @@ const DEFAULT_PROFORMA_INVOICE_ITEMS = [
   {
     no: '2',
     ref: 'I1002I',
-    description: 'NDFEB DISC MAGNET, N35, D10X3MM, NICKEL COATING, PLASTIC TUBE PACKING, 10PCS/TUBE',
+    description:
+      'NDFEB DISC MAGNET, N35, D10X3MM, NICKEL COATING, PLASTIC TUBE PACKING, 10PCS/TUBE',
     quantity: 1,
     netPrice: 1,
     netValue: 1,
@@ -638,7 +754,10 @@ const PROFORMA_CANVAS_OFFSET_LEFT = 70
 const PROFORMA_CANVAS_OFFSET_TOP = 64
 
 const buildBillingInfoFields = (record = {}) => {
-  const { values, hasExplicit } = buildFieldsBySchema(record, BILLING_INFO_FIELD_SCHEMA)
+  const { values, hasExplicit } = buildFieldsBySchema(
+    record,
+    BILLING_INFO_FIELD_SCHEMA
+  )
 
   if (!hasExplicit.titleCompanyCn && values.companyName) {
     values.titleCompanyCn = values.companyName
@@ -656,18 +775,34 @@ const buildBillingInfoFields = (record = {}) => {
 }
 
 const buildProformaInvoiceFields = (record = {}) => {
-  const { values, hasExplicit, flattenedMap } = buildFieldsBySchema(record, PROFORMA_INVOICE_FIELD_SCHEMA)
-  const recordItems = Array.isArray(record?.items) ? record.items.slice(0, 2) : []
+  const { values, hasExplicit, flattenedMap } = buildFieldsBySchema(
+    record,
+    PROFORMA_INVOICE_FIELD_SCHEMA
+  )
+  const recordItems = Array.isArray(record?.items)
+    ? record.items.slice(0, 2)
+    : []
 
   if (!hasExplicit.buyerCompanyName) {
     values.buyerCompanyName =
-      flattenedMap.customername || flattenedMap.name || flattenedMap.partnername || values.buyerCompanyName
+      flattenedMap.customername ||
+      flattenedMap.name ||
+      flattenedMap.partnername ||
+      values.buyerCompanyName
   }
 
   if (!hasExplicit.buyerAddressTel) {
-    const address = flattenedMap.customeraddress || flattenedMap.shiptoaddress || flattenedMap.address || ''
+    const address =
+      flattenedMap.customeraddress ||
+      flattenedMap.shiptoaddress ||
+      flattenedMap.address ||
+      ''
     const contact =
-      flattenedMap.contacttel || flattenedMap.contactphone || flattenedMap.contact || flattenedMap.phone || ''
+      flattenedMap.contacttel ||
+      flattenedMap.contactphone ||
+      flattenedMap.contact ||
+      flattenedMap.phone ||
+      ''
     const combined = [address, contact].filter(Boolean).join(' ')
     if (combined) {
       values.buyerAddressTel = combined
@@ -675,7 +810,8 @@ const buildProformaInvoiceFields = (record = {}) => {
   }
 
   if (!hasExplicit.invoiceNo) {
-    values.invoiceNo = flattenedMap.code || flattenedMap.invoiceno || values.invoiceNo
+    values.invoiceNo =
+      flattenedMap.code || flattenedMap.invoiceno || values.invoiceNo
   }
   if (!hasExplicit.orderNo) {
     values.orderNo =
@@ -697,7 +833,11 @@ const buildProformaInvoiceFields = (record = {}) => {
   }
   if (!hasExplicit.email) {
     values.email =
-      flattenedMap.contactemail || flattenedMap.contact_email || flattenedMap.email || flattenedMap.mail || values.email
+      flattenedMap.contactemail ||
+      flattenedMap.contact_email ||
+      flattenedMap.email ||
+      flattenedMap.mail ||
+      values.email
   }
   if (!hasExplicit.incoterms) {
     const term = flattenedMap.priceterm || flattenedMap.price_term || ''
@@ -709,14 +849,21 @@ const buildProformaInvoiceFields = (record = {}) => {
   }
   if (!hasExplicit.deliveryMethod) {
     const transport =
-      flattenedMap.transporttype || flattenedMap.transport_type || flattenedMap.deliverymethod || values.deliveryMethod
-    values.deliveryMethod = transport ? `By ${transport}` : values.deliveryMethod
+      flattenedMap.transporttype ||
+      flattenedMap.transport_type ||
+      flattenedMap.deliverymethod ||
+      values.deliveryMethod
+    values.deliveryMethod = transport
+      ? `By ${transport}`
+      : values.deliveryMethod
   }
   if (!hasExplicit.leadTime) {
-    values.leadTime = flattenedMap.leadtime || flattenedMap.deliverycycle || values.leadTime
+    values.leadTime =
+      flattenedMap.leadtime || flattenedMap.deliverycycle || values.leadTime
   }
   if (!hasExplicit.paymentTerms) {
-    const payment = flattenedMap.paymentmethod || flattenedMap.payment_method || ''
+    const payment =
+      flattenedMap.paymentmethod || flattenedMap.payment_method || ''
     if (payment) {
       values.paymentTerms = payment
     }
@@ -728,17 +875,31 @@ const buildProformaInvoiceFields = (record = {}) => {
   const mappedItems = DEFAULT_PROFORMA_INVOICE_ITEMS.map((fallback, index) => {
     const source = recordItems[index] || {}
     const quantity = parseNumericValue(source.quantity)
-    const netPrice = parseNumericValue(source.netPrice ?? source.unitPrice ?? source.price)
-    const explicitNetValue = parseNumericValue(source.netValue ?? source.totalPrice ?? source.amount)
-    const normalizedQuantity = Number.isNaN(quantity) ? fallback.quantity : quantity
-    const normalizedNetPrice = Number.isNaN(netPrice) ? fallback.netPrice : netPrice
+    const netPrice = parseNumericValue(
+      source.netPrice ?? source.unitPrice ?? source.price
+    )
+    const explicitNetValue = parseNumericValue(
+      source.netValue ?? source.totalPrice ?? source.amount
+    )
+    const normalizedQuantity = Number.isNaN(quantity)
+      ? fallback.quantity
+      : quantity
+    const normalizedNetPrice = Number.isNaN(netPrice)
+      ? fallback.netPrice
+      : netPrice
     const normalizedNetValue = Number.isNaN(explicitNetValue)
       ? normalizedQuantity * normalizedNetPrice
       : explicitNetValue
 
     return {
       no: String(index + 1),
-      ref: String(source.refNo || source.ref || source.productCode || source.specCode || fallback.ref),
+      ref: String(
+        source.refNo ||
+          source.ref ||
+          source.productCode ||
+          source.specCode ||
+          fallback.ref
+      ),
       description: String(
         source.enDesc ||
           source.goodsDescription ||
@@ -773,15 +934,22 @@ const buildProformaInvoiceFields = (record = {}) => {
     if (!hasExplicit[`item${index}NetPrice`]) {
       values[`item${index}NetPrice`] = formatDollarMoney(row.netPrice, 4)
     } else {
-      const normalizedNetPrice = parseNumericValue(values[`item${index}NetPrice`])
+      const normalizedNetPrice = parseNumericValue(
+        values[`item${index}NetPrice`]
+      )
       if (!Number.isNaN(normalizedNetPrice)) {
-        values[`item${index}NetPrice`] = formatDollarMoney(normalizedNetPrice, 4)
+        values[`item${index}NetPrice`] = formatDollarMoney(
+          normalizedNetPrice,
+          4
+        )
       }
     }
     if (!hasExplicit[`item${index}NetValue`]) {
       values[`item${index}NetValue`] = formatUSDMoney(row.netValue, 2)
     } else {
-      const normalizedNetValue = parseNumericValue(values[`item${index}NetValue`])
+      const normalizedNetValue = parseNumericValue(
+        values[`item${index}NetValue`]
+      )
       if (!Number.isNaN(normalizedNetValue)) {
         values[`item${index}NetValue`] = formatUSDMoney(normalizedNetValue, 2)
       }
@@ -791,12 +959,22 @@ const buildProformaInvoiceFields = (record = {}) => {
   applyRowValues(1)
   applyRowValues(2)
 
-  const totalFromItems = mappedItems.reduce((sum, item) => sum + item.netValue, 0)
-  const explicitTotal = hasExplicit.totalNetValue ? parseNumericValue(values.totalNetValue) : Number.NaN
-  const normalizedTotal = Number.isNaN(explicitTotal) ? totalFromItems : explicitTotal
+  const totalFromItems = mappedItems.reduce(
+    (sum, item) => sum + item.netValue,
+    0
+  )
+  const explicitTotal = hasExplicit.totalNetValue
+    ? parseNumericValue(values.totalNetValue)
+    : Number.NaN
+  const normalizedTotal = Number.isNaN(explicitTotal)
+    ? totalFromItems
+    : explicitTotal
   if (!hasExplicit.totalNetValue) {
     values.totalNetValue = formatUSDMoney(normalizedTotal, 2)
-  } else if (values.totalNetValue && !String(values.totalNetValue).includes('US$')) {
+  } else if (
+    values.totalNetValue &&
+    !String(values.totalNetValue).includes('US$')
+  ) {
     values.totalNetValue = formatUSDMoney(values.totalNetValue, 2)
   }
 
@@ -805,11 +983,19 @@ const buildProformaInvoiceFields = (record = {}) => {
     values.amountInWords = amountWords || values.amountInWords
   }
 
-  if (values.headerPhone && !String(values.headerPhone).toUpperCase().startsWith('PHONE:')) {
+  if (
+    values.headerPhone &&
+    !String(values.headerPhone).toUpperCase().startsWith('PHONE:')
+  ) {
     values.headerPhone = `PHONE: ${values.headerPhone}`
   }
-  values.headerWebsite = String(values.headerWebsite || '').trim().toUpperCase() || 'WWW.KSMAGNETIC.COM'
-  values.title = String(values.title || 'PROFORMA INVOICE').trim().toUpperCase()
+  values.headerWebsite =
+    String(values.headerWebsite || '')
+      .trim()
+      .toUpperCase() || 'WWW.KSMAGNETIC.COM'
+  values.title = String(values.title || 'PROFORMA INVOICE')
+    .trim()
+    .toUpperCase()
   values.date = normalizeEnglishDateValue(values.date)
   const normalizedDeliveryMethod = String(values.deliveryMethod || '').trim()
   if (!normalizedDeliveryMethod) {
@@ -827,7 +1013,13 @@ const PURCHASE_CONTRACT_FIELD_SCHEMA = [
     key: 'buyerCompany',
     label: '买方公司',
     defaultValue: '杭州科森磁材有限公司',
-    aliases: ['buyercompany', 'companyname', 'company_name', 'customername', 'name'],
+    aliases: [
+      'buyercompany',
+      'companyname',
+      'company_name',
+      'customername',
+      'name',
+    ],
   },
   {
     key: 'buyerAddress',
@@ -845,7 +1037,14 @@ const PURCHASE_CONTRACT_FIELD_SCHEMA = [
     key: 'buyerPhone',
     label: '买方电话',
     defaultValue: '电话: 0571 8679 0529',
-    aliases: ['buyerphone', 'companyphone', 'phone', 'tel', 'contactphone', 'contact_phone'],
+    aliases: [
+      'buyerphone',
+      'companyphone',
+      'phone',
+      'tel',
+      'contactphone',
+      'contact_phone',
+    ],
   },
   {
     key: 'website',
@@ -893,7 +1092,12 @@ const PURCHASE_CONTRACT_FIELD_SCHEMA = [
     key: 'settlement',
     label: '结算方式',
     defaultValue: '月结30天',
-    aliases: ['settlement', 'settlementmethod', 'paymentmethod', 'payment_method'],
+    aliases: [
+      'settlement',
+      'settlementmethod',
+      'paymentmethod',
+      'payment_method',
+    ],
   },
   {
     key: 'itemNo',
@@ -906,7 +1110,13 @@ const PURCHASE_CONTRACT_FIELD_SCHEMA = [
     label: '产品描述',
     defaultValue:
       '如图，圆环沉孔磁钢，D9.525XD3.048X3.175-82°沉孔、深度约1mm，N42(不含管制元素钐、钆、镝、铽、镥、钪、钇)，镀镍铜镍，內圆公差+0.1/-0，厚度公差+0/-0.1，其余公差+/-0.1, 轴向充磁供货，沉孔面为N极。产品外观好，避免缺边掉角。',
-    aliases: ['itemdescription', 'item_desc', 'productname', 'goodsdescription', 'description'],
+    aliases: [
+      'itemdescription',
+      'item_desc',
+      'productname',
+      'goodsdescription',
+      'description',
+    ],
   },
   {
     key: 'quantity',
@@ -936,7 +1146,12 @@ const PURCHASE_CONTRACT_FIELD_SCHEMA = [
     key: 'requiredDeliveryDate',
     label: '要求交货日期',
     defaultValue: '2026/03/05',
-    aliases: ['requireddeliverydate', 'required_delivery_date', 'deliverydate', 'delivery_date'],
+    aliases: [
+      'requireddeliverydate',
+      'required_delivery_date',
+      'deliverydate',
+      'delivery_date',
+    ],
   },
   {
     key: 'sellerConfirmDeliveryDate',
@@ -1068,38 +1283,230 @@ const PURCHASE_CONTRACT_GRID_LINE_LAYOUT = [
 ]
 
 const PURCHASE_CONTRACT_STATIC_TEXT_LAYOUT = [
-  { text: '采购合同', left: 0, top: 75.2, width: PURCHASE_CONTRACT_CANVAS_WIDTH, className: 'purchase-title purchase-center' },
-  { text: '卖方:', left: 71.54, top: 94.86, width: 25, className: 'purchase-no-wrap' },
-  { text: '合同编号', left: 363.91, top: 107.46, width: 36, className: 'purchase-no-wrap' },
-  { text: '签订日期', left: 363.91, top: 119.34, width: 36, className: 'purchase-no-wrap' },
-  { text: '价格条件', left: 363.91, top: 129.9, width: 36, className: 'purchase-no-wrap' },
-  { text: '结算方式', left: 363.91, top: 140.46, width: 36, className: 'purchase-no-wrap' },
-  { text: '序号', left: 74.9, top: 164.94, width: 16, className: 'purchase-no-wrap' },
-  { text: '产品描述', left: 213.05, top: 164.46, width: 35, className: 'purchase-no-wrap' },
-  { text: '数量(个)', left: 374.71, top: 164.7, width: 27, className: 'purchase-no-wrap' },
-  { text: '单价', left: 435.43, top: 164.94, width: 20, className: 'purchase-no-wrap' },
-  { text: '金额', left: 489.58, top: 164.94, width: 20, className: 'purchase-no-wrap' },
-  { text: '总计', left: 435.43, top: 236.46, width: 20, className: 'purchase-no-wrap' },
-  { text: '唛头\n格式', left: 71.54, top: 266.49, width: 24, className: 'purchase-center purchase-multiline' },
-  { text: '内箱(小白盒)', left: 97.58, top: 266.25, width: 44, className: 'purchase-no-wrap' },
-  { text: 'SIZE: D9.525XD3.048X3.175', left: 141.26, top: 251.33, width: 145, className: 'purchase-arial purchase-no-wrap' },
-  { text: 'GRADE: N42', left: 141.26, top: 264.56, width: 80, className: 'purchase-arial purchase-no-wrap' },
-  { text: 'COATING: NICUNI', left: 141.26, top: 277.76, width: 100, className: 'purchase-arial purchase-no-wrap' },
-  { text: "Q'TY:", left: 141.26, top: 290.96, width: 40, className: 'purchase-arial purchase-no-wrap' },
-  { text: '纸箱(外箱)', left: 290.69, top: 271.41, width: 37, className: 'purchase-no-wrap' },
-  { text: '由我司提供', left: 363.79, top: 271.65, width: 40, className: 'purchase-no-wrap' },
-  { text: '要求交货日期', left: 71.54, top: 306.45, width: 48, className: 'purchase-no-wrap' },
-  { text: '卖方确认交货日期', left: 290.69, top: 306.45, width: 65, className: 'purchase-no-wrap' },
-  { text: '内包装', left: 71.54, top: 323.37, width: 24, className: 'purchase-no-wrap' },
-  { text: '外包装', left: 290.69, top: 323.37, width: 24, className: 'purchase-no-wrap' },
-  { text: '是否屏蔽', left: 71.54, top: 343.77, width: 32, className: 'purchase-no-wrap' },
-  { text: '交货地点', left: 290.69, top: 343.77, width: 32, className: 'purchase-no-wrap' },
-  { text: '随货单据', left: 71.54, top: 368.25, width: 32, className: 'purchase-no-wrap' },
-  { text: '其他要求', left: 71.54, top: 392.25, width: 32, className: 'purchase-no-wrap' },
-  { text: PURCHASE_CONTRACT_TERMS_TEXT, left: 71.54, top: 411.93, width: 450.03, className: 'purchase-multiline purchase-terms' },
-  { text: '买方签章:', left: 71.54, top: 596.99, width: 40, className: 'purchase-no-wrap' },
-  { text: '卖方签章:', left: 363.91, top: 596.99, width: 40, className: 'purchase-no-wrap' },
-  { text: '.375 in', left: 76.97, top: 741.56, width: 28, className: 'purchase-calibri purchase-no-wrap' },
+  {
+    text: '采购合同',
+    left: 0,
+    top: 75.2,
+    width: PURCHASE_CONTRACT_CANVAS_WIDTH,
+    className: 'purchase-title purchase-center',
+  },
+  {
+    text: '卖方:',
+    left: 71.54,
+    top: 94.86,
+    width: 25,
+    className: 'purchase-no-wrap',
+  },
+  {
+    text: '合同编号',
+    left: 363.91,
+    top: 107.46,
+    width: 36,
+    className: 'purchase-no-wrap',
+  },
+  {
+    text: '签订日期',
+    left: 363.91,
+    top: 119.34,
+    width: 36,
+    className: 'purchase-no-wrap',
+  },
+  {
+    text: '价格条件',
+    left: 363.91,
+    top: 129.9,
+    width: 36,
+    className: 'purchase-no-wrap',
+  },
+  {
+    text: '结算方式',
+    left: 363.91,
+    top: 140.46,
+    width: 36,
+    className: 'purchase-no-wrap',
+  },
+  {
+    text: '序号',
+    left: 74.9,
+    top: 164.94,
+    width: 16,
+    className: 'purchase-no-wrap',
+  },
+  {
+    text: '产品描述',
+    left: 213.05,
+    top: 164.46,
+    width: 35,
+    className: 'purchase-no-wrap',
+  },
+  {
+    text: '数量(个)',
+    left: 374.71,
+    top: 164.7,
+    width: 27,
+    className: 'purchase-no-wrap',
+  },
+  {
+    text: '单价',
+    left: 435.43,
+    top: 164.94,
+    width: 20,
+    className: 'purchase-no-wrap',
+  },
+  {
+    text: '金额',
+    left: 489.58,
+    top: 164.94,
+    width: 20,
+    className: 'purchase-no-wrap',
+  },
+  {
+    text: '总计',
+    left: 435.43,
+    top: 236.46,
+    width: 20,
+    className: 'purchase-no-wrap',
+  },
+  {
+    text: '唛头\n格式',
+    left: 71.54,
+    top: 266.49,
+    width: 24,
+    className: 'purchase-center purchase-multiline',
+  },
+  {
+    text: '内箱(小白盒)',
+    left: 97.58,
+    top: 266.25,
+    width: 44,
+    className: 'purchase-no-wrap',
+  },
+  {
+    text: 'SIZE: D9.525XD3.048X3.175',
+    left: 141.26,
+    top: 251.33,
+    width: 145,
+    className: 'purchase-arial purchase-no-wrap',
+  },
+  {
+    text: 'GRADE: N42',
+    left: 141.26,
+    top: 264.56,
+    width: 80,
+    className: 'purchase-arial purchase-no-wrap',
+  },
+  {
+    text: 'COATING: NICUNI',
+    left: 141.26,
+    top: 277.76,
+    width: 100,
+    className: 'purchase-arial purchase-no-wrap',
+  },
+  {
+    text: "Q'TY:",
+    left: 141.26,
+    top: 290.96,
+    width: 40,
+    className: 'purchase-arial purchase-no-wrap',
+  },
+  {
+    text: '纸箱(外箱)',
+    left: 290.69,
+    top: 271.41,
+    width: 37,
+    className: 'purchase-no-wrap',
+  },
+  {
+    text: '由我司提供',
+    left: 363.79,
+    top: 271.65,
+    width: 40,
+    className: 'purchase-no-wrap',
+  },
+  {
+    text: '要求交货日期',
+    left: 71.54,
+    top: 306.45,
+    width: 48,
+    className: 'purchase-no-wrap',
+  },
+  {
+    text: '卖方确认交货日期',
+    left: 290.69,
+    top: 306.45,
+    width: 65,
+    className: 'purchase-no-wrap',
+  },
+  {
+    text: '内包装',
+    left: 71.54,
+    top: 323.37,
+    width: 24,
+    className: 'purchase-no-wrap',
+  },
+  {
+    text: '外包装',
+    left: 290.69,
+    top: 323.37,
+    width: 24,
+    className: 'purchase-no-wrap',
+  },
+  {
+    text: '是否屏蔽',
+    left: 71.54,
+    top: 343.77,
+    width: 32,
+    className: 'purchase-no-wrap',
+  },
+  {
+    text: '交货地点',
+    left: 290.69,
+    top: 343.77,
+    width: 32,
+    className: 'purchase-no-wrap',
+  },
+  {
+    text: '随货单据',
+    left: 71.54,
+    top: 368.25,
+    width: 32,
+    className: 'purchase-no-wrap',
+  },
+  {
+    text: '其他要求',
+    left: 71.54,
+    top: 392.25,
+    width: 32,
+    className: 'purchase-no-wrap',
+  },
+  {
+    text: PURCHASE_CONTRACT_TERMS_TEXT,
+    left: 71.54,
+    top: 411.93,
+    width: 450.03,
+    className: 'purchase-multiline purchase-terms',
+  },
+  {
+    text: '买方签章:',
+    left: 71.54,
+    top: 596.99,
+    width: 40,
+    className: 'purchase-no-wrap',
+  },
+  {
+    text: '卖方签章:',
+    left: 363.91,
+    top: 596.99,
+    width: 40,
+    className: 'purchase-no-wrap',
+  },
+  {
+    text: '.375 in',
+    left: 76.97,
+    top: 741.56,
+    width: 28,
+    className: 'purchase-calibri purchase-no-wrap',
+  },
   {
     text: '第 1 页，共 2 页',
     left: 261.05,
@@ -1309,7 +1716,8 @@ const buildPurchaseInlineStyle = ({ left, top, width, height }) => {
   return styleParts.join(';')
 }
 
-const formatPurchaseNodeText = (text = '') => escapeHTML(String(text || '')).replaceAll('\n', '<br />')
+const formatPurchaseNodeText = (text = '') =>
+  escapeHTML(String(text || '')).replaceAll('\n', '<br />')
 
 const getChinaDateParts = (dateValue) => {
   if (!(dateValue instanceof Date) || Number.isNaN(dateValue.getTime())) {
@@ -1389,35 +1797,58 @@ const formatPurchaseQuantityValue = (raw) => {
 }
 
 const buildPurchaseContractFields = (record = {}) => {
-  const { values, hasExplicit, flattenedMap } = buildFieldsBySchema(record, PURCHASE_CONTRACT_FIELD_SCHEMA)
+  const { values, hasExplicit, flattenedMap } = buildFieldsBySchema(
+    record,
+    PURCHASE_CONTRACT_FIELD_SCHEMA
+  )
   const recordItems = Array.isArray(record?.items) ? record.items : []
   const firstItem = recordItems[0] || {}
 
   if (!hasExplicit.sellerName) {
-    values.sellerName = flattenedMap.suppliername || flattenedMap.partnername || flattenedMap.name || values.sellerName
+    values.sellerName =
+      flattenedMap.suppliername ||
+      flattenedMap.partnername ||
+      flattenedMap.name ||
+      values.sellerName
   }
   if (!hasExplicit.sellerAddress) {
     values.sellerAddress =
-      flattenedMap.supplieraddress || flattenedMap.partneraddress || flattenedMap.address || values.sellerAddress
+      flattenedMap.supplieraddress ||
+      flattenedMap.partneraddress ||
+      flattenedMap.address ||
+      values.sellerAddress
   }
   if (!hasExplicit.sellerPhone) {
     const phoneText =
-      flattenedMap.supplierphone || flattenedMap.contactphone || flattenedMap.phone || flattenedMap.tel || ''
+      flattenedMap.supplierphone ||
+      flattenedMap.contactphone ||
+      flattenedMap.phone ||
+      flattenedMap.tel ||
+      ''
     if (phoneText) {
-      values.sellerPhone = phoneText.startsWith('电话') ? phoneText : `电话：${phoneText}`
+      values.sellerPhone = phoneText.startsWith('电话')
+        ? phoneText
+        : `电话：${phoneText}`
     }
   }
   if (!hasExplicit.contractNo) {
-    values.contractNo = flattenedMap.code || flattenedMap.purchasecode || values.contractNo
+    values.contractNo =
+      flattenedMap.code || flattenedMap.purchasecode || values.contractNo
   }
   if (!hasExplicit.signDate) {
-    values.signDate = flattenedMap.signdate || flattenedMap.sign_date || flattenedMap.created_at || values.signDate
+    values.signDate =
+      flattenedMap.signdate ||
+      flattenedMap.sign_date ||
+      flattenedMap.created_at ||
+      values.signDate
   }
   if (!hasExplicit.priceTerm) {
-    values.priceTerm = flattenedMap.priceterm || flattenedMap.price_term || values.priceTerm
+    values.priceTerm =
+      flattenedMap.priceterm || flattenedMap.price_term || values.priceTerm
   }
   if (!hasExplicit.settlement) {
-    values.settlement = flattenedMap.settlement || flattenedMap.paymentmethod || values.settlement
+    values.settlement =
+      flattenedMap.settlement || flattenedMap.paymentmethod || values.settlement
   }
 
   if (!hasExplicit.itemDescription) {
@@ -1429,11 +1860,16 @@ const buildPurchaseContractFields = (record = {}) => {
       firstItem.description ||
       values.itemDescription
     const spec = String(firstItem.specCode || '').trim()
-    values.itemDescription = spec && !String(itemDescription).includes(spec) ? `${itemDescription}，${spec}` : itemDescription
+    values.itemDescription =
+      spec && !String(itemDescription).includes(spec)
+        ? `${itemDescription}，${spec}`
+        : itemDescription
   }
   if (!hasExplicit.quantity) {
     values.quantity =
-      firstItem.quantity != null && firstItem.quantity !== '' ? String(firstItem.quantity) : values.quantity
+      firstItem.quantity != null && firstItem.quantity !== ''
+        ? String(firstItem.quantity)
+        : values.quantity
   }
   if (!hasExplicit.unitPrice) {
     const unitPriceRaw = firstItem.unitPrice ?? firstItem.price
@@ -1442,7 +1878,8 @@ const buildPurchaseContractFields = (record = {}) => {
     }
   }
   if (!hasExplicit.amount) {
-    const explicitAmount = firstItem.totalPrice ?? firstItem.totalAmount ?? firstItem.amount
+    const explicitAmount =
+      firstItem.totalPrice ?? firstItem.totalAmount ?? firstItem.amount
     if (explicitAmount != null && explicitAmount !== '') {
       values.amount = String(explicitAmount)
     } else {
@@ -1454,7 +1891,11 @@ const buildPurchaseContractFields = (record = {}) => {
     }
   }
   if (!hasExplicit.totalAmount) {
-    const explicitTotal = flattenedMap.totalamount || flattenedMap.total_price || flattenedMap.totalprice || ''
+    const explicitTotal =
+      flattenedMap.totalamount ||
+      flattenedMap.total_price ||
+      flattenedMap.totalprice ||
+      ''
     if (explicitTotal) {
       values.totalAmount = explicitTotal
     } else {
@@ -1463,37 +1904,64 @@ const buildPurchaseContractFields = (record = {}) => {
   }
   if (!hasExplicit.requiredDeliveryDate) {
     values.requiredDeliveryDate =
-      flattenedMap.deliverydate || flattenedMap.delivery_date || flattenedMap.requireddeliverydate || values.requiredDeliveryDate
+      flattenedMap.deliverydate ||
+      flattenedMap.delivery_date ||
+      flattenedMap.requireddeliverydate ||
+      values.requiredDeliveryDate
   }
   if (!hasExplicit.sellerConfirmDeliveryDate) {
     values.sellerConfirmDeliveryDate =
-      flattenedMap.sellerconfirmdeliverydate || flattenedMap.confirm_delivery_date || values.sellerConfirmDeliveryDate
+      flattenedMap.sellerconfirmdeliverydate ||
+      flattenedMap.confirm_delivery_date ||
+      values.sellerConfirmDeliveryDate
   }
   if (!hasExplicit.innerPackaging) {
     values.innerPackaging =
-      flattenedMap.innerpackaging || flattenedMap.inner_package || firstItem.packDetail || values.innerPackaging
+      flattenedMap.innerpackaging ||
+      flattenedMap.inner_package ||
+      firstItem.packDetail ||
+      values.innerPackaging
   }
   if (!hasExplicit.outerPackaging) {
-    values.outerPackaging = flattenedMap.outerpackaging || flattenedMap.outer_package || values.outerPackaging
+    values.outerPackaging =
+      flattenedMap.outerpackaging ||
+      flattenedMap.outer_package ||
+      values.outerPackaging
   }
   if (!hasExplicit.shield) {
-    values.shield = flattenedMap.shield || flattenedMap.isshielded || values.shield
+    values.shield =
+      flattenedMap.shield || flattenedMap.isshielded || values.shield
   }
   if (!hasExplicit.deliveryAddress) {
     values.deliveryAddress =
-      flattenedMap.deliveryaddress || flattenedMap.delivery_address || flattenedMap.deliveryplace || values.deliveryAddress
+      flattenedMap.deliveryaddress ||
+      flattenedMap.delivery_address ||
+      flattenedMap.deliveryplace ||
+      values.deliveryAddress
   }
   if (!hasExplicit.shippingDocs) {
-    values.shippingDocs = flattenedMap.shippingdocs || flattenedMap.documents || values.shippingDocs
+    values.shippingDocs =
+      flattenedMap.shippingdocs || flattenedMap.documents || values.shippingDocs
   }
   if (!hasExplicit.otherRequirement) {
-    values.otherRequirement = flattenedMap.otherrequirement || flattenedMap.remark || values.otherRequirement
+    values.otherRequirement =
+      flattenedMap.otherrequirement ||
+      flattenedMap.remark ||
+      values.otherRequirement
   }
 
-  values.website = String(values.website || 'WWW.KSMAGNETIC.COM').trim().toUpperCase()
+  values.website = String(values.website || 'WWW.KSMAGNETIC.COM')
+    .trim()
+    .toUpperCase()
   values.signDate = normalizePurchaseDateValue(values.signDate, 'cn')
-  values.requiredDeliveryDate = normalizePurchaseDateValue(values.requiredDeliveryDate, 'slash')
-  values.sellerConfirmDeliveryDate = normalizePurchaseDateValue(values.sellerConfirmDeliveryDate, 'slash')
+  values.requiredDeliveryDate = normalizePurchaseDateValue(
+    values.requiredDeliveryDate,
+    'slash'
+  )
+  values.sellerConfirmDeliveryDate = normalizePurchaseDateValue(
+    values.sellerConfirmDeliveryDate,
+    'slash'
+  )
   values.quantity = formatPurchaseQuantityValue(values.quantity)
   values.unitPrice = formatPurchaseCurrencyValue(values.unitPrice, 3)
   values.amount = formatPurchaseCurrencyValue(values.amount, 2)
@@ -1508,13 +1976,17 @@ const buildPurchaseStaticNodeHTML = (node) => {
       .split(/\s+/)
       .includes('purchase-multiline')
   const multilineAttr = isMultiline ? ' data-multiline="true"' : ''
-  const className = ['purchase-text', 'purchase-editable', node.className].filter(Boolean).join(' ')
+  const className = ['purchase-text', 'purchase-editable', node.className]
+    .filter(Boolean)
+    .join(' ')
   return `<div class="${className}" style="${buildPurchaseInlineStyle(node)}" contenteditable="true" spellcheck="false"${multilineAttr}>${formatPurchaseNodeText(node.text)}</div>`
 }
 
 const buildPurchaseEditableNodeHTML = (fields, node) => {
   const value = String(fields[node.fieldKey] || '')
-  const className = ['purchase-text', 'purchase-editable', node.className].filter(Boolean).join(' ')
+  const className = ['purchase-text', 'purchase-editable', node.className]
+    .filter(Boolean)
+    .join(' ')
   const multilineAttr = node.multiline ? ' data-multiline="true"' : ''
   return `<div class="${className}" style="${buildPurchaseInlineStyle(node)}" data-billing-field="${escapeHTML(node.fieldKey)}" data-default="${escapeHTML(value)}" contenteditable="true" spellcheck="false"${multilineAttr}>${formatPurchaseNodeText(value)}</div>`
 }
@@ -1524,11 +1996,15 @@ const buildPurchaseGridLineHTML = (line, index) =>
 
 const buildPurchaseContractTemplateHTML = (record = {}) => {
   const fields = buildPurchaseContractFields(record)
-  const staticNodesHTML = PURCHASE_CONTRACT_STATIC_TEXT_LAYOUT.map(buildPurchaseStaticNodeHTML).join('')
+  const staticNodesHTML = PURCHASE_CONTRACT_STATIC_TEXT_LAYOUT.map(
+    buildPurchaseStaticNodeHTML
+  ).join('')
   const editableNodesHTML = PURCHASE_CONTRACT_EDITABLE_TEXT_LAYOUT.map((node) =>
     buildPurchaseEditableNodeHTML(fields, node)
   ).join('')
-  const gridLinesHTML = PURCHASE_CONTRACT_GRID_LINE_LAYOUT.map(buildPurchaseGridLineHTML).join('')
+  const gridLinesHTML = PURCHASE_CONTRACT_GRID_LINE_LAYOUT.map(
+    buildPurchaseGridLineHTML
+  ).join('')
 
   return `
     <section class="purchase-contract-template">
@@ -1548,7 +2024,10 @@ const buildPurchaseContractTemplateHTML = (record = {}) => {
 }
 
 const matchMagic = (arrayBuffer, expectedMagic) => {
-  if (!(arrayBuffer instanceof ArrayBuffer) || arrayBuffer.byteLength < expectedMagic.length) {
+  if (
+    !(arrayBuffer instanceof ArrayBuffer) ||
+    arrayBuffer.byteLength < expectedMagic.length
+  ) {
     return false
   }
   const bytes = new Uint8Array(arrayBuffer, 0, expectedMagic.length)
@@ -1556,7 +2035,8 @@ const matchMagic = (arrayBuffer, expectedMagic) => {
 }
 
 const isExcelArrayBuffer = (arrayBuffer) =>
-  matchMagic(arrayBuffer, EXCEL_XLS_MAGIC) || matchMagic(arrayBuffer, EXCEL_XLSX_MAGIC)
+  matchMagic(arrayBuffer, EXCEL_XLS_MAGIC) ||
+  matchMagic(arrayBuffer, EXCEL_XLSX_MAGIC)
 
 const isPDFArrayBuffer = (arrayBuffer) => matchMagic(arrayBuffer, PDF_MAGIC)
 
@@ -1573,7 +2053,11 @@ const looksLikeHTML = (text) => {
     return false
   }
   const start = text.trimStart().slice(0, 256).toLowerCase()
-  return start.startsWith('<!doctype html') || start.startsWith('<html') || start.includes('<table')
+  return (
+    start.startsWith('<!doctype html') ||
+    start.startsWith('<html') ||
+    start.includes('<table')
+  )
 }
 
 const looksLikeAppShellHTML = (text) => {
@@ -1623,13 +2107,20 @@ const buildEditableSheetHTML = (arrayBuffer) => {
   } catch (err) {
     const message = String(err?.message || '')
     if (message.includes('could not find <table>')) {
-      throw new Error('模板内容不是有效的 Excel 工作表，请上传原始 xls/xlsx 模板文件')
+      throw new Error(
+        '模板内容不是有效的 Excel 工作表，请上传原始 xls/xlsx 模板文件'
+      )
     }
     throw err
   }
 }
 
-const buildTemplateHTMLFromResponse = (templateKey, arrayBuffer, contentType = '', record = {}) => {
+const buildTemplateHTMLFromResponse = (
+  templateKey,
+  arrayBuffer,
+  contentType = '',
+  record = {}
+) => {
   const fixedTemplateHTML = getFixedTemplateHTML(templateKey, record)
   if (fixedTemplateHTML) {
     return fixedTemplateHTML
@@ -1673,12 +2164,17 @@ const fetchTemplateHTML = async (templateKey, record = {}) => {
   }
 
   const authToken = getToken(AUTH_SCOPE.ADMIN)
-  const serverHeaders = authToken ? { Authorization: `Bearer ${authToken}` } : {}
+  const serverHeaders = authToken
+    ? { Authorization: `Bearer ${authToken}` }
+    : {}
 
   try {
-    const serverResp = await fetchBinaryWithMeta(`/templates/file/${templateKey}`, {
-      headers: serverHeaders,
-    })
+    const serverResp = await fetchBinaryWithMeta(
+      `/templates/file/${templateKey}`,
+      {
+        headers: serverHeaders,
+      }
+    )
     if (serverResp.ok) {
       const serverHTML = buildTemplateHTMLFromResponse(
         templateKey,
@@ -1949,7 +2445,8 @@ const buildRecordPanelHTML = (record, templateKey) => {
   const isBillingInfo = templateKey === 'billingInfo'
   const isProformaInvoice = templateKey === 'pi'
   const isPurchaseContract = templateKey === 'purchase'
-  const isFieldSyncTemplate = isBillingInfo || isProformaInvoice || isPurchaseContract
+  const isFieldSyncTemplate =
+    isBillingInfo || isProformaInvoice || isPurchaseContract
   const fields = isBillingInfo
     ? buildBillingInfoFields(record)
     : isProformaInvoice
@@ -1964,13 +2461,26 @@ const buildRecordPanelHTML = (record, templateKey) => {
       : isPurchaseContract
         ? '提示：左侧字段与右侧采购合同固定版式双向同步，模板按原始合同坐标锁定，印章/图示为模板素材。'
         : '提示：模板区每个单元格都可直接编辑，字段区用于复制参考值。'
-  const rows = (isBillingInfo
-    ? BILLING_INFO_FIELD_SCHEMA.map((field) => [field.label, fields[field.key] || '', field.key])
-    : isProformaInvoice
-      ? PROFORMA_INVOICE_FIELD_SCHEMA.map((field) => [field.label, fields[field.key] || '', field.key])
-      : isPurchaseContract
-        ? PURCHASE_CONTRACT_PANEL_FIELD_SCHEMA.map((field) => [field.label, fields[field.key] || '', field.key])
-        : Object.entries(fields).map(([key, value]) => [key, value, key])
+  const rows = (
+    isBillingInfo
+      ? BILLING_INFO_FIELD_SCHEMA.map((field) => [
+          field.label,
+          fields[field.key] || '',
+          field.key,
+        ])
+      : isProformaInvoice
+        ? PROFORMA_INVOICE_FIELD_SCHEMA.map((field) => [
+            field.label,
+            fields[field.key] || '',
+            field.key,
+          ])
+        : isPurchaseContract
+          ? PURCHASE_CONTRACT_PANEL_FIELD_SCHEMA.map((field) => [
+              field.label,
+              fields[field.key] || '',
+              field.key,
+            ])
+          : Object.entries(fields).map(([key, value]) => [key, value, key])
   )
     .map(
       ([label, value, fieldKey]) => `

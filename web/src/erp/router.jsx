@@ -15,11 +15,11 @@ const ERPRouter = () => {
       <Route path="/admin-login" element={<AdminLoginPage />} />
       <Route
         path="/"
-        element={(
+        element={
           <AuthGuard requireAdmin>
             <ERPLayout />
           </AuthGuard>
-        )}
+        }
       >
         <Route index element={<Navigate to="/dashboard" replace />} />
         <Route path="dashboard" element={<DashboardPage />} />

@@ -6,7 +6,11 @@ export const normalizeNumber = (value) => {
   return Number.isNaN(num) ? 0 : num
 }
 
-export const calcItemsTotal = (items = [], qtyKey = 'quantity', priceKey = 'unitPrice') => {
+export const calcItemsTotal = (
+  items = [],
+  qtyKey = 'quantity',
+  priceKey = 'unitPrice'
+) => {
   return items.reduce((sum, item) => {
     const qty = normalizeNumber(item?.[qtyKey])
     const price = normalizeNumber(item?.[priceKey])
@@ -18,7 +22,11 @@ export const calcItemsQty = (items = [], qtyKey = 'quantity') => {
   return items.reduce((sum, item) => sum + normalizeNumber(item?.[qtyKey]), 0)
 }
 
-export const summarizeItems = (items = [], qtyKey = 'quantity', priceKey = 'unitPrice') => {
+export const summarizeItems = (
+  items = [],
+  qtyKey = 'quantity',
+  priceKey = 'unitPrice'
+) => {
   const totalQty = calcItemsQty(items, qtyKey)
   const totalAmount = calcItemsTotal(items, qtyKey, priceKey)
   return {

@@ -31,11 +31,21 @@ export const calcReceivableDate = (baseDate, paymentCycleDays) => {
   return formatDate(parsedBaseDate)
 }
 
-export const createAutoCode = (prefix, currentSize, date = new Date(), extraSegments = []) => {
+export const createAutoCode = (
+  prefix,
+  currentSize,
+  date = new Date(),
+  extraSegments = []
+) => {
   const year = date.getFullYear()
   const month = String(date.getMonth() + 1).padStart(2, '0')
   const day = String(date.getDate()).padStart(2, '0')
   const serial = String(currentSize + 1).padStart(4, '0')
-  const segments = [prefix, ...extraSegments.filter(Boolean), `${year}${month}${day}`, serial]
+  const segments = [
+    prefix,
+    ...extraSegments.filter(Boolean),
+    `${year}${month}${day}`,
+    serial,
+  ]
   return segments.join('-')
 }

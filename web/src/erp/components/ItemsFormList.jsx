@@ -1,5 +1,15 @@
 import React from 'react'
-import { Button, Col, Form, Input, InputNumber, Row, Select, Space, Typography } from 'antd'
+import {
+  Button,
+  Col,
+  Form,
+  Input,
+  InputNumber,
+  Row,
+  Select,
+  Space,
+  Typography,
+} from 'antd'
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons'
 
 const { Text } = Typography
@@ -26,7 +36,16 @@ const ItemsFormList = ({ name, label, fields }) => {
                   <Col span={field.span || 6} key={field.name}>
                     <Form.Item
                       name={[itemField.name, field.name]}
-                      rules={field.required ? [{ required: true, message: `请输入${field.label}` }] : []}
+                      rules={
+                        field.required
+                          ? [
+                              {
+                                required: true,
+                                message: `请输入${field.label}`,
+                              },
+                            ]
+                          : []
+                      }
                     >
                       {renderItemField(field)}
                     </Form.Item>

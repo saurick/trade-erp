@@ -86,7 +86,8 @@ export const moduleDefinitions = [
     section: 'master',
     codePrefix: 'CS',
     defaultStatus: BOX_STATUS.AUTO,
-    description: '客户/供应商建档（合作客户/供应商可自动编码，地址用于发票显示）。',
+    description:
+      '客户/供应商建档（合作客户/供应商可自动编码，地址用于发票显示）。',
     columns: [
       { title: '代码', dataIndex: 'code' },
       { title: '类型', dataIndex: 'partnerType' },
@@ -116,9 +117,19 @@ export const moduleDefinitions = [
       { name: 'name', label: '客户/供应商名称', type: 'input', required: true },
       { name: 'address', label: '客户地址', type: 'textarea', required: true },
       { name: 'contact', label: '联系人', type: 'input', required: true },
-      { name: 'contactPhone', label: '联系方式', type: 'input', required: true },
+      {
+        name: 'contactPhone',
+        label: '联系方式',
+        type: 'input',
+        required: true,
+      },
       { name: 'taxNo', label: '税号', type: 'input' },
-      { name: 'paymentCycleDays', label: '付款周期(天)', type: 'number', required: true },
+      {
+        name: 'paymentCycleDays',
+        label: '付款周期(天)',
+        type: 'number',
+        required: true,
+      },
     ],
   },
   {
@@ -137,14 +148,30 @@ export const moduleDefinitions = [
       { title: '英文描述', dataIndex: 'enDesc' },
     ],
     formFields: [
-      { name: 'hsCode', label: '海关编码', type: 'select', required: true, options: [
-        { label: '85051110', value: '85051110' },
-        { label: '85051190', value: '85051190' },
-      ] },
-      { name: 'specCode', label: '规格编码/图号', type: 'input', required: true },
+      {
+        name: 'hsCode',
+        label: '海关编码',
+        type: 'select',
+        required: true,
+        options: [
+          { label: '85051110', value: '85051110' },
+          { label: '85051190', value: '85051190' },
+        ],
+      },
+      {
+        name: 'specCode',
+        label: '规格编码/图号',
+        type: 'input',
+        required: true,
+      },
       { name: 'cnDesc', label: '中文描述', type: 'input', required: true },
       { name: 'enDesc', label: '英文描述', type: 'input', required: true },
-      { name: 'attachment', label: '附件（图纸等）', type: 'upload', uploadCategory: 'attachments' },
+      {
+        name: 'attachment',
+        label: '附件（图纸等）',
+        type: 'upload',
+        uploadCategory: 'attachments',
+      },
     ],
   },
   {
@@ -176,12 +203,33 @@ export const moduleDefinitions = [
       { name: 'contactName', label: '联系人', type: 'input' },
       { name: 'contactTel', label: '联系方式', type: 'input' },
       { name: 'contactEmail', label: '邮箱', type: 'input' },
-      { name: 'currency', label: '币种', type: 'select', required: true, options: currencyOptions },
-      { name: 'priceTerm', label: '运输条款', type: 'select', options: priceTermOptions },
+      {
+        name: 'currency',
+        label: '币种',
+        type: 'select',
+        required: true,
+        options: currencyOptions,
+      },
+      {
+        name: 'priceTerm',
+        label: '运输条款',
+        type: 'select',
+        options: priceTermOptions,
+      },
       { name: 'startPlace', label: '起运地', type: 'input' },
       { name: 'endPlace', label: '目的地', type: 'input' },
-      { name: 'deliveryMethod', label: '运输方式', type: 'select', options: deliveryMethodOptions },
-      { name: 'payMode', label: '付款方式', type: 'select', options: payModeOptions },
+      {
+        name: 'deliveryMethod',
+        label: '运输方式',
+        type: 'select',
+        options: deliveryMethodOptions,
+      },
+      {
+        name: 'payMode',
+        label: '付款方式',
+        type: 'select',
+        options: payModeOptions,
+      },
       { name: 'validPeriod', label: '有效期（天）', type: 'number' },
       { name: 'remark', label: '备注', type: 'textarea' },
       {
@@ -252,14 +300,40 @@ export const moduleDefinitions = [
         required: true,
         filter: (item) => item.partnerType !== '合作供应商',
       },
-      { name: 'customerContractNo', label: '客户合同号', type: 'input', required: true },
+      {
+        name: 'customerContractNo',
+        label: '客户合同号',
+        type: 'input',
+        required: true,
+      },
       { name: 'orderNo', label: '订单号', type: 'input' },
       { name: 'orderDate', label: '下单时间', type: 'date' },
       { name: 'signDate', label: '签约日期', type: 'date', required: true },
-      { name: 'deliveryDate', label: '备货期限（预计发货日期）', type: 'date', required: true },
-      { name: 'transportType', label: '运输方式', type: 'select', options: transportOptions, required: true },
-      { name: 'paymentMethod', label: '付款方式', type: 'select', options: payModeOptions },
-      { name: 'priceTerm', label: '运输条款', type: 'select', options: priceTermOptions },
+      {
+        name: 'deliveryDate',
+        label: '备货期限（预计发货日期）',
+        type: 'date',
+        required: true,
+      },
+      {
+        name: 'transportType',
+        label: '运输方式',
+        type: 'select',
+        options: transportOptions,
+        required: true,
+      },
+      {
+        name: 'paymentMethod',
+        label: '付款方式',
+        type: 'select',
+        options: payModeOptions,
+      },
+      {
+        name: 'priceTerm',
+        label: '运输条款',
+        type: 'select',
+        options: priceTermOptions,
+      },
       { name: 'startPlace', label: '起运地', type: 'input' },
       { name: 'endPlace', label: '目的地', type: 'input' },
       { name: 'prepayRatio', label: '预收款比例(%)', type: 'number' },
@@ -291,7 +365,9 @@ export const moduleDefinitions = [
         label: '生成采购合同',
         type: 'primary',
         onRun: (record, helpers) => {
-          const suppliers = helpers.getModuleRecords('partners').filter((item) => item.partnerType === '合作供应商')
+          const suppliers = helpers
+            .getModuleRecords('partners')
+            .filter((item) => item.partnerType === '合作供应商')
           helpers.createLinkedRecord('purchaseContracts', record, (source) => ({
             supplierName: suppliers[0]?.name || '',
             signDate: source.signDate,
@@ -355,17 +431,41 @@ export const moduleDefinitions = [
       { title: '交货地点', dataIndex: 'deliveryAddress' },
       { title: '开票与否', dataIndex: 'invoiceRequired' },
     ],
-    codeBuilder: (values, { currentSize }) => createAutoCode('CG', currentSize, new Date(), [values.salesNo]),
+    codeBuilder: (values, { currentSize }) =>
+      createAutoCode('CG', currentSize, new Date(), [values.salesNo]),
     formFields: [
-      { name: 'supplierName', label: '厂商名称/供应商', type: 'select-ref', refModule: 'partners', required: true, filter: (item) => item.partnerType === '合作供应商' },
+      {
+        name: 'supplierName',
+        label: '厂商名称/供应商',
+        type: 'select-ref',
+        refModule: 'partners',
+        required: true,
+        filter: (item) => item.partnerType === '合作供应商',
+      },
       { name: 'signDate', label: '签约日期', type: 'date', required: true },
       { name: 'salesNo', label: '业务员编号', type: 'input', required: true },
       { name: 'deliveryDate', label: '交货日期', type: 'date', required: true },
-      { name: 'deliveryAddress', label: '交货地点', type: 'input', required: true },
+      {
+        name: 'deliveryAddress',
+        label: '交货地点',
+        type: 'input',
+        required: true,
+      },
       { name: 'follower', label: '跟单员', type: 'input' },
       { name: 'buyer', label: '采购业务员', type: 'input' },
-      { name: 'invoiceRequired', label: '开票与否', type: 'select', options: yesNoOptions, required: true },
-      { name: 'attachment', label: '附件（图纸等）', type: 'upload', uploadCategory: 'attachments' },
+      {
+        name: 'invoiceRequired',
+        label: '开票与否',
+        type: 'select',
+        options: yesNoOptions,
+        required: true,
+      },
+      {
+        name: 'attachment',
+        label: '附件（图纸等）',
+        type: 'upload',
+        uploadCategory: 'attachments',
+      },
       { name: 'remark', label: '备注', type: 'textarea' },
       {
         name: 'items',
@@ -411,7 +511,8 @@ export const moduleDefinitions = [
     section: 'warehouse',
     codePrefix: 'RK',
     defaultStatus: BOX_STATUS.DRAFT,
-    description: '采购到货→入库通知→质检→允许入库→入库单（货位、检测报告附件）。',
+    description:
+      '采购到货→入库通知→质检→允许入库→入库单（货位、检测报告附件）。',
     columns: [
       { title: '入库通知单号', dataIndex: 'code' },
       { title: '入库单号', dataIndex: 'entryNo' },
@@ -422,7 +523,12 @@ export const moduleDefinitions = [
       { title: '数量', dataIndex: 'quantity' },
     ],
     formFields: [
-      { name: 'purchaseCode', label: '采购合同号', type: 'input', required: true },
+      {
+        name: 'purchaseCode',
+        label: '采购合同号',
+        type: 'input',
+        required: true,
+      },
       { name: 'productName', label: '产品名称', type: 'input', required: true },
       { name: 'warehouseName', label: '仓库', type: 'input', required: true },
       { name: 'location', label: '货位', type: 'input', required: true },
@@ -438,7 +544,12 @@ export const moduleDefinitions = [
         required: true,
       },
       { name: 'quantity', label: '数量', type: 'number', required: true },
-      { name: 'qcAttachment', label: '检测报告附件', type: 'upload', uploadCategory: 'attachments' },
+      {
+        name: 'qcAttachment',
+        label: '检测报告附件',
+        type: 'upload',
+        uploadCategory: 'attachments',
+      },
       { name: 'remark', label: '备注（装箱明细）', type: 'textarea' },
     ],
     rowActions: [
@@ -475,9 +586,19 @@ export const moduleDefinitions = [
     ],
     formFields: [
       { name: 'productName', label: '产品名称', type: 'input', required: true },
-      { name: 'warehouseName', label: '仓库名称', type: 'input', required: true },
+      {
+        name: 'warehouseName',
+        label: '仓库名称',
+        type: 'input',
+        required: true,
+      },
       { name: 'location', label: '货位', type: 'input', required: true },
-      { name: 'availableQty', label: '可用数量', type: 'number', required: true },
+      {
+        name: 'availableQty',
+        label: '可用数量',
+        type: 'number',
+        required: true,
+      },
       { name: 'lockedQty', label: '锁定数量', type: 'number', required: true },
     ],
   },
@@ -509,19 +630,46 @@ export const moduleDefinitions = [
       },
       { name: 'startPort', label: '起运地', type: 'input', required: true },
       { name: 'destPort', label: '目的地', type: 'input', required: true },
-      { name: 'shipToAddress', label: '收货地址（SHIP TO）', type: 'textarea', required: true },
-      { name: 'transportType', label: '运输方式', type: 'select', options: transportOptions, required: true },
-      { name: 'courierPayMode', label: '快件付款方式', type: 'select', options: courierPayOptions },
+      {
+        name: 'shipToAddress',
+        label: '收货地址（SHIP TO）',
+        type: 'textarea',
+        required: true,
+      },
+      {
+        name: 'transportType',
+        label: '运输方式',
+        type: 'select',
+        options: transportOptions,
+        required: true,
+      },
+      {
+        name: 'courierPayMode',
+        label: '快件付款方式',
+        type: 'select',
+        options: courierPayOptions,
+      },
       { name: 'collectAccount', label: '到付账号', type: 'input' },
       { name: 'arriveCountry', label: '运抵国', type: 'input', required: true },
       { name: 'goodsNameEn', label: '英文货名', type: 'input' },
       { name: 'salesOwner', label: '业务员', type: 'input', required: true },
       { name: 'warehouseShipDate', label: '进仓发货日期', type: 'date' },
-      { name: 'totalPackages', label: '总件数（木箱数）', type: 'number', required: true },
+      {
+        name: 'totalPackages',
+        label: '总件数（木箱数）',
+        type: 'number',
+        required: true,
+      },
       { name: 'woodCaseSize', label: '木箱尺寸', type: 'input' },
       { name: 'customsChannel', label: '报关渠道', type: 'input' },
       { name: 'marking', label: '唛头', type: 'textarea' },
-      { name: 'attachments', label: '附件（进仓通知/随货发票）', type: 'upload', multiple: true, uploadCategory: 'attachments' },
+      {
+        name: 'attachments',
+        label: '附件（进仓通知/随货发票）',
+        type: 'upload',
+        multiple: true,
+        uploadCategory: 'attachments',
+      },
       { name: 'remark', label: '备注（收件人详细信息）', type: 'textarea' },
       {
         name: 'items',
@@ -546,7 +694,8 @@ export const moduleDefinitions = [
             record,
             (source) => ({
               shipmentCode: source.code,
-              productName: firstItem.productModel || firstItem.productName || '',
+              productName:
+                firstItem.productModel || firstItem.productName || '',
               quantity: firstItem.quantity || 0,
               warehouseName: '杭州一号仓',
               location: 'A-01-03',
@@ -554,7 +703,8 @@ export const moduleDefinitions = [
             }),
             {
               inventoryDelta: {
-                productName: firstItem.productModel || firstItem.productName || '',
+                productName:
+                  firstItem.productModel || firstItem.productName || '',
                 warehouseName: '杭州一号仓',
                 location: 'A-01-03',
                 deltaQty: -Number(firstItem.quantity || 0),
@@ -569,7 +719,9 @@ export const moduleDefinitions = [
         label: '生成结汇',
         onRun: (record, helpers) => {
           const partners = helpers.getModuleRecords('partners')
-          const matched = partners.find((item) => item.name === record.customerName)
+          const matched = partners.find(
+            (item) => item.name === record.customerName
+          )
           helpers.createLinkedRecord('settlements', record, (source) => ({
             invoiceNo: source.code,
             shipDate: source.warehouseShipDate || source.signDate,
@@ -599,7 +751,12 @@ export const moduleDefinitions = [
       { title: '货位', dataIndex: 'location' },
     ],
     formFields: [
-      { name: 'shipmentCode', label: '关联发票号', type: 'input', required: true },
+      {
+        name: 'shipmentCode',
+        label: '关联发票号',
+        type: 'input',
+        required: true,
+      },
       { name: 'productName', label: '产品', type: 'input', required: true },
       { name: 'quantity', label: '数量', type: 'number', required: true },
       { name: 'warehouseName', label: '仓库', type: 'input', required: true },
@@ -626,13 +783,21 @@ export const moduleDefinitions = [
     formFields: [
       { name: 'invoiceNo', label: '发票号', type: 'input', required: true },
       { name: 'shipDate', label: '发货日期', type: 'date', required: true },
-      { name: 'paymentCycleDays', label: '付款周期(天)', type: 'number', required: true },
+      {
+        name: 'paymentCycleDays',
+        label: '付款周期(天)',
+        type: 'number',
+        required: true,
+      },
       { name: 'amount', label: '金额(USD)', type: 'number', required: true },
       { name: 'remark', label: '备注', type: 'textarea' },
     ],
     beforeSave: (values) => ({
       ...values,
-      receivableDate: calcReceivableDate(values.shipDate, values.paymentCycleDays),
+      receivableDate: calcReceivableDate(
+        values.shipDate,
+        values.paymentCycleDays
+      ),
     }),
   },
   {
@@ -663,7 +828,12 @@ export const moduleDefinitions = [
         ],
       },
       { name: 'refNo', label: '关联 PI/发票号', type: 'input', required: true },
-      { name: 'receivedAmount', label: '收汇金额', type: 'number', required: true },
+      {
+        name: 'receivedAmount',
+        label: '收汇金额',
+        type: 'number',
+        required: true,
+      },
       { name: 'bankFee', label: '银行扣费', type: 'number', required: true },
       { name: 'registerDate', label: '登记日期', type: 'date', required: true },
       { name: 'remark', label: '备注', type: 'textarea' },
@@ -693,38 +863,70 @@ export const menuSections = [
     title: '基础资料',
     items: moduleDefinitions
       .filter((moduleItem) => moduleItem.section === 'master')
-      .map((moduleItem) => ({ key: moduleItem.path, label: moduleItem.title, moduleKey: moduleItem.key })),
+      .map((moduleItem) => ({
+        key: moduleItem.path,
+        label: moduleItem.title,
+        moduleKey: moduleItem.key,
+      })),
   },
   {
     key: 'sales',
     title: '销售链路',
     items: moduleDefinitions
       .filter((moduleItem) => moduleItem.section === 'sales')
-      .map((moduleItem) => ({ key: moduleItem.path, label: moduleItem.title, moduleKey: moduleItem.key })),
+      .map((moduleItem) => ({
+        key: moduleItem.path,
+        label: moduleItem.title,
+        moduleKey: moduleItem.key,
+      })),
   },
   {
     key: 'purchase',
     title: '采购/仓储',
     items: moduleDefinitions
-      .filter((moduleItem) => moduleItem.section === 'purchase' || moduleItem.section === 'warehouse')
-      .map((moduleItem) => ({ key: moduleItem.path, label: moduleItem.title, moduleKey: moduleItem.key })),
+      .filter(
+        (moduleItem) =>
+          moduleItem.section === 'purchase' ||
+          moduleItem.section === 'warehouse'
+      )
+      .map((moduleItem) => ({
+        key: moduleItem.path,
+        label: moduleItem.title,
+        moduleKey: moduleItem.key,
+      })),
   },
   {
     key: 'finance',
     title: '财务环节',
     items: moduleDefinitions
       .filter((moduleItem) => moduleItem.section === 'finance')
-      .map((moduleItem) => ({ key: moduleItem.path, label: moduleItem.title, moduleKey: moduleItem.key })),
+      .map((moduleItem) => ({
+        key: moduleItem.path,
+        label: moduleItem.title,
+        moduleKey: moduleItem.key,
+      })),
   },
   {
     key: 'documents',
     title: '单据模板',
-    items: [{ key: '/docs/print-center', label: '打印模板中心', moduleKey: 'print-center' }],
+    items: [
+      {
+        key: '/docs/print-center',
+        label: '打印模板中心',
+        moduleKey: 'print-center',
+      },
+    ],
   },
   {
     key: 'system',
     title: '系统管理',
-    items: [{ key: '/system/permissions', label: '权限管理', moduleKey: 'permission-center' }],
+    items: [
+      {
+        key: '/system/permissions',
+        label: '权限管理',
+        moduleKey: 'permission-center',
+      },
+    ],
   },
 ]
 

@@ -13,7 +13,16 @@ import {
   SwapOutlined,
   WalletOutlined,
 } from '@ant-design/icons'
-import { Breadcrumb, Button, Layout, Menu, Space, Spin, Tag, Typography } from 'antd'
+import {
+  Breadcrumb,
+  Button,
+  Layout,
+  Menu,
+  Space,
+  Spin,
+  Tag,
+  Typography,
+} from 'antd'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { JsonRpc } from '@/common/utils/jsonRpc'
 import { AUTH_SCOPE, logout } from '@/common/auth/auth'
@@ -52,8 +61,14 @@ const ERPLayout = () => {
   const [profileLoading, setProfileLoading] = useState(true)
   const [adminProfile, setAdminProfile] = useState(null)
 
-  const authRpc = useMemo(() => new JsonRpc({ url: 'auth', authScope: AUTH_SCOPE.ADMIN }), [])
-  const adminRpc = useMemo(() => new JsonRpc({ url: 'admin', authScope: AUTH_SCOPE.ADMIN }), [])
+  const authRpc = useMemo(
+    () => new JsonRpc({ url: 'auth', authScope: AUTH_SCOPE.ADMIN }),
+    []
+  )
+  const adminRpc = useMemo(
+    () => new JsonRpc({ url: 'admin', authScope: AUTH_SCOPE.ADMIN }),
+    []
+  )
 
   useEffect(() => {
     let mounted = true
@@ -85,9 +100,14 @@ const ERPLayout = () => {
     }
   }, [adminRpc, location, navigate])
 
-  const allItems = useMemo(() => menuSections.flatMap((section) => section.items), [])
+  const allItems = useMemo(
+    () => menuSections.flatMap((section) => section.items),
+    []
+  )
   const isSuperAdmin = adminProfile?.level === 0
-  const allowedPermissions = normalizeMenuPermissions(adminProfile?.menu_permissions || [])
+  const allowedPermissions = normalizeMenuPermissions(
+    adminProfile?.menu_permissions || []
+  )
 
   const visibleSections = useMemo(() => {
     if (isSuperAdmin) {
@@ -97,7 +117,9 @@ const ERPLayout = () => {
     return menuSections
       .map((section) => ({
         ...section,
-        items: section.items.filter((item) => allowedPermissions.includes(item.key)),
+        items: section.items.filter((item) =>
+          allowedPermissions.includes(item.key)
+        ),
       }))
       .filter((section) => section.items.length > 0)
   }, [allowedPermissions, isSuperAdmin])
@@ -119,7 +141,10 @@ const ERPLayout = () => {
 
   const currentItem = allItems.find((item) => item.key === location.pathname)
   const selectedKeys = currentItem ? [currentItem.key] : []
-  const currentLevelTag = levelTagConfig[adminProfile?.level] || { color: 'default', label: '未识别角色' }
+  const currentLevelTag = levelTagConfig[adminProfile?.level] || {
+    color: 'default',
+    label: '未识别角色',
+  }
 
   const handleLogout = async () => {
     try {
@@ -148,9 +173,18 @@ const ERPLayout = () => {
 
   return (
     <Layout className="erp-app-shell">
-      <Sider breakpoint="lg" collapsedWidth="0" width={260} className="erp-sider">
+      <Sider
+        breakpoint="lg"
+        collapsedWidth="0"
+        width={260}
+        className="erp-sider"
+      >
         <div className="erp-sider-brand">
-          <img src="/templates/billing-info-logo.png" alt="KS Magnetics" className="erp-sider-brand-logo" />
+          <img
+            src="/templates/billing-info-logo.png"
+            alt="KS Magnetics"
+            className="erp-sider-brand-logo"
+          />
         </div>
         <Menu
           mode="inline"

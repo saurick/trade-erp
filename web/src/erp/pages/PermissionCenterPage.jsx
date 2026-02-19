@@ -30,7 +30,10 @@ const levelTextMap = {
 }
 
 const PermissionCenterPage = () => {
-  const adminRpc = useMemo(() => new JsonRpc({ url: 'admin', authScope: AUTH_SCOPE.ADMIN }), [])
+  const adminRpc = useMemo(
+    () => new JsonRpc({ url: 'admin', authScope: AUTH_SCOPE.ADMIN }),
+    []
+  )
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [currentAdmin, setCurrentAdmin] = useState(null)
@@ -50,7 +53,9 @@ const PermissionCenterPage = () => {
       ])
 
       setCurrentAdmin(meResult?.data || null)
-      setAdmins(Array.isArray(listResult?.data?.admins) ? listResult.data.admins : [])
+      setAdmins(
+        Array.isArray(listResult?.data?.admins) ? listResult.data.admins : []
+      )
     } catch (err) {
       message.error(err?.message || '加载权限数据失败')
     } finally {
@@ -68,7 +73,9 @@ const PermissionCenterPage = () => {
     }
     const normalized = normalizeMenuPermissions(admin.menu_permissions || [])
     setEditingAdmin(admin)
-    setSelectedPermissions(normalized.length ? normalized : defaultMenuPermissions())
+    setSelectedPermissions(
+      normalized.length ? normalized : defaultMenuPermissions()
+    )
     setModalOpen(true)
   }
 
@@ -115,7 +122,11 @@ const PermissionCenterPage = () => {
       title: '状态',
       dataIndex: 'disabled',
       width: 100,
-      render: (disabled) => <Tag color={disabled ? 'red' : 'green'}>{disabled ? '禁用' : '启用'}</Tag>,
+      render: (disabled) => (
+        <Tag color={disabled ? 'red' : 'green'}>
+          {disabled ? '禁用' : '启用'}
+        </Tag>
+      ),
     },
     {
       title: '菜单权限',
@@ -124,14 +135,20 @@ const PermissionCenterPage = () => {
         if (record.level === 0) {
           return <Tag color="gold">全部菜单</Tag>
         }
-        const normalized = normalizeMenuPermissions(record.menu_permissions || [])
-        const effective = normalized.length ? normalized : defaultMenuPermissions()
+        const normalized = normalizeMenuPermissions(
+          record.menu_permissions || []
+        )
+        const effective = normalized.length
+          ? normalized
+          : defaultMenuPermissions()
         return (
           <Space wrap size={[4, 6]}>
             {effective.slice(0, 4).map((key) => (
               <Tag key={key}>{getPermissionLabel(key)}</Tag>
             ))}
-            {effective.length > 4 ? <Text type="secondary">+{effective.length - 4}</Text> : null}
+            {effective.length > 4 ? (
+              <Text type="secondary">+{effective.length - 4}</Text>
+            ) : null}
           </Space>
         )
       },
@@ -144,7 +161,11 @@ const PermissionCenterPage = () => {
           return <Text type="secondary">系统保留</Text>
         }
         return (
-          <Button size="small" disabled={!isSuperAdmin} onClick={() => openEditModal(record)}>
+          <Button
+            size="small"
+            disabled={!isSuperAdmin}
+            onClick={() => openEditModal(record)}
+          >
             编辑权限
           </Button>
         )
@@ -152,7 +173,9 @@ const PermissionCenterPage = () => {
     },
   ]
 
-  const checkboxOptions = ERP_MENU_PERMISSION_OPTIONS.filter((item) => item.key !== '/system/permissions').map((item) => ({
+  const checkboxOptions = ERP_MENU_PERMISSION_OPTIONS.filter(
+    (item) => item.key !== '/system/permissions'
+  ).map((item) => ({
     label: item.label,
     value: item.key,
   }))
