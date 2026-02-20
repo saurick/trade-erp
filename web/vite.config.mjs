@@ -1,6 +1,10 @@
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
-import { resolve } from 'path'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command, mode }) => {
@@ -41,6 +45,8 @@ export default defineConfig(({ command, mode }) => {
       minify: 'esbuild',
       cssMinify: 'esbuild',
       target: 'es2018',
+      // ERP 场景依赖包体较大，阈值按实际体积上调，避免无效告警噪声
+      chunkSizeWarningLimit: 1200,
       rollupOptions: {
         output: {
           // 对齐 webpack 的命名风格
@@ -48,15 +54,24 @@ export default defineConfig(({ command, mode }) => {
           chunkFileNames: 'assets/[name].[hash].js',
           assetFileNames: 'assets/[name].[hash].[ext]',
 
-          // 粗粒度拆分：react 等进 vendors，其余 node_modules 进 vendor
+          // 按依赖域拆分，减小默认 vendor 聚合块体积
           manualChunks(id) {
             if (id.includes('node_modules')) {
+              if (/[\\/]node_modules[\\/](xlsx)[\\/]/.test(id)) {
+                return 'xlsx'
+              }
               if (
-                /[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom|antd|mobx)/.test(
+                /[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom|react-helmet-async)/.test(
                   id
                 )
               ) {
-                return 'vendors'
+                return 'react'
+              }
+              if (/[\\/]node_modules[\\/](@ant-design|antd|rc-)/.test(id)) {
+                return 'antd'
+              }
+              if (/[\\/]node_modules[\\/](mobx|mobx-react-lite)/.test(id)) {
+                return 'mobx'
               }
               return 'vendor'
             }

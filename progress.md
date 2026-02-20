@@ -1,4 +1,48 @@
 ## 2026-02-20
+- 完成：将 `scripts/git-hooks/pre-push.sh` 调整为更严格模式：先执行 `scripts/qa/shellcheck.sh`（`SHELLCHECK_STRICT=1`）再执行 `scripts/qa/full.sh`（`SECRETS_STRICT=1`）。
+- 完成：同步更新 `README.md` 与 `scripts/README.md` 的 pre-push 说明，确保文档与实际门禁策略一致。
+- 验证：执行 `bash scripts/git-hooks/pre-push.sh` 通过，且 `qa:shellcheck`、`qa:secrets` 均按阻断模式执行。
+- 下一步：继续保持“日常走 full、发版前走 strict”的执行节奏。
+- 阻塞/风险：无。
+
+## 2026-02-20
+- 完成：修复 `web` 三类非阻断告警：将 Vite 配置迁移为 ESM（`web/vite.config.mjs`）以消除 CJS Node API 弃用提示；新增 `baseline-browser-mapping` 最新版本；优化 `manualChunks` 并按 ERP 依赖体量调整 `chunkSizeWarningLimit`。
+- 验证：执行 `pnpm --dir /Users/simon/projects/trade-erp/web test && pnpm --dir /Users/simon/projects/trade-erp/web build`，当前不再出现 Vite CJS 提示、baseline 过期提示与 chunk>500k 告警。
+- 下一步：如需进一步压缩首屏包体，可继续把大模块（如 `antd`）按页面做动态导入。
+- 阻塞/风险：`antd` 产物仍接近 1MB（已低于当前告警阈值），后续可结合路由级拆包继续优化。
+
+## 2026-02-20
+- 完成：删除 `scripts/sync-quality.sh` 与 `scripts/sync-targets.txt.example`，避免对外交付代码时暴露跨仓库同步上下文。
+- 完成：清理 `README.md`、`scripts/README.md`、`scripts/setup-git-hooks.sh` 中与该脚本相关的命令入口和说明。
+- 下一步：无。
+- 阻塞/风险：无。
+
+## 2026-02-20
+- 完成：修复 `scripts/doctor.sh` 的 Node 版本提示变量展开边界问题，将提示行变量改为 `${...}` 显式包裹，避免在特定 shell/locale 下触发 `unbound variable`。
+- 验证：构造版本不一致场景执行 `doctor.sh`，现可正常输出提示且不报错。
+- 下一步：无。
+- 阻塞/风险：无。
+
+## 2026-02-20
+- 完成：`scripts/sync-quality.sh` 通用化改造（不再写死仓库名，支持 `--apply`、`--all-siblings`、`scripts/sync-targets*.txt` 清单，默认 dry-run）。
+- 完成：新增 `scripts/sync-targets.txt.example`，并在 `README`/`scripts/README` 补充用法说明；脚本改为 Bash 3 兼容实现。
+- 下一步：如需长期固定目标，可在本地维护 `scripts/sync-targets.local.txt`。
+- 阻塞/风险：无。
+
+## 2026-02-20
+- 完成：按 `n` 使用习惯将版本锁定切换为 `.n-node-version`（移除 `.nvmrc`），并调整 `doctor`/脚本文档说明为 `n auto` 工作流。
+- 完成：`scripts/doctor.sh` 改为按优先级读取 `.n-node-version`、`.node-version`、`.nvmrc` 进行 Node 版本提示。
+- 下一步：本地执行 `n auto` 后再跑 QA 脚本，保持 Node 版本一致。
+- 阻塞/风险：无。
+
+## 2026-02-20
+- 完成：新增本地质量脚本 `scripts/doctor.sh`、`scripts/qa/strict.sh`、`scripts/qa/shellcheck.sh`、`scripts/sync-quality.sh`，并新增 `.nvmrc`（Node 版本锁定）。
+- 完成：更新 `scripts/setup-git-hooks.sh`，纳入新增脚本可执行权限；更新 `scripts/README.md` 与根 `README.md` 使用说明。
+- 验证：执行脚本语法检查、`doctor` 检查、`--help` 与 `sync-quality --dry-run` 冒烟通过。
+- 下一步：如需启用强安全策略，可安装 `gitleaks/shellcheck` 并在关键流程启用 `strict`。
+- 阻塞/风险：当前环境未安装 `gitleaks` 与 `shellcheck`，对应检查为提示模式。
+
+## 2026-02-20
 - 完成：删除 `/Users/simon/projects/trade-erp/web/link_node_modules.sh`，该脚本已不再使用。
 - 下一步：无。
 - 阻塞/风险：无。
