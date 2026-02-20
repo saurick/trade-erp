@@ -199,7 +199,6 @@ const ERPLayout = () => {
         <Header className="erp-header">
           <Space>
             <Text strong>外销 ERP 管理后台</Text>
-            <Tag color="green">Phase 1</Tag>
           </Space>
           <Space size={8}>
             <Tag color={currentLevelTag.color}>{currentLevelTag.label}</Tag>
