@@ -141,3 +141,8 @@
 - 验证：`bash scripts/qa/strict.sh` 已全通过；`bash scripts/git-hooks/pre-push.sh` 已全通过。
 - 下一步：继续按目录分批清理历史质量问题，优先做与业务改动同目录的小批次。
 - 阻塞/风险：无。
+
+## 2026-02-20
+- 完成：按三仓库同步审计结果统一根级 `.gitignore`（补充 `output/`、`.playwright-cli/`），与现有脚本产物忽略策略保持一致。
+- 下一步：如后续新增工具缓存目录（如 coverage/sbom 报告目录），继续三仓库同批补充忽略规则。
+- 阻塞/风险：无。
