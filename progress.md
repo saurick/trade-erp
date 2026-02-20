@@ -1,3 +1,34 @@
+## 2026-02-20
+- 完成：将根目录 `README.md` 规范为统一同构结构（项目简介、目录结构、快速开始、质量命令、门禁、文档索引、数据库迁移约束），与同目录模板仓库保持一致骨架。
+- 完成：保留 ERP 项目差异内容（业务专题文档、迁移命令细节）并按统一章节归位。
+- 下一步：后续新增文档时，保持三个仓库根 README 章节结构不变，仅维护各自差异内容。
+- 阻塞/风险：无。
+
+## 2026-02-20
+- 完成：按统一规范重写根目录 `README.md`（项目简介、目录结构、快速开始、质量命令、门禁说明、文档索引），并补齐 `web/README.md` 与 `server/README.md` 结构化说明。
+- 完成：修正此前 `server/README.md` 代码块围栏不闭合问题，当前 Markdown 结构可正常渲染。
+- 下一步：后续新增命令或文档时，先更新对应目录 README，再同步根 README 索引。
+- 阻塞/风险：无。
+
+## 2026-02-19
+- 完成：按目录就近原则，将脚本文档从 `/Users/simon/projects/trade-erp/docs/qa-scripts.md` 调整为 `/Users/simon/projects/trade-erp/scripts/README.md`，与仓库内“文档跟模块目录走”的习惯保持一致。
+- 完成：同步更新 `README.md` 中脚本文档入口链接，避免路径失效。
+- 下一步：后续脚本行为变更优先维护 `scripts/README.md`，并保持三个仓库同构。
+- 阻塞/风险：无。
+
+## 2026-02-19
+- 完成：为 6 项本地质量脚本补充统一可读文档 `/Users/simon/projects/trade-erp/docs/qa-scripts.md`，覆盖作用、执行时机、环境变量、失败处理与 hook 映射。
+- 完成：6 项脚本增加 `-h/--help` 说明，支持终端快速查看用途与参数，降低脚本心智负担。
+- 完成：`README.md` 补充 `docs/qa-scripts.md` 入口，避免脚本说明散落。
+- 下一步：如后续脚本行为变更，先更新 `docs/qa-scripts.md` 再改脚本，保持文档与实现一致。
+- 阻塞/风险：无。
+
+## 2026-02-19
+- 完成：同步完善三仓库（`trade-erp`、`collision-simulator`、`webapp-template`）README 的本地质量门禁说明，明确 6 项脚本入口（`bootstrap/db-guard/secrets/fast/full/commit-msg`）与“增量 + 全量”执行策略。
+- 完成：在三仓库分别实跑 6 项脚本（本次 `bootstrap` 使用 `BOOTSTRAP_SKIP_INSTALL=1`），`scripts/qa/full.sh` 与 `scripts/git-hooks/commit-msg.sh` 均通过。
+- 下一步：后续新增规范或脚本时，保持三仓库同批次同步与回归执行，避免模板漂移。
+- 阻塞/风险：`secrets.sh` 依赖 `gitleaks`，未安装时仅提示不阻断；如需强制阻断可启用 `SECRETS_STRICT=1`。
+
 ## 2026-02-19
 - 完成：按要求执行“三仓库统一提交推送”，补充并纳入 `AGENTS.md` 协作约定文件，保证本仓库与同目录项目协作规则一致。
 - 下一步：继续按本地 hooks 与协作约定进行开发与提交。

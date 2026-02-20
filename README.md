@@ -1,16 +1,19 @@
 # trade-erp
 
-基于 `webapp-template` 迁移的外销 ERP 管理后台（一期预需求落地版）。
+## 项目简介
+
+外销 ERP 管理后台项目（基于 `webapp-template` 演进），包含前端管理台与 Go Kratos 后端。
 
 ## 目录结构
 
-- `web/`：Ant Design 管理后台（当前实现重点）
-- `server/`：Go Kratos + Ent 后端骨架
-- `docs/`：需求映射与阶段清单
+- `web/`：前端管理后台（Vite + React）
+- `server/`：后端服务（Kratos + Ent + Atlas）
+- `scripts/`：本地质量门禁与 Git hooks 脚本
+- `docs/`：ERP 业务与方案文档
 
 ## 快速开始
 
-### 1) 启动前端后台
+### 1) 启动前端
 
 ```bash
 cd /Users/simon/projects/trade-erp/web
@@ -20,14 +23,7 @@ pnpm start
 
 默认地址：`http://localhost:5173`
 
-### 2) 前端测试
-
-```bash
-cd /Users/simon/projects/trade-erp/web
-pnpm test
-```
-
-### 3) 后端（可选）
+### 2) 启动后端
 
 ```bash
 cd /Users/simon/projects/trade-erp/server
@@ -35,7 +31,7 @@ make init
 make run
 ```
 
-### 3.1) 数据迁移与字段校验
+### 3) 数据迁移（Ent + Atlas）
 
 ```bash
 cd /Users/simon/projects/trade-erp/server
@@ -44,79 +40,58 @@ make migrate_apply
 make db_schema_check
 ```
 
-- 默认从 `configs/dev/config.yaml` 自动解析数据库连接并执行迁移。
-- 若必须使用环境变量 `DB_URL`，请显式加：`USE_ENV_DB_URL=1 make migrate_apply`。
+- 默认从 `server/configs/dev/config.yaml` 解析数据库连接。
+- 如需强制使用环境变量：`USE_ENV_DB_URL=1 make migrate_apply`。
 
-### 4) 管理员登录
-
-- 登录地址：`http://localhost:5173/admin-login`
-- 默认超级管理员：读取 `server/configs/dev/config.yaml` 的 `data.auth.admin`
-- 进入系统后按菜单权限显示可访问菜单（超级管理员默认全部菜单）
-- 前端仅展示后端真实数据，已移除演示/假数据 seed
-- ERP 数据列表已按路由懒加载（模块页仅请求当前模块及其引用模块；看板页按需请求全模块）
-- 打印模板当前仅保留 3 项：开票信息、外销形式发票 PI、采购合同
-- 上述 3 项均为固定版式，左右字段双向同步，右侧文字可编辑；采购合同“其他条款”为整体多行编辑区；固定模板的 logo/水印/示意图锁定，不支持上传覆盖
-
-## 本地 Git Hooks（无 CI 场景）
-
-首次启用：
+## 常用质量命令
 
 ```bash
-cd /Users/simon/projects/trade-erp
-bash scripts/setup-git-hooks.sh
+# 开发期快速检查
+bash /Users/simon/projects/trade-erp/scripts/qa/fast.sh
+
+# 提交前全量检查
+bash /Users/simon/projects/trade-erp/scripts/qa/full.sh
+
+# 首次启用本地 hooks
+bash /Users/simon/projects/trade-erp/scripts/setup-git-hooks.sh
 ```
 
-启用后默认行为：
+## 本地质量门禁（无 CI）
 
-- `pre-commit`：仅对暂存的 `web/` 文件执行 `Prettier`，并对 `web/src/**/*.js|jsx` 执行 `ESLint --fix`
-- `pre-push`：执行全量质量检查  
-  `web: pnpm lint && pnpm css && pnpm test && pnpm build`  
-  `server: go test ./... && make build`
+- `pre-commit`：仅对暂存 `web/` 文件做增量 `Prettier + ESLint --fix`
+- `pre-push`：执行 `scripts/qa/full.sh`
+- `commit-msg`：校验提交信息（Conventional Commits）
 
-常用命令：
+质量脚本详细说明见：`/Users/simon/projects/trade-erp/scripts/README.md`
 
-```bash
-# 查看当前 hooks 路径
-git config --get core.hooksPath
+## 文档索引
 
-# 临时跳过 pre-push（紧急场景）
-SKIP_PRE_PUSH=1 git push
-```
+### 根目录文档
 
-## 一期预需求实现
+- 协作约定：`/Users/simon/projects/trade-erp/AGENTS.md`
+- 进度记录：`/Users/simon/projects/trade-erp/progress.md`
 
-详见：`/Users/simon/projects/trade-erp/docs/erp-phase1-requirements.md`
+### 子目录文档
 
-登录与权限接口说明：`/Users/simon/projects/trade-erp/docs/erp-auth-permission-api.md`
+- 脚本说明：`/Users/simon/projects/trade-erp/scripts/README.md`
+- 后端说明：`/Users/simon/projects/trade-erp/server/README.md`
+- 前端说明：`/Users/simon/projects/trade-erp/web/README.md`
 
-全模块核查清单：`/Users/simon/projects/trade-erp/docs/erp-module-implementation-check-20260210.md`
+### 专题文档
 
-长期表结构方案：`/Users/simon/projects/trade-erp/docs/erp-longterm-schema-plan-20260211.md`
-
-`erp_module_records` 单表评估：`/Users/simon/projects/trade-erp/docs/erp-module-records-assessment-20260211.md`
-
-ERP 联调测试数据说明：`/Users/simon/projects/trade-erp/docs/erp-testdata.md`
+- `/Users/simon/projects/trade-erp/docs/erp-phase1-requirements.md`
+- `/Users/simon/projects/trade-erp/docs/erp-auth-permission-api.md`
+- `/Users/simon/projects/trade-erp/docs/erp-module-implementation-check-20260210.md`
+- `/Users/simon/projects/trade-erp/docs/erp-longterm-schema-plan-20260211.md`
+- `/Users/simon/projects/trade-erp/docs/erp-module-records-assessment-20260211.md`
+- `/Users/simon/projects/trade-erp/docs/erp-testdata.md`
 
 ## 数据库迁移约束
 
-`server` 已采用 Ent + Atlas 工作流：
+`server` 使用 Ent + Atlas 工作流：
 
 - 禁止手写 SQL
-- 使用 `make data` 生成迁移
-- 迁移文件纳入版本管理
+- 必须通过 `make data` 生成迁移
+- 迁移文件需纳入版本管理
 
-参考：`/Users/simon/projects/trade-erp/server/internal/data/AI_DB_WORKFLOW.md`
-
-## 本次后端补充
-
-- `admin_users` 增加 `menu_permissions` 字段（Ent + Atlas 迁移生成）
-- 新增 `erp_module_records` 表，支持 ERP 模块统一 CRUD 持久化
-- `admin` JSON-RPC 新增菜单权限接口：`menu_options`、`set_permissions`
-- `admin.me/admin.list` 返回 `menu_permissions`
-- 新增 `erp` JSON-RPC 域：`list/create/update/delete`
-- `erp` 服务端增加模块级规则校验（模块白名单、必填字段、数值范围、状态箱合法值）
-- `erp` 服务端统一计算关键派生字段（`totalAmount`、`totalPackages`、`receivableDate`）
-- 启用 HTTP tracing middleware，并补充 `request_id`、`latency_ms` 日志字段
-- 新增附件上传/读取接口：`POST /files/upload`、`GET /files/...`
-- 新增模板上传/读取接口：`POST /templates/upload/{template_key}`、`GET /templates/file/{template_key}`
-- 新增 Prometheus 指标端点：`GET /metrics`
+流程详见：`/Users/simon/projects/trade-erp/server/internal/data/AI_DB_WORKFLOW.md`
