@@ -1,4 +1,9 @@
 ## 2026-02-20
+- 完成：删除 `/Users/simon/projects/trade-erp/web/link_node_modules.sh`，该脚本已不再使用。
+- 下一步：无。
+- 阻塞/风险：无。
+
+## 2026-02-20
 - 完成：修复 `/Users/simon/projects/trade-erp/web/tailwind.config.js` 的 `global-require` 告警，将插件 `require()` 从 `plugins` 数组内移动到文件顶部常量声明。
 - 验证：`pnpm exec eslint tailwind.config.js` 通过。
 - 下一步：后续新增 Tailwind 插件沿用顶部常量引用写法，避免再次触发 `global-require`。
