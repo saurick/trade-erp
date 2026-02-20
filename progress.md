@@ -1,4 +1,10 @@
 ## 2026-02-20
+- 完成：修复 `/Users/simon/projects/trade-erp/web/tailwind.config.js` 的 `global-require` 告警，将插件 `require()` 从 `plugins` 数组内移动到文件顶部常量声明。
+- 验证：`pnpm exec eslint tailwind.config.js` 通过。
+- 下一步：后续新增 Tailwind 插件沿用顶部常量引用写法，避免再次触发 `global-require`。
+- 阻塞/风险：无。
+
+## 2026-02-20
 - 完成：将根目录 `README.md` 规范为统一同构结构（项目简介、目录结构、快速开始、质量命令、门禁、文档索引、数据库迁移约束），与同目录模板仓库保持一致骨架。
 - 完成：保留 ERP 项目差异内容（业务专题文档、迁移命令细节）并按统一章节归位。
 - 下一步：后续新增文档时，保持三个仓库根 README 章节结构不变，仅维护各自差异内容。
