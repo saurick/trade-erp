@@ -121,3 +121,9 @@
 - 完成：数据层新增 MySQL 启动重试窗口与单测，降低宿主机重启后数据库短暂未就绪导致的启动失败（`server/internal/data/data.go`、`server/internal/data/data_ping_retry_test.go`）。
 - 下一步：部署前按目标机器复制 `.env.example` 为 `.env` 并校准路径/端口/镜像，再执行 `docker compose up -d`。
 - 阻塞/风险：仓库存在大量既有前端未提交改动（与本次同步无关）；提交时需严格按文件范围选择，避免混入。
+
+## 2026-02-20
+- 完成：三仓库 pre-commit 接入 `gitleaks`、`shellcheck`、`go vet`、`golangci-lint`、`yamllint`，默认采用“增量/新增问题拦截”策略以兼容历史基线。
+- 完成：本仓库已回归执行 `scripts/doctor.sh`、`scripts/git-hooks/pre-commit.sh`、`scripts/qa/go-vet.sh`、`scripts/qa/golangci-lint.sh`、`scripts/qa/yamllint.sh`，当前通过。
+- 下一步：后续逐步清理历史告警后，将 `golangci-lint` 与 `yamllint` 切换到全量阻断模式。
+- 阻塞/风险：无。
