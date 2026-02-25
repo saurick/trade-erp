@@ -974,6 +974,9 @@ export const buildProformaInvoiceTemplateHTML = (
 }
 
 export const PROFORMA_INVOICE_STYLE = `
+      .template-wrap.template-wrap-proforma-fit {
+        overflow: hidden;
+      }
       .template-wrap .proforma-template {
         display: flex;
         justify-content: center;
@@ -1023,7 +1026,7 @@ export const PROFORMA_INVOICE_STYLE = `
         overflow: hidden;
         text-overflow: ellipsis;
       }
-      .template-wrap .proforma-editable[data-multiline=\"true\"] {
+      .template-wrap .proforma-editable[data-multiline="true"] {
         white-space: pre-wrap;
         overflow: visible;
         text-overflow: initial;
