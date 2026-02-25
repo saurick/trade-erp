@@ -3043,6 +3043,10 @@ const buildWindowHTML = ({
         var isProformaTemplate = Boolean(document.querySelector('.proforma-template'));
         var isPurchaseTemplate = Boolean(document.querySelector('.purchase-contract-template'));
         var isFieldSyncTemplate = isBillingTemplate || isProformaTemplate || isPurchaseTemplate;
+        var PROFORMA_BASE_WIDTH = ${PROFORMA_PAGE_WIDTH};
+        var PROFORMA_BASE_HEIGHT = ${PROFORMA_PAGE_HEIGHT};
+        var PROFORMA_FIT_PADDING = 12;
+        var proformaAutoFitRaf = 0;
 
         var toFieldKey = function (raw) {
           return String(raw || '')
@@ -3126,18 +3130,51 @@ const buildWindowHTML = ({
           if (!isProformaTemplate || !templateWrap || !proformaTemplate || !proformaPaper) {
             return;
           }
-          // PI 预览按 1:1 画布渲染，避免自动缩放造成字体与线条失真。
-          templateWrap.classList.remove('template-wrap-proforma-fit');
-          proformaPaper.style.transform = 'none';
-          proformaPaper.style.left = '0';
+          // PI 预览按容器整页缩放，保证一屏显示且不出现滚动条。
+          var availableWidth = Math.max(
+            templateWrap.clientWidth - PROFORMA_FIT_PADDING * 2,
+            320
+          );
+          var availableHeight = Math.max(
+            templateWrap.clientHeight - PROFORMA_FIT_PADDING * 2,
+            320
+          );
+          var rawScale = Math.min(
+            availableWidth / PROFORMA_BASE_WIDTH,
+            availableHeight / PROFORMA_BASE_HEIGHT,
+            1
+          );
+          var scale = Number(rawScale.toFixed(4));
+          if (!Number.isFinite(scale) || scale <= 0) {
+            scale = 1;
+          }
+          var scaledHeight = Math.round(PROFORMA_BASE_HEIGHT * scale);
+          var verticalGap = Math.max(templateWrap.clientHeight - scaledHeight, 0);
+          var topPadding = Math.floor(verticalGap / 2);
+          var bottomPadding = verticalGap - topPadding;
+
+          templateWrap.classList.add('template-wrap-proforma-fit');
+          proformaPaper.style.transform =
+            'translateX(-50%) scale(' + String(scale) + ')';
+          proformaPaper.style.left = '50%';
           proformaPaper.style.top = '0';
-          proformaTemplate.style.paddingTop = '0';
-          proformaTemplate.style.paddingBottom = '0';
-          proformaTemplate.style.height = 'auto';
+          proformaTemplate.style.paddingTop = String(topPadding) + 'px';
+          proformaTemplate.style.paddingBottom = String(bottomPadding) + 'px';
+          proformaTemplate.style.height =
+            String(scaledHeight + topPadding + bottomPadding) + 'px';
         };
 
         var scheduleProformaAutoFit = function () {
-          applyProformaAutoFit();
+          if (!isProformaTemplate) {
+            return;
+          }
+          if (proformaAutoFitRaf) {
+            window.cancelAnimationFrame(proformaAutoFitRaf);
+          }
+          proformaAutoFitRaf = window.requestAnimationFrame(function () {
+            proformaAutoFitRaf = 0;
+            applyProformaAutoFit();
+          });
         };
 
         var collectPanelFieldMap = function () {

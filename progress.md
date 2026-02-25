@@ -185,3 +185,10 @@
 - 验证：`cd /Users/simon/projects/trade-erp/web && pnpm test -- src/erp/utils/printCenterRecord.test.js` 通过（同时全量跑过现有 6 个测试文件）；`pnpm exec eslint --no-warn-ignored src/erp/pages/PrintCenterPage.jsx` 与 `pnpm exec eslint src/erp/utils/printCenterRecord.js src/erp/utils/printCenterRecord.test.js` 通过。
 - 下一步：请在“打印模板中心 -> 开票信息”页面刷新后验证按钮状态；若仍禁用，抓一条 `erp.list`（`module_key=partners`）响应给我，我直接按接口返回继续收敛。
 - 阻塞/风险：若后端在当前账号下返回 `partners` 空数组或权限错误，按钮仍会保持禁用（这是预期保护）。
+
+## 2026-02-25
+- 完成：PI 预览恢复“整页适配”逻辑，按容器宽高计算缩放比例并居中显示，确保页面一屏展示且不出现滚动条（`web/src/erp/data/printTemplates.js`）。
+- 完成：新增 `template-wrap-proforma-fit` 的无滚动样式约束，避免适配态下出现内层滚动（`web/src/erp/data/proformaInvoiceTemplate.mjs`）。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm test` 通过（25/25）。
+- 下一步：请在 PI 编辑页刷新后复核“隐藏/显示左侧字段区”两种状态下是否都能一页显示。
+- 阻塞/风险：若浏览器窗口高度过低（极小分辨率），会继续缩小整页以保证无滚动，视觉上会更小。
