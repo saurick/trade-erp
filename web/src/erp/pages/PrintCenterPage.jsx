@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import {
   Button,
   Card,
@@ -18,6 +18,10 @@ import {
   uploadTemplateFile,
 } from '../data/printTemplates'
 import { useERPData } from '../data/ERPDataContext'
+import {
+  hasPrintableRecord,
+  pickPrintableRecord,
+} from '../utils/printCenterRecord'
 
 const { Paragraph, Text, Title } = Typography
 
@@ -28,18 +32,44 @@ const recordSourceMap = {
 }
 
 const PrintCenterPage = () => {
-  const { moduleRecords } = useERPData()
+  const { moduleRecords, ensureModuleLoaded, isModuleLoading } = useERPData()
   const [activeKey, setActiveKey] = useState(templateList[0]?.key)
   const [uploading, setUploading] = useState(false)
+  const activeModuleKey = recordSourceMap[activeKey] || ''
 
-  const activeRecord = useMemo(() => {
-    const moduleKey = recordSourceMap[activeKey]
-    if (!moduleKey) {
-      return {}
+  useEffect(() => {
+    if (!activeModuleKey) {
+      return
     }
-    return (moduleRecords[moduleKey] || [])[0] || {}
-  }, [activeKey, moduleRecords])
-  const hasActiveRecord = Boolean(activeRecord && activeRecord.id)
+    // 打印中心不依赖路由预取，切换模板时主动兜底拉取对应模块记录。
+    ensureModuleLoaded(activeModuleKey).catch((err) => {
+      const code = Number(err?.code)
+      if ([10005, 10006, 40302].includes(code)) {
+        message.warning('当前模板记录加载失败，请重新登录或检查权限')
+        return
+      }
+      message.error(err?.message || '加载当前模板记录失败')
+    })
+  }, [activeModuleKey, ensureModuleLoaded])
+
+  const activeRecordList = useMemo(() => {
+    if (!activeModuleKey) {
+      return []
+    }
+    return moduleRecords[activeModuleKey] || []
+  }, [activeModuleKey, moduleRecords])
+
+  const activeRecord = useMemo(
+    () => pickPrintableRecord(activeRecordList),
+    [activeRecordList]
+  )
+  const hasActiveRecord = useMemo(
+    () => hasPrintableRecord(activeRecordList),
+    [activeRecordList]
+  )
+  const activeRecordLoading = activeModuleKey
+    ? isModuleLoading(activeModuleKey)
+    : false
 
   const activeTemplate = useMemo(
     () => templateList.find((item) => item.key === activeKey),
@@ -123,7 +153,7 @@ const PrintCenterPage = () => {
                     type="primary"
                     icon={<PrinterOutlined />}
                     onClick={handleOpenEditablePrint}
-                    disabled={!hasActiveRecord}
+                    disabled={!hasActiveRecord || activeRecordLoading}
                   >
                     打开可编辑打印窗口
                   </Button>
@@ -146,7 +176,7 @@ const PrintCenterPage = () => {
                 <Paragraph style={{ marginBottom: 0 }}>
                   模板提示：当前仅保留采购合同、PI、开票信息三种模板，均为固定版式（来源于原始文件版式）。
                 </Paragraph>
-                {!hasActiveRecord ? (
+                {!activeRecordLoading && !hasActiveRecord ? (
                   <Text type="warning">
                     当前模板暂无数据库记录，打印按钮已禁用。
                   </Text>
@@ -164,7 +194,9 @@ const PrintCenterPage = () => {
                 <div>
                   <Text strong>当前记录字段预览（前 10 项）：</Text>
                   <div style={{ marginTop: 8 }}>
-                    {activeRecordFields.length === 0 ? (
+                    {activeRecordLoading ? (
+                      <Text type="secondary">记录加载中...</Text>
+                    ) : activeRecordFields.length === 0 ? (
                       <Text type="secondary">
                         暂无记录，可先在对应业务模块新增数据。
                       </Text>

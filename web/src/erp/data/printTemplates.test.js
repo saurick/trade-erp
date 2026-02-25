@@ -36,8 +36,11 @@ describe('printTemplates', () => {
       'application/pdf'
     )
     expect(html).toContain('proforma-template')
+    expect(html).toContain('proforma-meta-box')
+    expect(html).not.toContain('proforma-divider')
     expect(html).toContain('PROFORMA INVOICE')
     expect(html).toContain('/templates/billing-info-logo.png')
+    expect(html).toContain('/templates/proforma-signature.png')
   })
 
   it('purchase 使用固定版式模板', () => {

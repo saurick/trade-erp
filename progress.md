@@ -12,6 +12,15 @@
 - 下一步：在部署环境安装/配置 Chrome 可执行文件；若默认路径不可用，可通过 `ERP_PDF_CHROME_PATH` 显式指定。
 - 阻塞/风险：若服务器运行环境缺少 Chromium，`/templates/render-pdf` 会返回“服务器生成 PDF 失败”。
 
+## 2026-02-25
+- 完成：外销形式发票（PI）模板抽离为可复用模块 `web/src/erp/data/proformaInvoiceTemplate.mjs`，并在打印编辑器中复用字段映射与模板渲染（`web/src/erp/data/printTemplates.js`）。
+- 完成：修复 PI 固定版式的边线重叠/多画问题：去除 meta 区域左右竖线、避免签字区出现双竖线，使外框竖线仅在“货品/条款表格段”出现，贴近参考 PDF（`web/src/erp/data/proformaInvoiceTemplate.mjs`）。
+- 完成：新增 PI 像素级对比脚本（渲染参考 PDF + 截图当前模板 + 生成 diff）：`web/scripts/pi-pixel-diff.mjs`，并接入 `pnpm pi:pixel-diff` 使用入口与文档（`web/package.json`、`web/README.md`）。
+- 完成：补充单测断言，确保 PI 固定版式包含 `proforma-meta-box` 等关键结构（`web/src/erp/data/printTemplates.test.js`）。
+- 验证：`cd web && pnpm test` 通过；`pnpm pi:pixel-diff -- --ref /Users/simon/Downloads/外销形式发票模版.pdf` 可生成 `ref/current/diff` PNG。
+- 下一步：确认“签字章区”最终是保持图片（更贴近 PDF）还是维持可编辑文字；如需更聚焦线条差异，可在 diff 脚本内默认 mask 该区域。
+- 阻塞/风险：像素 diff 脚本目前依赖 macOS `qlmanage` + `npx`（首次运行会拉取 `@playwright/cli`）；非 mac 环境需补充渲染实现或改用 Poppler。
+
 ## 2026-02-20
 - 完成：落地最小侵入基线策略：`pre-commit` 的 Go 检查改为“仅改动包 + `golangci-lint` 仅新增问题（`--new-from-rev HEAD`）”；YAML 检查改为“默认仅变更文件，`YAMLLINT_ALL=1` 才全量”。
 - 完成：新增并启用根目录 `.yamllint`（降噪规则 + 忽略锁文件/生成目录），并同步更新 `scripts/README.md` 与根 `README.md` 的门禁说明。
@@ -160,3 +169,19 @@
 - 完成：按三仓库同步审计结果统一根级 `.gitignore`（补充 `output/`、`.playwright-cli/`），与现有脚本产物忽略策略保持一致。
 - 下一步：如后续新增工具缓存目录（如 coverage/sbom 报告目录），继续三仓库同批补充忽略规则。
 - 阻塞/风险：无。
+
+## 2026-02-25
+- 完成：PI 打印编辑器改为单一样式源，移除 `printTemplates.js` 中遗留的整段旧版 PI 样式，避免与 `proformaInvoiceTemplate.mjs` 双重覆盖导致的字体/线条冲突。
+- 完成：关闭 PI 预览区按高度强制缩放逻辑（保留滚动浏览），避免页面内模板被压缩后出现“字体偏小、间距异常”的观感偏差。
+- 完成：卖方签字章区改为图片渲染（`web/public/templates/proforma-signature.png`），并在 `pi-pixel-diff` 脚本中补齐签章图 dataURL 注入，保证对比截图与实际模板素材一致。
+- 完成：清理本地打印态里 PI 的强制小字号规则与自动行高规则，减少打印/导出时的线条重叠与文字挤压。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm test` 通过（21/21）；`pnpm pi:pixel-diff -- --ref /Users/simon/Downloads/外销形式发票模版.pdf --out /Users/simon/projects/trade-erp/output/pi-pixel-diff-fix2 --browser chrome` 已输出差异图。
+- 下一步：在你的真实“形式发票 PI 编辑器页面”再做一轮截图复核（重点看顶部字号、表格线闭合、签章位置）；若仍有偏差，再按区块做 2-3 组定点微调。
+- 阻塞/风险：像素差异目前仍未到理想阈值（ignoreAA 约 14 万），主要来自历史文本坐标与参考模板字体族差异，需继续小步调参收敛。
+
+## 2026-02-25
+- 完成：修复打印模板中心“开票信息”按钮误禁用问题（`web/src/erp/pages/PrintCenterPage.jsx`）：切换模板时主动 `ensureModuleLoaded` 拉取对应模块记录，不再仅依赖路由预取。
+- 完成：记录可打印判定改为“存在可用记录对象”而非强依赖 `id` 字段，减少数据形态差异导致的误判；新增工具函数与单测（`web/src/erp/utils/printCenterRecord.js`、`web/src/erp/utils/printCenterRecord.test.js`）。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm test -- src/erp/utils/printCenterRecord.test.js` 通过（同时全量跑过现有 6 个测试文件）；`pnpm exec eslint --no-warn-ignored src/erp/pages/PrintCenterPage.jsx` 与 `pnpm exec eslint src/erp/utils/printCenterRecord.js src/erp/utils/printCenterRecord.test.js` 通过。
+- 下一步：请在“打印模板中心 -> 开票信息”页面刷新后验证按钮状态；若仍禁用，抓一条 `erp.list`（`module_key=partners`）响应给我，我直接按接口返回继续收敛。
+- 阻塞/风险：若后端在当前账号下返回 `partners` 空数组或权限错误，按钮仍会保持禁用（这是预期保护）。

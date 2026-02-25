@@ -1,5 +1,11 @@
 import * as XLSX from 'xlsx'
 import { AUTH_SCOPE, getToken } from '@/common/auth/auth'
+import {
+  PROFORMA_INVOICE_FIELD_SCHEMA as PROFORMA_INVOICE_FIELD_SCHEMA_MJS,
+  PROFORMA_INVOICE_STYLE as PROFORMA_INVOICE_STYLE_MJS,
+  buildProformaInvoiceFields as buildProformaInvoiceFields_MJS,
+  buildProformaInvoiceTemplateHTML as buildProformaInvoiceTemplateHTML_MJS,
+} from './proformaInvoiceTemplate.mjs'
 
 export const templateList = [
   { key: 'pi', title: '形式发票 PI' },
@@ -2433,7 +2439,7 @@ const getFixedTemplateHTML = (templateKey, record = {}) => {
     return DEFAULT_BILLING_INFO_TEMPLATE_HTML
   }
   if (templateKey === 'pi') {
-    return buildProformaInvoiceTemplateHTML(record)
+    return buildProformaInvoiceTemplateHTML_MJS(record)
   }
   if (templateKey === 'purchase') {
     return buildPurchaseContractTemplateHTML(record)
@@ -2450,7 +2456,7 @@ const buildRecordPanelHTML = (record, templateKey) => {
   const fields = isBillingInfo
     ? buildBillingInfoFields(record)
     : isProformaInvoice
-      ? buildProformaInvoiceFields(record)
+      ? buildProformaInvoiceFields_MJS(record)
       : isPurchaseContract
         ? buildPurchaseContractFields(record)
         : flattenRecord(record)
@@ -2469,7 +2475,7 @@ const buildRecordPanelHTML = (record, templateKey) => {
           field.key,
         ])
       : isProformaInvoice
-        ? PROFORMA_INVOICE_FIELD_SCHEMA.map((field) => [
+        ? PROFORMA_INVOICE_FIELD_SCHEMA_MJS.map((field) => [
             field.label,
             fields[field.key] || '',
             field.key,
@@ -2635,9 +2641,6 @@ const buildWindowHTML = ({
         overflow: auto;
         max-height: calc(100vh - 100px);
       }
-      .template-wrap.template-wrap-proforma-fit {
-        overflow: hidden;
-      }
       .template-wrap td[contenteditable="true"],
       .template-wrap th[contenteditable="true"] {
         outline: 1px dashed transparent;
@@ -2800,312 +2803,7 @@ const buildWindowHTML = ({
       .template-wrap .billing-value-bank-account { left: 169.62px; top: 388.74px; width: 250px; }
       .template-wrap .billing-footer-company { left: 379.5px; top: 542.52px; width: 190px; }
       .template-wrap .billing-footer-date { left: 396px; top: 576.18px; width: 170px; }
-      .template-wrap .proforma-template {
-        display: flex;
-        justify-content: center;
-        min-height: 100%;
-        padding: 24px 0;
-        background: #d9d9d9;
-      }
-      .template-wrap.template-wrap-proforma-fit .proforma-template {
-        position: relative;
-        align-items: flex-start;
-        min-height: 0;
-        padding: 0;
-      }
-      .template-wrap .proforma-paper {
-        width: ${PROFORMA_PAGE_WIDTH}px;
-        height: ${PROFORMA_PAGE_HEIGHT}px;
-        position: relative;
-        background: #fff;
-        box-shadow: 0 2px 14px rgba(0, 0, 0, 0.2);
-        font-family: Arial, Helvetica, sans-serif;
-        color: #111;
-      }
-      .template-wrap.template-wrap-proforma-fit .proforma-paper {
-        position: absolute;
-        left: 50%;
-        top: 0;
-        transform-origin: top center;
-      }
-      .template-wrap .proforma-sheet {
-        position: absolute;
-        left: ${PROFORMA_CANVAS_OFFSET_LEFT}px;
-        top: ${PROFORMA_CANVAS_OFFSET_TOP}px;
-        width: ${PROFORMA_CANVAS_WIDTH}px;
-        height: ${PROFORMA_CANVAS_HEIGHT}px;
-        border: 1.6px solid #111;
-        background: #fff;
-      }
-      .template-wrap .proforma-editable {
-        display: block;
-        position: relative;
-        z-index: 1;
-        outline: 1px dashed transparent;
-        border-radius: 2px;
-        min-height: 20px;
-        line-height: 1.18;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-      .template-wrap .proforma-editable[data-multiline="true"] {
-        white-space: pre-wrap;
-        overflow: visible;
-        text-overflow: initial;
-      }
-      .template-wrap .proforma-editable:focus {
-        outline-color: #1f7a3f;
-        background: rgba(31, 122, 63, 0.08);
-      }
-      .template-wrap .proforma-header {
-        display: flex;
-        justify-content: space-between;
-        gap: 18px;
-        padding: 16px 8px 2px;
-        min-height: 104px;
-      }
-      .template-wrap .proforma-header-left {
-        flex: 1;
-        min-width: 0;
-      }
-      .template-wrap .proforma-header-company {
-        font-size: 21px;
-        font-weight: 700;
-        letter-spacing: 0.2px;
-      }
-      .template-wrap .proforma-header-address {
-        margin-top: 4px;
-        font-size: 13.5px;
-      }
-      .template-wrap .proforma-header-phone {
-        margin-top: 5px;
-        font-size: 13.5px;
-      }
-      .template-wrap .proforma-header-right {
-        width: 382px;
-        text-align: right;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-      }
-      .template-wrap .proforma-logo {
-        width: 365px;
-        max-width: 100%;
-        margin-top: 0;
-        user-select: none;
-        -webkit-user-drag: none;
-      }
-      .template-wrap .proforma-header-website {
-        margin-top: 6px;
-        font-size: 13.3px;
-        text-align: center;
-        width: 100%;
-        padding-right: 10px;
-      }
-      .template-wrap .proforma-divider {
-        border-top: 2.6px solid #000;
-      }
-      .template-wrap .proforma-title-wrap {
-        padding: 9px 0 4px;
-        text-align: center;
-      }
-      .template-wrap .proforma-title {
-        font-size: 23.5px;
-        font-weight: 700;
-        letter-spacing: 0.3px;
-      }
-      .template-wrap .proforma-meta {
-        display: flex;
-        justify-content: space-between;
-        gap: 16px;
-        padding: 4px 10px 4px;
-        min-height: 145px;
-      }
-      .template-wrap .proforma-buyer {
-        flex: 1;
-        min-height: 100%;
-      }
-      .template-wrap .proforma-buyer-company {
-        font-size: 17px;
-        font-weight: 700;
-      }
-      .template-wrap .proforma-buyer-address {
-        margin-top: 6px;
-        font-size: 13.5px;
-      }
-      .template-wrap .proforma-meta-table {
-        width: 42%;
-        border-collapse: collapse;
-        table-layout: fixed;
-      }
-      .template-wrap .proforma-meta-table th,
-      .template-wrap .proforma-meta-table td {
-        border: 0;
-        padding: 3px 5px;
-        vertical-align: top;
-      }
-      .template-wrap .proforma-meta-table th {
-        width: 35%;
-        text-align: left;
-        white-space: nowrap;
-        font-size: 12.7px;
-        font-weight: 700;
-      }
-      .template-wrap .proforma-meta-table td {
-        font-size: 12.7px;
-      }
-      .template-wrap .proforma-items-table {
-        width: 100%;
-        border-collapse: collapse;
-        table-layout: fixed;
-        border-top: 1.6px solid #000;
-      }
-      .template-wrap .proforma-items-table th,
-      .template-wrap .proforma-items-table td {
-        border: 1.6px solid #000;
-        padding: 4px 8px;
-        font-size: 13px;
-        vertical-align: middle;
-      }
-      .template-wrap .proforma-items-table thead tr {
-        height: 76px;
-      }
-      .template-wrap .proforma-item-row {
-        height: 101px;
-      }
-      .template-wrap .proforma-items-table th {
-        text-align: center;
-        font-weight: 700;
-      }
-      .template-wrap .proforma-cell-left {
-        text-align: left;
-      }
-      .template-wrap .proforma-cell-center {
-        text-align: center;
-      }
-      .template-wrap .proforma-cell-right {
-        text-align: right;
-      }
-      .template-wrap .proforma-cell-strong {
-        font-weight: 700;
-      }
-      .template-wrap .proforma-total-title-row td {
-        height: 49px;
-        font-size: 13.3px;
-        font-weight: 700;
-        border-bottom: 0;
-      }
-      .template-wrap .proforma-total-words-row td {
-        height: 64px;
-        font-size: 13.3px;
-        font-weight: 700;
-        border-top: 0;
-      }
-      .template-wrap .proforma-total-value-cell {
-        vertical-align: middle !important;
-      }
-      .template-wrap .proforma-amount-words {
-        white-space: normal;
-      }
-      .template-wrap .proforma-terms-table {
-        width: 100%;
-        border-collapse: collapse;
-        table-layout: fixed;
-      }
-      .template-wrap .proforma-terms-table th,
-      .template-wrap .proforma-terms-table td {
-        border: 1.6px solid #000;
-        padding: 4px 6px;
-        vertical-align: middle;
-        font-size: 13px;
-      }
-      .template-wrap .proforma-terms-spacer-row {
-        height: 30px;
-      }
-      .template-wrap .proforma-terms-main-row {
-        height: 58px;
-      }
-      .template-wrap .proforma-terms-lead-row {
-        height: 71px;
-      }
-      .template-wrap .proforma-terms-notes-row {
-        height: 61px;
-      }
-      .template-wrap .proforma-terms-table th {
-        width: 18%;
-        text-align: left;
-        font-weight: 700;
-      }
-      .template-wrap .proforma-terms-table td {
-        width: 32%;
-      }
-      .template-wrap .proforma-signature-zone {
-        border-left: 1.6px solid #000;
-        border-right: 1.6px solid #000;
-        padding: 16px 14px 8px;
-        height: 249px;
-      }
-      .template-wrap .proforma-seller-signature {
-        width: 43%;
-        margin: 0 auto;
-        text-align: center;
-        color: #52638f;
-      }
-      .template-wrap .proforma-seller-company-en {
-        font-size: 13px;
-        font-weight: 700;
-      }
-      .template-wrap .proforma-seller-company-cn {
-        margin-top: 3px;
-        font-size: 16px;
-        font-family: "SimSun", "Songti SC", "Noto Serif CJK SC", serif;
-      }
-      .template-wrap .proforma-seller-signer {
-        margin-top: 10px;
-        font-size: 22px;
-        font-family: "Brush Script MT", "Segoe Script", cursive;
-      }
-      .template-wrap .proforma-seller-sign-line {
-        margin-top: 6px;
-        border-top: 2px dotted #52638f;
-      }
-      .template-wrap .proforma-seller-sign-note {
-        margin-top: 4px;
-        font-size: 10px;
-        font-style: italic;
-      }
-      .template-wrap .proforma-signature-labels {
-        display: flex;
-        justify-content: space-between;
-        gap: 16px;
-        margin-top: 14px;
-      }
-      .template-wrap .proforma-signature-label {
-        flex: 1;
-        font-size: 13.5px;
-        font-weight: 700;
-      }
-      .template-wrap .proforma-bank-table {
-        width: 100%;
-        border-collapse: collapse;
-        table-layout: fixed;
-        border-top: 1.6px solid #000;
-      }
-      .template-wrap .proforma-bank-table th,
-      .template-wrap .proforma-bank-table td {
-        padding: 3px 6px;
-        text-align: left;
-        vertical-align: top;
-        border: 0;
-      }
-      .template-wrap .proforma-bank-table th {
-        font-size: 13px;
-        font-weight: 700;
-      }
-      .template-wrap .proforma-bank-table td {
-        font-size: 13px;
-      }
+      ${PROFORMA_INVOICE_STYLE_MJS}
       .template-wrap .purchase-contract-template {
         display: flex;
         justify-content: center;
@@ -3287,19 +2985,6 @@ const buildWindowHTML = ({
           min-height: 0 !important;
           border-width: 0.35mm !important;
         }
-        .template-wrap .proforma-items-table thead tr,
-        .template-wrap .proforma-item-row,
-        .template-wrap .proforma-total-title-row td,
-        .template-wrap .proforma-total-words-row td,
-        .template-wrap .proforma-terms-spacer-row,
-        .template-wrap .proforma-terms-main-row,
-        .template-wrap .proforma-terms-lead-row,
-        .template-wrap .proforma-terms-notes-row {
-          height: auto !important;
-        }
-        .template-wrap .proforma-signature-zone {
-          height: auto !important;
-        }
         .template-wrap .purchase-contract-template {
           padding: 0 !important;
           background: #fff !important;
@@ -3313,30 +2998,6 @@ const buildWindowHTML = ({
         .template-wrap .purchase-contract-canvas {
           transform: none !important;
         }
-        .template-wrap .proforma-header-company { font-size: 8.4pt !important; }
-        .template-wrap .proforma-header-address { font-size: 6.5pt !important; }
-        .template-wrap .proforma-header-phone { font-size: 6.3pt !important; }
-        .template-wrap .proforma-header-website { font-size: 6.4pt !important; }
-        .template-wrap .proforma-title { font-size: 7.1pt !important; }
-        .template-wrap .proforma-buyer-company { font-size: 6.4pt !important; }
-        .template-wrap .proforma-buyer-address { font-size: 5.8pt !important; }
-        .template-wrap .proforma-meta-table th,
-        .template-wrap .proforma-meta-table td,
-        .template-wrap .proforma-items-table th,
-        .template-wrap .proforma-items-table td,
-        .template-wrap .proforma-total-title-row td,
-        .template-wrap .proforma-total-words-row td,
-        .template-wrap .proforma-terms-table th,
-        .template-wrap .proforma-terms-table td,
-        .template-wrap .proforma-signature-label,
-        .template-wrap .proforma-bank-table th,
-        .template-wrap .proforma-bank-table td {
-          font-size: 5.8pt !important;
-        }
-        .template-wrap .proforma-seller-company-en { font-size: 5.4pt !important; }
-        .template-wrap .proforma-seller-company-cn { font-size: 6pt !important; }
-        .template-wrap .proforma-seller-signer { font-size: 8.6pt !important; }
-        .template-wrap .proforma-seller-sign-note { font-size: 4.6pt !important; }
       }
     </style>
   </head>
@@ -3382,9 +3043,6 @@ const buildWindowHTML = ({
         var isProformaTemplate = Boolean(document.querySelector('.proforma-template'));
         var isPurchaseTemplate = Boolean(document.querySelector('.purchase-contract-template'));
         var isFieldSyncTemplate = isBillingTemplate || isProformaTemplate || isPurchaseTemplate;
-        var PROFORMA_BASE_WIDTH = ${PROFORMA_PAGE_WIDTH};
-        var PROFORMA_BASE_HEIGHT = ${PROFORMA_CANVAS_OFFSET_TOP + PROFORMA_CANVAS_HEIGHT + 8};
-        var proformaAutoFitRaf = 0;
 
         var toFieldKey = function (raw) {
           return String(raw || '')
@@ -3468,33 +3126,18 @@ const buildWindowHTML = ({
           if (!isProformaTemplate || !templateWrap || !proformaTemplate || !proformaPaper) {
             return;
           }
-          var wrapRect = templateWrap.getBoundingClientRect();
-          var availableWidth = Math.max(wrapRect.width - 24, 320);
-          var availableHeight = Math.max(wrapRect.height - 24, 320);
-          var scale = Math.min(availableWidth / PROFORMA_BASE_WIDTH, availableHeight / PROFORMA_BASE_HEIGHT, 1);
-          var roundedScale = Number(scale.toFixed(4));
-          var topPadding = 4;
-          var bottomPadding = 4;
-          var scaledHeight = Math.round(PROFORMA_BASE_HEIGHT * roundedScale);
-
-          templateWrap.classList.add('template-wrap-proforma-fit');
-          proformaPaper.style.transform = 'translateX(-50%) scale(' + roundedScale + ')';
-          proformaTemplate.style.paddingTop = String(topPadding) + 'px';
-          proformaTemplate.style.paddingBottom = String(bottomPadding) + 'px';
-          proformaTemplate.style.height = String(scaledHeight + topPadding + bottomPadding) + 'px';
+          // PI 预览按 1:1 画布渲染，避免自动缩放造成字体与线条失真。
+          templateWrap.classList.remove('template-wrap-proforma-fit');
+          proformaPaper.style.transform = 'none';
+          proformaPaper.style.left = '0';
+          proformaPaper.style.top = '0';
+          proformaTemplate.style.paddingTop = '0';
+          proformaTemplate.style.paddingBottom = '0';
+          proformaTemplate.style.height = 'auto';
         };
 
         var scheduleProformaAutoFit = function () {
-          if (!isProformaTemplate) {
-            return;
-          }
-          if (proformaAutoFitRaf) {
-            window.cancelAnimationFrame(proformaAutoFitRaf);
-          }
-          proformaAutoFitRaf = window.requestAnimationFrame(function () {
-            proformaAutoFitRaf = 0;
-            applyProformaAutoFit();
-          });
+          applyProformaAutoFit();
         };
 
         var collectPanelFieldMap = function () {
@@ -4190,6 +3833,6 @@ export const uploadTemplateFile = async (templateKey, file) => {
 export const __TEST_ONLY__ = {
   buildTemplateHTMLFromResponse,
   buildBillingInfoFields,
-  buildProformaInvoiceFields,
+  buildProformaInvoiceFields: buildProformaInvoiceFields_MJS,
   buildPurchaseContractFields,
 }

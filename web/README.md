@@ -16,6 +16,34 @@ pnpm test
 pnpm build
 ```
 
+## PI 像素级对比（模板 1:1 校验）
+
+> 依赖：macOS 的 `qlmanage`（把参考 PDF 渲染为 PNG）；以及 `npx`（脚本会通过 npx 临时拉起 `playwright-cli` 截图）。
+
+```bash
+cd /Users/simon/projects/trade-erp/web
+pnpm pi:pixel-diff -- --ref /Users/simon/Downloads/外销形式发票模版.pdf
+```
+
+默认输出目录：`/Users/simon/projects/trade-erp/output/pi-pixel-diff/`
+
+- `ref.png`：参考 PDF 渲染图
+- `current.png`：当前模板渲染截图
+- `diff.png`：像素差异图（忽略抗锯齿）
+- `diff-include-aa.png`：像素差异图（包含抗锯齿）
+
+PI 模板默认素材：
+
+- Logo：`/Users/simon/projects/trade-erp/web/public/templates/billing-info-logo.png`
+- 卖方签章图：`/Users/simon/projects/trade-erp/web/public/templates/proforma-signature.png`
+
+可选参数：
+
+- `--out /path/to/dir`
+- `--record /path/to/record.json`
+- `--mask x,y,w,h`（可重复传入，用于忽略某块区域）
+- `--browser chrome|firefox|msedge`（默认 `chrome`；`webkit` 需先安装 Playwright 浏览器）
+
 ## 环境变量
 
 - `VITE_BASE_URL`：前端部署基础路径
