@@ -118,6 +118,10 @@ export default defineConfig(({ command, mode }) => {
           target: 'http://localhost:8003',
           changeOrigin: true,
         },
+        '/templates/render-pdf': {
+          target: 'http://localhost:8003',
+          changeOrigin: true,
+        },
         '/files': {
           target: 'http://localhost:8003',
           changeOrigin: true,

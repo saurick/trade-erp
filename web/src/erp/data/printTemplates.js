@@ -2509,7 +2509,15 @@ const buildRecordPanelHTML = (record, templateKey) => {
   `
 }
 
-const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
+const buildWindowHTML = ({
+  title,
+  templateKey,
+  templateHTML,
+  recordPanelHTML,
+  source,
+  authToken,
+  appBaseURL,
+}) => `
 <html>
   <head>
     <meta charset="utf-8" />
@@ -2542,10 +2550,23 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
         border-radius: 6px;
         cursor: pointer;
       }
+      .toolbar button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
       .toolbar .ghost {
         border: 1px solid #8c8c8c;
         background: #fff;
         color: #262626;
+      }
+      .toolbar .server-btn {
+        border-color: #0958d9;
+        background: #0958d9;
+      }
+      .toolbar-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
       }
       .source-tag {
         display: inline-block;
@@ -2555,6 +2576,12 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
         font-size: 12px;
         background: #e6f4ea;
         color: #1f7a3f;
+      }
+      .server-status {
+        display: inline-block;
+        margin-left: 8px;
+        font-size: 12px;
+        color: #595959;
       }
       .content {
         padding: 14px;
@@ -3318,9 +3345,12 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
       <div>
         <strong>${escapeHTML(title)}</strong>
         <span class="source-tag">${source === 'server' ? '使用上传模板' : '使用默认模板'}</span>
+        <span class="server-status" id="server-pdf-status"></span>
       </div>
-      <div>
+      <div class="toolbar-actions">
         <button class="ghost" id="toggle-grid-btn">切换字段区</button>
+        <button class="ghost" id="server-preview-btn">服务器预览PDF</button>
+        <button class="server-btn" id="server-download-btn">下载PDF</button>
         <button id="print-btn">打印</button>
       </div>
     </header>
@@ -3334,11 +3364,19 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
       (function () {
         var printBtn = document.getElementById('print-btn');
         var toggleGridBtn = document.getElementById('toggle-grid-btn');
+        var serverPreviewBtn = document.getElementById('server-preview-btn');
+        var serverDownloadBtn = document.getElementById('server-download-btn');
+        var serverStatus = document.getElementById('server-pdf-status');
         var panel = document.querySelector('.record-panel');
         var templateWrap = document.querySelector('.template-wrap');
         var proformaTemplate = document.querySelector('.proforma-template');
         var proformaPaper = document.querySelector('.proforma-paper');
         var panelDisplayBeforePrint = null;
+        var popupTitle = ${JSON.stringify(title)};
+        var currentTemplateKey = ${JSON.stringify(templateKey)};
+        var adminToken = ${JSON.stringify(authToken || '')};
+        var appBaseURL = ${JSON.stringify(appBaseURL || '')};
+        var serverPDFBusy = false;
 
         var isBillingTemplate = Boolean(document.querySelector('.billing-info-template'));
         var isProformaTemplate = Boolean(document.querySelector('.proforma-template'));
@@ -3722,6 +3760,315 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
           syncAllBillingFieldsFromPanel();
         };
 
+        var setServerPDFStatus = function (message, isError) {
+          if (!serverStatus) {
+            return;
+          }
+          serverStatus.textContent = String(message || '');
+          serverStatus.style.color = isError ? '#cf1322' : '#595959';
+        };
+
+        var setServerPDFBusy = function (busy) {
+          serverPDFBusy = busy;
+          if (serverPreviewBtn) {
+            serverPreviewBtn.disabled = busy;
+          }
+          if (serverDownloadBtn) {
+            serverDownloadBtn.disabled = busy;
+          }
+          if (busy) {
+            setServerPDFStatus('服务器生成中...', false);
+          }
+        };
+
+        var sanitizeFilePart = function (raw) {
+          return String(raw || '')
+            .trim()
+            .toLowerCase()
+            .replace(/\\s+/g, '-')
+            .replace(/[^a-z0-9_-]/g, '-')
+            .replace(/-+/g, '-')
+            .replace(/^-|-$/g, '');
+        };
+
+        var buildServerPDFFileName = function () {
+          var now = new Date();
+          var stamp = String(now.getFullYear()) +
+            String(now.getMonth() + 1).padStart(2, '0') +
+            String(now.getDate()).padStart(2, '0') +
+            '_' +
+            String(now.getHours()).padStart(2, '0') +
+            String(now.getMinutes()).padStart(2, '0') +
+            String(now.getSeconds()).padStart(2, '0');
+          var keyPart = sanitizeFilePart(currentTemplateKey) || 'template';
+          return keyPart + '_' + stamp + '.pdf';
+        };
+
+        var resolveSnapshotURL = function (raw) {
+          try {
+            return String(new URL(String(raw || ''), appBaseURL || window.location.href));
+          } catch (err) {
+            return String(raw || '');
+          }
+        };
+
+        var blobToDataURL = function (blob) {
+          return new Promise(function (resolve, reject) {
+            var reader = new FileReader();
+            reader.onload = function () {
+              resolve(String(reader.result || ''));
+            };
+            reader.onerror = function () {
+              reject(new Error('读取图片失败'));
+            };
+            reader.readAsDataURL(blob);
+          });
+        };
+
+        var inlineSnapshotImages = async function (root) {
+          var images = Array.prototype.slice.call(root.querySelectorAll('img[src]'));
+          await Promise.all(
+            images.map(async function (img) {
+              var src = String(img.getAttribute('src') || '').trim();
+              if (!src || src.startsWith('data:')) {
+                return;
+              }
+              try {
+                var resp = await fetch(resolveSnapshotURL(src), { credentials: 'include' });
+                if (!resp.ok) {
+                  return;
+                }
+                var blob = await resp.blob();
+                var dataURL = await blobToDataURL(blob);
+                if (dataURL) {
+                  img.setAttribute('src', dataURL);
+                }
+              } catch (err) {
+                // 图片内联失败时保留原始 src，避免阻断 PDF 生成。
+              }
+            })
+          );
+        };
+
+        var applyServerPDFLayoutOverrides = function (root) {
+          var head = root.querySelector('head');
+          if (!head) {
+            return;
+          }
+
+          var style = root.ownerDocument.createElement('style');
+          style.setAttribute('data-server-pdf-style', 'true');
+          style.textContent = [
+            '@page {',
+            '  size: A4 portrait !important;',
+            '  margin: 0 !important;',
+            '}',
+            'html, body {',
+            '  margin: 0 !important;',
+            '  padding: 0 !important;',
+            '  background: #fff !important;',
+            '}',
+            'body {',
+            '  -webkit-print-color-adjust: exact !important;',
+            '  print-color-adjust: exact !important;',
+            '}',
+            '.content {',
+            '  display: block !important;',
+            '  padding: 0 !important;',
+            '}',
+            '.template-wrap {',
+            '  display: block !important;',
+            '  overflow: visible !important;',
+            '  border: 0 !important;',
+            '  border-radius: 0 !important;',
+            '  padding: 0 !important;',
+            '  max-height: none !important;',
+            '}',
+            '.template-wrap .billing-info-template,',
+            '.template-wrap .proforma-template,',
+            '.template-wrap .purchase-contract-template {',
+            '  padding: 0 !important;',
+            '  background: #fff !important;',
+            '  min-height: 0 !important;',
+            '}',
+            '.template-wrap .billing-info-paper,',
+            '.template-wrap .proforma-paper,',
+            '.template-wrap .purchase-contract-paper {',
+            '  margin-left: auto !important;',
+            '  margin-right: auto !important;',
+            '  box-shadow: none !important;',
+            '}',
+            '.template-wrap .billing-info-paper {',
+            '  position: relative !important;',
+            '}',
+            '.template-wrap .billing-info-canvas {',
+            '  width: 595px !important;',
+            '  height: 842px !important;',
+            '  margin-left: auto !important;',
+            '  margin-right: auto !important;',
+            '}',
+          ].join('\\n');
+          head.appendChild(style);
+        };
+
+        var normalizeServerPDFSnapshotRuntimeState = function (root) {
+          var content = root.querySelector('.content');
+          if (content) {
+            content.style.display = 'block';
+            content.style.padding = '0';
+          }
+
+          var templateWrapNode = root.querySelector('.template-wrap');
+          if (templateWrapNode) {
+            templateWrapNode.classList.remove('template-wrap-proforma-fit');
+            templateWrapNode.style.overflow = 'visible';
+            templateWrapNode.style.maxHeight = 'none';
+            templateWrapNode.style.padding = '0';
+            templateWrapNode.style.border = '0';
+          }
+
+          var proformaTemplateNode = root.querySelector('.proforma-template');
+          if (proformaTemplateNode) {
+            proformaTemplateNode.style.paddingTop = '0';
+            proformaTemplateNode.style.paddingBottom = '0';
+            proformaTemplateNode.style.height = 'auto';
+          }
+
+          var proformaPaperNode = root.querySelector('.proforma-paper');
+          if (proformaPaperNode) {
+            proformaPaperNode.style.transform = 'none';
+            proformaPaperNode.style.left = '0';
+            proformaPaperNode.style.top = '0';
+          }
+        };
+
+        var buildServerPDFSnapshotHTML = async function () {
+          // 复制当前 DOM 并去掉交互脚本，仅保留打印态内容给服务端渲染。
+          var clonedRoot = document.documentElement.cloneNode(true);
+          var clonedBody = clonedRoot.querySelector('body');
+          if (clonedBody) {
+            clonedBody.classList.add('print-template-only');
+          }
+          var clonedToolbar = clonedRoot.querySelector('.toolbar');
+          if (clonedToolbar) {
+            clonedToolbar.remove();
+          }
+          var clonedPanel = clonedRoot.querySelector('.record-panel');
+          if (clonedPanel) {
+            clonedPanel.remove();
+          }
+          var scripts = clonedRoot.querySelectorAll('script');
+          scripts.forEach(function (node) {
+            node.remove();
+          });
+          normalizeServerPDFSnapshotRuntimeState(clonedRoot);
+          applyServerPDFLayoutOverrides(clonedRoot);
+          await inlineSnapshotImages(clonedRoot);
+          return '<!doctype html>' + clonedRoot.outerHTML;
+        };
+
+        var readServerErrorMessage = async function (resp) {
+          var contentType = String(resp.headers.get('content-type') || '').toLowerCase();
+          if (contentType.includes('application/json')) {
+            try {
+              var payload = await resp.json();
+              if (payload && payload.message) {
+                return String(payload.message);
+              }
+            } catch (err) {
+              // ignore parse error and fallback to text response.
+            }
+          }
+          try {
+            return String(await resp.text() || '').trim();
+          } catch (err) {
+            return '';
+          }
+        };
+
+        var requestServerPDFBlob = async function () {
+          if (!adminToken) {
+            throw new Error('登录已失效，请刷新页面后重试');
+          }
+          syncAllBillingFieldsFromPanel();
+          var snapshotHTML = await buildServerPDFSnapshotHTML();
+          var resp = await fetch('/templates/render-pdf', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: 'Bearer ' + adminToken
+            },
+            body: JSON.stringify({
+              title: popupTitle,
+              file_name: buildServerPDFFileName(),
+              template_key: currentTemplateKey,
+              html: snapshotHTML,
+              base_url: appBaseURL
+            })
+          });
+
+          if (!resp.ok) {
+            var msg = await readServerErrorMessage(resp);
+            throw new Error(msg || '服务器生成 PDF 失败');
+          }
+
+          var blob = await resp.blob();
+          if (!blob || blob.size === 0) {
+            throw new Error('服务器返回空 PDF');
+          }
+          return blob;
+        };
+
+        var previewServerPDF = async function () {
+          if (serverPDFBusy) {
+            return;
+          }
+          setServerPDFBusy(true);
+          try {
+            var blob = await requestServerPDFBlob();
+            var blobURL = URL.createObjectURL(blob);
+            var previewWindow = window.open(blobURL, '_blank');
+            if (!previewWindow) {
+              URL.revokeObjectURL(blobURL);
+              throw new Error('浏览器拦截了预览弹窗，请允许弹窗后重试');
+            }
+            window.setTimeout(function () {
+              URL.revokeObjectURL(blobURL);
+            }, 60000);
+            setServerPDFStatus('服务器 PDF 预览已打开', false);
+          } catch (err) {
+            setServerPDFStatus(err?.message || '服务器预览失败', true);
+          } finally {
+            setServerPDFBusy(false);
+          }
+        };
+
+        var downloadServerPDF = async function () {
+          if (serverPDFBusy) {
+            return;
+          }
+          setServerPDFBusy(true);
+          try {
+            var blob = await requestServerPDFBlob();
+            var blobURL = URL.createObjectURL(blob);
+            var link = document.createElement('a');
+            link.href = blobURL;
+            link.download = buildServerPDFFileName();
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.setTimeout(function () {
+              URL.revokeObjectURL(blobURL);
+            }, 60000);
+            setServerPDFStatus('服务器 PDF 已开始下载', false);
+          } catch (err) {
+            setServerPDFStatus(err?.message || '服务器下载失败', true);
+          } finally {
+            setServerPDFBusy(false);
+          }
+        };
+
         var enableTemplateOnlyPrint = function () {
           document.body.classList.add('print-template-only');
           if (panel) {
@@ -3756,6 +4103,16 @@ const buildWindowHTML = ({ title, templateHTML, recordPanelHTML, source }) => `
             scheduleProformaAutoFit();
           });
         }
+        if (serverPreviewBtn) {
+          serverPreviewBtn.addEventListener('click', function () {
+            previewServerPDF();
+          });
+        }
+        if (serverDownloadBtn) {
+          serverDownloadBtn.addEventListener('click', function () {
+            downloadServerPDF();
+          });
+        }
         bindEditableSanitizer();
         bindBillingSync();
         scheduleProformaAutoFit();
@@ -3769,6 +4126,8 @@ export const openPrintWindow = async (templateKey, record = {}) => {
   ensureTemplateEnabled(templateKey)
   const templateMeta = templateList.find((item) => item.key === templateKey)
   const title = templateMeta?.title || '打印模板'
+  const authToken = getToken(AUTH_SCOPE.ADMIN)
+  const appBaseURL = window.location.origin
   const { source, templateHTML } = await fetchTemplateHTML(templateKey, record)
   const recordPanelHTML = buildRecordPanelHTML(record, templateKey)
 
@@ -3781,9 +4140,12 @@ export const openPrintWindow = async (templateKey, record = {}) => {
   popup.document.write(
     buildWindowHTML({
       title,
+      templateKey,
       templateHTML,
       recordPanelHTML,
       source,
+      authToken,
+      appBaseURL,
     })
   )
   popup.document.close()

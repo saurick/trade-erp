@@ -86,6 +86,18 @@
 
 - 说明：读取指定模板 key 的当前模板文件（优先返回后台已上传模板）
 
+### `POST /templates/render-pdf`
+
+- 认证：管理员 Bearer Token
+- Content-Type：`application/json`
+- 入参：
+  - `title`：模板标题（可选）
+  - `file_name`：下载文件名（可选，服务端会兜底与清洗）
+  - `html`：待渲染的 HTML（必填，建议传打印态 DOM）
+  - `base_url`：静态资源基地址（可选，如 `http://localhost:5173/`）
+- 返回：`application/pdf` 二进制流（`inline`）
+- 说明：由服务器使用 Headless Chromium 渲染 PDF，适合统一版式预览与下载。
+
 ### `GET /metrics`
 
 - 说明：Prometheus 指标采集端点

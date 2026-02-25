@@ -1,3 +1,17 @@
+## 2026-02-25
+- 完成：打印弹窗工具栏新增“服务器预览PDF”“下载PDF”按钮，支持将当前编辑后的模板 DOM 提交给服务端渲染并预览/下载（`web/src/erp/data/printTemplates.js`）。
+- 完成：后端新增 `POST /templates/render-pdf` 接口，管理员鉴权后使用 Headless Chromium 统一渲染 PDF；支持 `base_url` 资源基址注入与文件名兜底清洗（`server/internal/server/template_pdf.go`）。
+- 完成：修复模板/文件 HTTP 路由在管理员鉴权上的误判问题，`isAdmin` 判断由“仅 context claims”改为“context 优先 + Authorization JWT 兜底校验”，并新增单测覆盖 admin/user token 分支（`server/internal/server/file_handlers.go`、`server/internal/server/file_handlers_auth_test.go`）。
+- 完成：修复服务器 PDF 与前端预览差异：前端改为传入主窗口 `base_url`、快照阶段尽量内联图片，后端渲染显式启用 `print media` 并增加短暂资源加载等待，降低缺图和样式偏差（`web/src/erp/data/printTemplates.js`、`server/internal/server/template_pdf.go`）。
+- 完成：修复服务器 PDF 页面偏左问题：快照生成阶段新增“服务器 PDF 专用布局覆盖”（强制 A4 竖版、清理预览态动态样式、纸张容器居中），减少右侧异常留白（`web/src/erp/data/printTemplates.js`）。
+- 完成：进一步固定服务端 `printToPDF` 纸张参数（A4 竖版 + scale=1 + 零边距，关闭 `preferCSSPageSize` 自适配），降低不同内核下横向偏移导致的左右留白不对称（`server/internal/server/template_pdf.go`）。
+- 完成：针对开票信息固定坐标模板补充服务器快照居中规则（`billing-info-canvas` 固定 595x842 并水平居中），修正服务端 PDF 右侧异常留白过大问题（`web/src/erp/data/printTemplates.js`）。
+- 完成：定位并修复开票信息模板服务端 PDF 右侧留白过大根因（72/96 DPI 比例差）：前端请求新增 `template_key`，服务端按模板 key 动态设置 `printToPDF` 缩放（`billingInfo` 使用 `4/3`），其余模板维持 `1.0`（`web/src/erp/data/printTemplates.js`、`server/internal/server/template_pdf.go`）。
+- 完成：开发环境代理新增 `/templates/render-pdf` 转发；接口文档补充新端点说明（`web/vite.config.mjs`、`docs/erp-auth-permission-api.md`）。
+- 验证：`cd server && go test ./...`；`cd web && pnpm exec eslint src/erp/data/printTemplates.js vite.config.mjs`；`cd web && pnpm test -- src/erp/data/printTemplates.test.js` 均通过。
+- 下一步：在部署环境安装/配置 Chrome 可执行文件；若默认路径不可用，可通过 `ERP_PDF_CHROME_PATH` 显式指定。
+- 阻塞/风险：若服务器运行环境缺少 Chromium，`/templates/render-pdf` 会返回“服务器生成 PDF 失败”。
+
 ## 2026-02-20
 - 完成：落地最小侵入基线策略：`pre-commit` 的 Go 检查改为“仅改动包 + `golangci-lint` 仅新增问题（`--new-from-rev HEAD`）”；YAML 检查改为“默认仅变更文件，`YAMLLINT_ALL=1` 才全量”。
 - 完成：新增并启用根目录 `.yamllint`（降噪规则 + 忽略锁文件/生成目录），并同步更新 `scripts/README.md` 与根 `README.md` 的门禁说明。
