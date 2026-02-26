@@ -1,6 +1,12 @@
 import * as XLSX from 'xlsx'
 import { AUTH_SCOPE, getToken } from '@/common/auth/auth'
 import {
+  PROFORMA_PAGE_WIDTH as PROFORMA_PAGE_WIDTH_MJS,
+  PROFORMA_PAGE_HEIGHT as PROFORMA_PAGE_HEIGHT_MJS,
+  PROFORMA_CANVAS_WIDTH as PROFORMA_CANVAS_WIDTH_MJS,
+  PROFORMA_CANVAS_HEIGHT as PROFORMA_CANVAS_HEIGHT_MJS,
+  PROFORMA_CANVAS_OFFSET_LEFT as PROFORMA_CANVAS_OFFSET_LEFT_MJS,
+  PROFORMA_CANVAS_OFFSET_TOP as PROFORMA_CANVAS_OFFSET_TOP_MJS,
   PROFORMA_INVOICE_FIELD_SCHEMA as PROFORMA_INVOICE_FIELD_SCHEMA_MJS,
   PROFORMA_INVOICE_STYLE as PROFORMA_INVOICE_STYLE_MJS,
   buildProformaInvoiceFields as buildProformaInvoiceFields_MJS,
@@ -752,12 +758,12 @@ const DEFAULT_PROFORMA_INVOICE_ITEMS = [
   },
 ]
 
-const PROFORMA_PAGE_WIDTH = 1414
-const PROFORMA_PAGE_HEIGHT = 2000
-const PROFORMA_CANVAS_WIDTH = 1269
-const PROFORMA_CANVAS_HEIGHT = 1370
-const PROFORMA_CANVAS_OFFSET_LEFT = 70
-const PROFORMA_CANVAS_OFFSET_TOP = 64
+const PROFORMA_PAGE_WIDTH = PROFORMA_PAGE_WIDTH_MJS
+const PROFORMA_PAGE_HEIGHT = PROFORMA_PAGE_HEIGHT_MJS
+const PROFORMA_CANVAS_WIDTH = PROFORMA_CANVAS_WIDTH_MJS
+const PROFORMA_CANVAS_HEIGHT = PROFORMA_CANVAS_HEIGHT_MJS
+const PROFORMA_CANVAS_OFFSET_LEFT = PROFORMA_CANVAS_OFFSET_LEFT_MJS
+const PROFORMA_CANVAS_OFFSET_TOP = PROFORMA_CANVAS_OFFSET_TOP_MJS
 
 const buildBillingInfoFields = (record = {}) => {
   const { values, hasExplicit } = buildFieldsBySchema(
@@ -3130,13 +3136,28 @@ const buildWindowHTML = ({
           if (!isProformaTemplate || !templateWrap || !proformaTemplate || !proformaPaper) {
             return;
           }
-          // PI 预览按容器整页缩放，保证一屏显示且不出现滚动条。
+          templateWrap.classList.add('template-wrap-proforma-fit');
+          // 兜底读取容器尺寸，避免首帧布局未稳定时把 PI 误缩到很小。
+          var wrapWidth = templateWrap.clientWidth || 0;
+          var wrapHeight = templateWrap.clientHeight || 0;
+          if (wrapWidth <= 0 || wrapHeight <= 0) {
+            var wrapRect = templateWrap.getBoundingClientRect();
+            wrapWidth = Math.round(wrapRect.width || 0);
+            wrapHeight = Math.round(wrapRect.height || 0);
+          }
+          if (wrapWidth < 320) {
+            wrapWidth = Math.max(window.innerWidth - 420, 320);
+          }
+          if (wrapHeight < 320) {
+            wrapHeight = Math.max(window.innerHeight - 120, 320);
+          }
+
           var availableWidth = Math.max(
-            templateWrap.clientWidth - PROFORMA_FIT_PADDING * 2,
+            wrapWidth - PROFORMA_FIT_PADDING * 2,
             320
           );
           var availableHeight = Math.max(
-            templateWrap.clientHeight - PROFORMA_FIT_PADDING * 2,
+            wrapHeight - PROFORMA_FIT_PADDING * 2,
             320
           );
           var rawScale = Math.min(
@@ -3149,11 +3170,10 @@ const buildWindowHTML = ({
             scale = 1;
           }
           var scaledHeight = Math.round(PROFORMA_BASE_HEIGHT * scale);
-          var verticalGap = Math.max(templateWrap.clientHeight - scaledHeight, 0);
+          var verticalGap = Math.max(wrapHeight - scaledHeight, 0);
           var topPadding = Math.floor(verticalGap / 2);
           var bottomPadding = verticalGap - topPadding;
 
-          templateWrap.classList.add('template-wrap-proforma-fit');
           proformaPaper.style.transform =
             'translateX(-50%) scale(' + String(scale) + ')';
           proformaPaper.style.left = '50%';
@@ -3768,6 +3788,7 @@ const buildWindowHTML = ({
 
         window.addEventListener('afterprint', restorePrintLayout);
         window.addEventListener('resize', scheduleProformaAutoFit);
+        window.addEventListener('load', scheduleProformaAutoFit);
 
         if (printBtn) {
           printBtn.addEventListener('click', function () {
@@ -3796,6 +3817,7 @@ const buildWindowHTML = ({
         bindEditableSanitizer();
         bindBillingSync();
         scheduleProformaAutoFit();
+        window.setTimeout(scheduleProformaAutoFit, 80);
       })();
     </script>
   </body>

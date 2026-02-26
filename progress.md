@@ -192,3 +192,27 @@
 - 验证：`cd /Users/simon/projects/trade-erp/web && pnpm test` 通过（25/25）。
 - 下一步：请在 PI 编辑页刷新后复核“隐藏/显示左侧字段区”两种状态下是否都能一页显示。
 - 阻塞/风险：若浏览器窗口高度过低（极小分辨率），会继续缩小整页以保证无滚动，视觉上会更小。
+
+## 2026-02-25
+- 完成：PI 预览缩放策略改为“按宽度优先适配”，取消按高度压缩导致的页面过小问题，使网页视觉比例更接近 PDF Expert 基准截图（`web/src/erp/data/printTemplates.js`）。
+- 完成：PI 适配态下通过运行时样式将模板容器 `max-height` 置空并保持无内部滚动，避免预览区出现滚动条。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm test` 通过（25/25）。
+- 下一步：请刷新 PI 页面后确认当前比例是否符合基准截图；若仍偏小，将继续微调 `PROFORMA_FIT_PADDING` 与缩放上限。
+- 阻塞/风险：在极低窗口高度下，为保持无内部滚动会被容器裁切到底部；这是“按宽度优先”与“固定窗口高度”的物理冲突。
+
+## 2026-02-26
+- 完成：PI 预览适配逻辑改为“按有效内容区（`PROFORMA_CANVAS_OFFSET_TOP + PROFORMA_CANVAS_HEIGHT`）缩放”，不再按整页 2000 高度计算，解决一页显示但内容过小的问题（`web/src/erp/data/printTemplates.js`）。
+- 完成：恢复高度参与缩放并保持垂直居中，维持“无滚动 + 单页显示”的同时提升可读性。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm test` 通过（25/25）。
+- 下一步：按你的实际页面截图再微调 `PROFORMA_FIT_PADDING`（当前 12）与内容基准高度（当前 `+8` 兜底）到目标观感。
+- 阻塞/风险：若窗口高度极低，仍会优先保证一页完整显示，字体会随之缩小。
+
+## 2026-02-26
+- 完成：PI 固定模板切到 A4 基准链路后，补齐预览态容器兜底（`clientWidth/clientHeight` 不可用时回退 `getBoundingClientRect` + `window.innerWidth/innerHeight`），修复首帧被异常缩小导致“字体过小/布局偏移”的问题（`web/src/erp/data/printTemplates.js`）。
+- 完成：PI 样式做第二轮收敛：整体字号上调、表格描述行居中、银行区列宽重分配并允许值字段换行，减少底部信息重叠/截断（`web/src/erp/data/proformaInvoiceTemplate.mjs`）。
+- 完成：修复 `deliveryMethod` 自动映射重复前缀问题，避免出现 `By By xxx`（`web/src/erp/data/proformaInvoiceTemplate.mjs`）。
+- 完成：`pi-pixel-diff` 脚本改为可处理尺寸不一致场景：截图统一整数 viewport，参考图自动按当前截图尺寸归一化后再做 `pixelmatch`，并增加关键等待，避免直接报 `Image sizes do not match`（`web/scripts/pi-pixel-diff.mjs`）。
+- 完成：清理 PI 独立 HTML 构建函数里未使用的可选输出缩放参数，保留固定 A4 直出，减少冗余路径与维护复杂度（`web/src/erp/data/proformaInvoiceTemplate.mjs`）。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/data/printTemplates.js src/erp/data/proformaInvoiceTemplate.mjs scripts/pi-pixel-diff.mjs` 通过；`pnpm test` 通过（25/25）；`pnpm pi:pixel-diff -- --ref /Users/simon/Downloads/外销形式发票模版.pdf --out /Users/simon/projects/trade-erp/output/pi-pixel-diff-a4-v4 --browser chrome` 已稳定产出 `diff`（ignoreAA=47393）。
+- 下一步：按你最新基准截图继续做最后一轮“字号/行高/竖向节奏”定点微调（主要是顶部标题区与明细表描述区），目标是把差异继续压低并与 PDF Expert 视觉一致。
+- 阻塞/风险：当前差异主要来自 PDF 渲染字体与浏览器字体栅格化差异；若需进一步逼近，需要锁定与 PDF Expert 更一致的字体族与渲染参数。

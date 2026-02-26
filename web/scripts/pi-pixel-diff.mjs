@@ -14,10 +14,8 @@ const repoRoot = path.resolve(webRoot, '..')
 
 const printUsageAndExit = (message) => {
   if (message) {
-    // eslint-disable-next-line no-console
     console.error(message)
   }
-  // eslint-disable-next-line no-console
   console.error(`
 用法：
   pnpm pi:pixel-diff -- --ref /绝对路径/外销形式发票模版.pdf [--out /绝对路径/输出目录] [--browser chrome|webkit|firefox|msedge]
@@ -178,6 +176,26 @@ const renderPdfToPng = (pdfPath, outDir) => {
   return candidates[0]
 }
 
+const resizePngWithSips = ({ inputPath, outputPath, width, height }) => {
+  const targetWidth = Math.max(1, Math.round(Number(width) || 0))
+  const targetHeight = Math.max(1, Math.round(Number(height) || 0))
+  run(
+    '/usr/bin/sips',
+    [
+      '-z',
+      String(targetHeight),
+      String(targetWidth),
+      path.resolve(inputPath),
+      '--out',
+      path.resolve(outputPath),
+    ],
+    { stdio: 'ignore' }
+  )
+  if (!fs.existsSync(outputPath)) {
+    throw new Error(`PNG 缩放失败：${outputPath}`)
+  }
+}
+
 const screenshotHTML = async ({
   htmlPath,
   outPngPath,
@@ -192,6 +210,8 @@ const screenshotHTML = async ({
   const env = { ...process.env, NPM_CONFIG_CACHE: cacheDir, TMPDIR: '/tmp' }
   const html = fs.readFileSync(path.resolve(htmlPath), 'utf8')
   const dataUrl = `data:text/html;charset=utf-8,${encodeURIComponent(html)}`
+  const width = Math.max(1, Math.round(Number(viewportWidth) || 0))
+  const height = Math.max(1, Math.round(Number(viewportHeight) || 0))
   const base = [
     '--yes',
     '--package',
@@ -203,9 +223,10 @@ const screenshotHTML = async ({
 
   const runnerOptions = { cwd: outDir, env, stdio: 'pipe' }
   run('npx', [...base, 'open', dataUrl, '--browser', browser], runnerOptions)
+  run('npx', [...base, 'resize', String(width), String(height)], runnerOptions)
   run(
     'npx',
-    [...base, 'resize', String(viewportWidth), String(viewportHeight)],
+    [...base, 'run-code', 'await page.waitForTimeout(120)'],
     runnerOptions
   )
   run(
@@ -282,6 +303,10 @@ const main = async () => {
     ).href
   )
 
+  const renderedPdfPng = renderPdfToPng(args.refPdf, args.outDir)
+  const refPath = path.join(args.outDir, 'ref.png')
+  fs.copyFileSync(renderedPdfPng, refPath)
+
   const logoPath = path.resolve(
     webRoot,
     'public/templates/billing-info-logo.png'
@@ -302,10 +327,6 @@ const main = async () => {
   const htmlPath = path.join(args.outDir, 'current.html')
   fs.writeFileSync(htmlPath, html, 'utf8')
 
-  const renderedPdfPng = renderPdfToPng(args.refPdf, args.outDir)
-  const refPath = path.join(args.outDir, 'ref.png')
-  fs.copyFileSync(renderedPdfPng, refPath)
-
   const curPath = path.join(args.outDir, 'current.png')
   await screenshotHTML({
     htmlPath,
@@ -316,8 +337,19 @@ const main = async () => {
     browser: args.browser,
   })
 
-  const refPng = readPng(refPath)
   const curPng = readPng(curPath)
+  let refPng = readPng(refPath)
+  if (refPng.width !== curPng.width || refPng.height !== curPng.height) {
+    const normalizedRefPath = path.join(args.outDir, 'ref-normalized.png')
+    // 参考 PDF 渲染尺寸受 qlmanage 影响，统一缩放到当前截图尺寸后再做像素对比。
+    resizePngWithSips({
+      inputPath: refPath,
+      outputPath: normalizedRefPath,
+      width: curPng.width,
+      height: curPng.height,
+    })
+    refPng = readPng(normalizedRefPath)
+  }
 
   const { refData, curData } = applyMasks(refPng, curPng, args.masks)
   refPng.data = refData
@@ -338,18 +370,13 @@ const main = async () => {
     includeAA: true,
   })
 
-  // eslint-disable-next-line no-console
   console.log('ref:', refPath)
-  // eslint-disable-next-line no-console
   console.log('current:', curPath)
-  // eslint-disable-next-line no-console
   console.log('diff(ignoreAA):', diffIgnoreAa, diffPath)
-  // eslint-disable-next-line no-console
   console.log('diff(includeAA):', diffIncludeAa, diffAaPath)
 }
 
 main().catch((err) => {
-  // eslint-disable-next-line no-console
   console.error(err?.stack || err?.message || String(err))
   process.exit(1)
 })

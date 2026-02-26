@@ -546,12 +546,12 @@ const DEFAULT_PROFORMA_INVOICE_ITEMS = [
   },
 ]
 
-export const PROFORMA_PAGE_WIDTH = 1414
-export const PROFORMA_PAGE_HEIGHT = 2000
-export const PROFORMA_CANVAS_WIDTH = 1269
-export const PROFORMA_CANVAS_HEIGHT = 1370
-export const PROFORMA_CANVAS_OFFSET_LEFT = 70
-export const PROFORMA_CANVAS_OFFSET_TOP = 64
+export const PROFORMA_PAGE_WIDTH = 595.32
+export const PROFORMA_PAGE_HEIGHT = 841.92
+export const PROFORMA_CANVAS_WIDTH = 534.27
+export const PROFORMA_CANVAS_HEIGHT = 576.8
+export const PROFORMA_CANVAS_OFFSET_LEFT = 29.47
+export const PROFORMA_CANVAS_OFFSET_TOP = 26.95
 
 export const buildProformaInvoiceFields = (record = {}) => {
   const { values, hasExplicit, flattenedMap } = buildFieldsBySchema(
@@ -631,10 +631,12 @@ export const buildProformaInvoiceFields = (record = {}) => {
       flattenedMap.transporttype ||
       flattenedMap.transport_type ||
       flattenedMap.deliverymethod ||
-      values.deliveryMethod
-    values.deliveryMethod = transport
-      ? `By ${transport}`
-      : values.deliveryMethod
+      ''
+    if (transport) {
+      values.deliveryMethod = /^by\s+/i.test(transport)
+        ? transport
+        : `By ${transport}`
+    }
   }
   if (!hasExplicit.leadTime) {
     values.leadTime =
@@ -757,7 +759,17 @@ export const buildProformaInvoiceFields = (record = {}) => {
     values.totalNetValue = formatUSDMoney(values.totalNetValue, 2)
   }
 
-  if (!hasExplicit.amountInWords) {
+  const shouldDeriveAmountWords =
+    recordItems.length > 0 ||
+    hasExplicit.totalNetValue ||
+    hasExplicit.item1Qty ||
+    hasExplicit.item1NetPrice ||
+    hasExplicit.item1NetValue ||
+    hasExplicit.item2Qty ||
+    hasExplicit.item2NetPrice ||
+    hasExplicit.item2NetValue
+
+  if (!hasExplicit.amountInWords && shouldDeriveAmountWords) {
     const amountWords = toUSDWords(normalizedTotal)
     values.amountInWords = amountWords || values.amountInWords
   }
@@ -976,17 +988,19 @@ export const buildProformaInvoiceTemplateHTML = (
 export const PROFORMA_INVOICE_STYLE = `
       .template-wrap.template-wrap-proforma-fit {
         overflow: hidden;
+        height: calc(100vh - 100px);
+        max-height: calc(100vh - 100px);
       }
       .template-wrap .proforma-template {
         display: flex;
         justify-content: center;
+        align-items: flex-start;
         min-height: 100%;
         padding: 24px 0;
         background: #d9d9d9;
       }
       .template-wrap.template-wrap-proforma-fit .proforma-template {
         position: relative;
-        align-items: flex-start;
         min-height: 0;
         padding: 0;
       }
@@ -1020,8 +1034,8 @@ export const PROFORMA_INVOICE_STYLE = `
         z-index: 1;
         outline: 1px dashed transparent;
         border-radius: 2px;
-        min-height: 20px;
-        line-height: 1.18;
+        min-height: 8px;
+        line-height: 1.2;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -1038,74 +1052,74 @@ export const PROFORMA_INVOICE_STYLE = `
       .template-wrap .proforma-header {
         display: flex;
         justify-content: space-between;
-        padding: 6px 10px 0;
+        padding: 2.6px 4.2px 0;
       }
       .template-wrap .proforma-header-left {
         flex: 1;
       }
       .template-wrap .proforma-header-company {
-        font-size: 16px;
+        font-size: 13.4px;
         font-weight: 700;
       }
       .template-wrap .proforma-header-address {
-        margin-top: 4px;
-        font-size: 12.5px;
+        margin-top: 1.5px;
+        font-size: 8.4px;
       }
       .template-wrap .proforma-header-phone {
-        margin-top: 5px;
-        font-size: 13.5px;
+        margin-top: 1.7px;
+        font-size: 8.5px;
       }
       .template-wrap .proforma-header-right {
-        width: 382px;
+        width: 161px;
         text-align: right;
         display: flex;
         flex-direction: column;
         align-items: flex-end;
       }
       .template-wrap .proforma-logo {
-        width: 365px;
+        width: 153.7px;
         max-width: 100%;
         margin-top: 0;
         user-select: none;
         -webkit-user-drag: none;
       }
       .template-wrap .proforma-header-website {
-        margin-top: 6px;
-        font-size: 13.3px;
+        margin-top: 2.1px;
+        font-size: 8.2px;
         text-align: center;
         width: 100%;
-        padding-right: 10px;
+        padding-right: 4.2px;
       }
       .template-wrap .proforma-meta-box {
-        border-top: 2.6px solid #000;
+        border-top: 1.1px solid #000;
       }
       .template-wrap .proforma-title-wrap {
-        padding: 9px 0 4px;
+        padding: 3.8px 0 1.7px;
         text-align: center;
       }
       .template-wrap .proforma-title {
-        font-size: 23.5px;
+        font-size: 18.2px;
         font-weight: 700;
-        letter-spacing: 0.3px;
+        letter-spacing: 0.1px;
       }
       .template-wrap .proforma-meta {
         display: flex;
         justify-content: space-between;
-        gap: 16px;
-        padding: 4px 10px 4px;
-        min-height: 199px;
+        gap: 6.7px;
+        padding: 1.7px 4.2px;
+        min-height: 84px;
       }
       .template-wrap .proforma-buyer {
         flex: 1;
         min-height: 100%;
       }
       .template-wrap .proforma-buyer-company {
-        font-size: 17px;
+        font-size: 12.8px;
         font-weight: 700;
       }
       .template-wrap .proforma-buyer-address {
-        margin-top: 6px;
-        font-size: 13.5px;
+        margin-top: 2.1px;
+        font-size: 8.6px;
       }
       .template-wrap .proforma-meta-table {
         width: 42%;
@@ -1115,44 +1129,45 @@ export const PROFORMA_INVOICE_STYLE = `
       .template-wrap .proforma-meta-table th,
       .template-wrap .proforma-meta-table td {
         border: 0;
-        padding: 3px 5px;
+        padding: 1.3px 2.1px;
         vertical-align: top;
       }
       .template-wrap .proforma-meta-table th {
         width: 35%;
         text-align: left;
         white-space: nowrap;
-        font-size: 12.7px;
+        font-size: 8.8px;
         font-weight: 700;
       }
       .template-wrap .proforma-meta-table td {
-        font-size: 12.7px;
+        font-size: 8.8px;
       }
       .template-wrap .proforma-items-table {
         width: 100%;
         border-collapse: collapse;
         table-layout: fixed;
-        border: 3.2px solid #000;
+        border: 1.35px solid #000;
       }
       .template-wrap .proforma-items-table th,
       .template-wrap .proforma-items-table td {
-        border: 1.6px solid #000;
-        padding: 4px 8px;
-        font-size: 13px;
+        border: 0.68px solid #000;
+        padding: 1.7px 3.4px;
+        font-size: 9px;
         vertical-align: middle;
       }
       .template-wrap .proforma-items-table thead tr {
-        height: 76px;
+        height: 34px;
       }
       .template-wrap .proforma-item-row {
-        height: 101px;
+        height: 47px;
       }
       .template-wrap .proforma-items-table th {
         text-align: center;
         font-weight: 700;
       }
       .template-wrap .proforma-cell-left {
-        text-align: left;
+        text-align: center;
+        line-height: 1.25;
       }
       .template-wrap .proforma-cell-center {
         text-align: center;
@@ -1164,14 +1179,14 @@ export const PROFORMA_INVOICE_STYLE = `
         font-weight: 700;
       }
       .template-wrap .proforma-total-title-row td {
-        height: 49px;
-        font-size: 13.3px;
+        height: 23px;
+        font-size: 9.2px;
         font-weight: 700;
         border-bottom: 0;
       }
       .template-wrap .proforma-total-words-row td {
-        height: 64px;
-        font-size: 13.3px;
+        height: 30px;
+        font-size: 9.2px;
         font-weight: 700;
         border-top: 0;
       }
@@ -1185,27 +1200,27 @@ export const PROFORMA_INVOICE_STYLE = `
         width: 100%;
         border-collapse: collapse;
         table-layout: fixed;
-        border: 3.2px solid #000;
+        border: 1.35px solid #000;
         border-top: 0;
       }
       .template-wrap .proforma-terms-table th,
       .template-wrap .proforma-terms-table td {
-        border: 1.6px solid #000;
-        padding: 4px 6px;
+        border: 0.68px solid #000;
+        padding: 1.7px 2.6px;
         vertical-align: middle;
-        font-size: 13px;
+        font-size: 8.9px;
       }
       .template-wrap .proforma-terms-spacer-row {
-        height: 30px;
+        height: 14px;
       }
       .template-wrap .proforma-terms-main-row {
-        height: 58px;
+        height: 27px;
       }
       .template-wrap .proforma-terms-lead-row {
-        height: 71px;
+        height: 33px;
       }
       .template-wrap .proforma-terms-notes-row {
-        height: 61px;
+        height: 29px;
       }
       .template-wrap .proforma-terms-table th {
         width: 18%;
@@ -1216,8 +1231,8 @@ export const PROFORMA_INVOICE_STYLE = `
         width: 32%;
       }
       .template-wrap .proforma-signature-zone {
-        padding: 16px 14px 8px;
-        height: 249px;
+        padding: 6.7px 5.9px 3.4px;
+        height: 112px;
       }
       .template-wrap .proforma-seller-signature {
         width: 51%;
@@ -1234,33 +1249,48 @@ export const PROFORMA_INVOICE_STYLE = `
       .template-wrap .proforma-signature-labels {
         display: flex;
         justify-content: space-between;
-        gap: 16px;
-        margin-top: 14px;
+        gap: 6.7px;
+        margin-top: 5.9px;
       }
       .template-wrap .proforma-signature-label {
         flex: 1;
-        font-size: 13.5px;
+        font-size: 9.3px;
         font-weight: 700;
       }
       .template-wrap .proforma-bank-table {
         width: 100%;
         border-collapse: collapse;
         table-layout: fixed;
-        border-top: 3.2px solid #000;
+        border-top: 1.35px solid #000;
       }
       .template-wrap .proforma-bank-table th,
       .template-wrap .proforma-bank-table td {
-        padding: 3px 6px;
+        padding: 1.3px 2.6px;
         text-align: left;
         vertical-align: top;
         border: 0;
       }
       .template-wrap .proforma-bank-table th {
-        font-size: 13px;
+        font-size: 8.4px;
         font-weight: 700;
       }
       .template-wrap .proforma-bank-table td {
-        font-size: 13px;
+        font-size: 8.4px;
+      }
+      .template-wrap .proforma-bank-table td .proforma-editable {
+        white-space: normal;
+        line-height: 1.22;
+        overflow: visible;
+        text-overflow: clip;
+      }
+      .template-wrap .proforma-bank-table tr > *:nth-child(1) {
+        width: 35%;
+      }
+      .template-wrap .proforma-bank-table tr > *:nth-child(2) {
+        width: 21%;
+      }
+      .template-wrap .proforma-bank-table tr > *:nth-child(3) {
+        width: 44%;
       }
 `
 
@@ -1276,10 +1306,10 @@ export const buildProformaInvoiceStandaloneHTML = (
     <style>
       * { box-sizing: border-box; }
       html, body { margin: 0; padding: 0; background: #fff; }
-      .template-wrap { width: ${PROFORMA_PAGE_WIDTH}px; height: ${PROFORMA_PAGE_HEIGHT}px; overflow: hidden; }
-      .template-wrap .proforma-template { padding: 0; background: #fff; justify-content: flex-start; }
-      .template-wrap .proforma-paper { box-shadow: none; }
       ${PROFORMA_INVOICE_STYLE}
+      .template-wrap { width: ${PROFORMA_PAGE_WIDTH}px; height: ${PROFORMA_PAGE_HEIGHT}px; overflow: hidden; }
+      .template-wrap .proforma-template { padding: 0 !important; background: #fff !important; justify-content: flex-start !important; min-height: ${PROFORMA_PAGE_HEIGHT}px !important; }
+      .template-wrap .proforma-paper { box-shadow: none; }
     </style>
   </head>
   <body>
