@@ -216,3 +216,8 @@
 - 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/data/printTemplates.js src/erp/data/proformaInvoiceTemplate.mjs scripts/pi-pixel-diff.mjs` 通过；`pnpm test` 通过（25/25）；`pnpm pi:pixel-diff -- --ref /Users/simon/Downloads/外销形式发票模版.pdf --out /Users/simon/projects/trade-erp/output/pi-pixel-diff-a4-v4 --browser chrome` 已稳定产出 `diff`（ignoreAA=47393）。
 - 下一步：按你最新基准截图继续做最后一轮“字号/行高/竖向节奏”定点微调（主要是顶部标题区与明细表描述区），目标是把差异继续压低并与 PDF Expert 视觉一致。
 - 阻塞/风险：当前差异主要来自 PDF 渲染字体与浏览器字体栅格化差异；若需进一步逼近，需要锁定与 PDF Expert 更一致的字体族与渲染参数。
+
+## 2026-02-26
+- 完成：补充根 `.gitignore` 忽略规则 `tmp/`，避免本地调试和脚本临时产物误入版本库。
+- 下一步：若后续新增临时产物目录，继续按同样方式同步到根忽略规则。
+- 阻塞/风险：无。
