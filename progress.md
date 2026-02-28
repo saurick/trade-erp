@@ -1,3 +1,43 @@
+## 2026-02-28
+- 完成：修复 favicon 字母边缘不平滑问题：从 `billing-info-logo.png` 左侧 `KS` 先按颜色分离二值蒙版，再分别用 `potrace` 生成平滑贝塞尔路径，替换 `web/public/favicon.svg` 为纯 path 版。
+- 完成：保留原始 `KS` 的相对位置和配色（`#1b3c59`、`#dfac4e`），去除上一版自动追踪导致的抖动轮廓。
+- 下一步：浏览器强刷后复核标签页图标；若需更接近原图细节，可继续微调蒙版阈值与 `potrace` 参数。
+- 阻塞/风险：不同浏览器抗锯齿策略不同，放大查看时仍可能有轻微显示差异，但边缘已由噪点折线改为平滑曲线。
+
+## 2026-02-28
+- 完成：基于 `web/public/templates/billing-info-logo.png` 左侧 `KS` 进行矢量追踪（`autotrace`），生成纯 path 版 `web/public/favicon.svg`，去除字体模拟与 base64 位图嵌入。
+- 完成：按 favicon 256x256 画布居中封装 `KS`（保持原始裁切比例与间距），继续保留 `favicon.png` 作为兼容兜底。
+- 验证：将新 `favicon.svg` 回渲染后与目标 `KS` 参考图做像素对比（RMSE 最优参数结果已应用）。
+- 下一步：浏览器强刷验证标签页显示；若仍需进一步收敛，可继续针对追踪参数或局部 path 做人工微调。
+- 阻塞/风险：源素材本身是位图，矢量追踪仍可能存在亚像素级渲染差异（不同浏览器抗锯齿策略不同）。
+
+## 2026-02-28
+- 完成：将 `web/public/favicon.svg` 从 base64 位图嵌入改为纯 SVG 元素（`rect + text`），去除 `data:image/png;base64`，满足可编辑矢量格式要求。
+- 下一步：浏览器强刷后确认标签页渲染效果；若需更高一致性可进一步将字母转为固定路径。
+- 阻塞/风险：当前方案基于系统字体渲染，不同系统可能存在轻微字形差异。
+
+## 2026-02-28
+- 完成：修复 favicon 空白问题：`web/public/favicon.svg` 由“外链 PNG”改为“内嵌 data URI 图片”，避免浏览器在 favicon 场景忽略外链资源。
+- 完成：新增兼容兜底图标 `web/public/favicon.png`（来源于 `billing-info-logo.png` 左侧 `KS`），并在前端入口增加 fallback 引用（`web/index.html`、`web/public/index.html`）。
+- 下一步：浏览器清空站点缓存后再次打开页面，确认标签页图标正常显示。
+- 阻塞/风险：若浏览器持久化缓存旧 favicon，可能仍短暂显示旧图或空白，需强刷或关闭重开标签页。
+
+## 2026-02-28
+- 完成：按反馈将 `favicon.svg` 改为直接使用 `web/public/templates/billing-info-logo.png` 左侧 `KS` 区域（通过 `viewBox` 裁切），确保字形与间距与原 logo 一致。
+- 下一步：浏览器强刷后确认标签页图标清晰度；如需进一步提高清晰度可改为内嵌矢量路径版。
+- 阻塞/风险：当前方案在 SVG 中引用 PNG，缩放到极小尺寸时仍受位图清晰度影响。
+
+## 2026-02-28
+- 完成：按反馈调整站点图标字母间距，`web/public/favicon.svg` 中 `S` 的横向位置右移，避免 `K` 与 `S` 过近。
+- 下一步：浏览器强刷后确认标签页中 `KS` 间距观感；如仍需更松可继续微调 `x` 坐标。
+- 阻塞/风险：无。
+
+## 2026-02-28
+- 完成：新增站点图标 `web/public/favicon.svg`，使用 `KS` 配色 logo（蓝色 `K` + 金色 `S`）替换旧 PNG 图标。
+- 完成：同步更新前端入口 favicon 引用为 SVG（`web/index.html`、`web/public/index.html`）。
+- 下一步：启动前端后在浏览器标签页确认新 favicon 显示是否符合预期；如需完全 1:1 还原可再按你提供的矢量稿微调。
+- 阻塞/风险：当前 SVG 使用系统粗体字体近似原图，若不同系统字体渲染差异较大，细节可能有轻微偏差。
+
 ## 2026-02-25
 - 完成：打印弹窗工具栏新增“服务器预览PDF”“下载PDF”按钮，支持将当前编辑后的模板 DOM 提交给服务端渲染并预览/下载（`web/src/erp/data/printTemplates.js`）。
 - 完成：后端新增 `POST /templates/render-pdf` 接口，管理员鉴权后使用 Headless Chromium 统一渲染 PDF；支持 `base_url` 资源基址注入与文件名兜底清洗（`server/internal/server/template_pdf.go`）。
