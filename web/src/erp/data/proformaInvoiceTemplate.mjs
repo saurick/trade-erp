@@ -1133,14 +1133,17 @@ export const PROFORMA_INVOICE_STYLE = `
         vertical-align: top;
       }
       .template-wrap .proforma-meta-table th {
-        width: 35%;
+        /* 标签和值保持紧凑对齐，减少阅读时视线跳跃。 */
+        width: 31%;
         text-align: left;
         white-space: nowrap;
         font-size: 8.8px;
         font-weight: 700;
+        padding-right: 1px;
       }
       .template-wrap .proforma-meta-table td {
         font-size: 8.8px;
+        padding-left: 0.9px;
       }
       .template-wrap .proforma-items-table {
         width: 100%;
@@ -1285,12 +1288,18 @@ export const PROFORMA_INVOICE_STYLE = `
       }
       .template-wrap .proforma-bank-table tr > *:nth-child(1) {
         width: 35%;
+        padding-right: 6.4px;
       }
       .template-wrap .proforma-bank-table tr > *:nth-child(2) {
-        width: 21%;
+        /* 右侧标签右对齐到值列边缘，保证“标签-值”更贴近且左右分区更清晰。 */
+        width: 19%;
+        text-align: right;
+        padding-left: 6.4px;
+        padding-right: 2.2px;
       }
       .template-wrap .proforma-bank-table tr > *:nth-child(3) {
-        width: 44%;
+        width: 46%;
+        padding-left: 2.2px;
       }
 `
 

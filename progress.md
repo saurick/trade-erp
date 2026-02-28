@@ -269,3 +269,40 @@
 - 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/data/printTemplates.js src/erp/data/printTemplates.test.js` 通过；`pnpm test -- src/erp/data/printTemplates.test.js` 通过（26/26）。
 - 下一步：请在“打印模板中心 -> PI/采购合同/开票信息”各抽一条记录点“打印”复核，重点确认字号、行距、边框与页面预览一致。
 - 阻塞/风险：不同浏览器对 `zoom` 的打印支持存在差异；已增加 `transform: scale(...)` fallback，但建议优先使用 Chrome/Edge 打印以获得最稳定结果。
+
+## 2026-02-28
+- 完成：PI 顶部信息区（`Invoice No./Order No./Date/Email`）收紧标签列宽并微调左右内边距，确保字段名与字段值更靠近、同组阅读更连贯（`web/src/erp/data/proformaInvoiceTemplate.mjs`）。
+- 完成：PI 底部收款信息区（`BENEFICIARY NAME/ADDRESS/A/C NO. USD/A/C NO. EURO`）重分配第 2/3 列宽并收紧两列间距，减少标签和值的视觉断层（`web/src/erp/data/proformaInvoiceTemplate.mjs`）。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/data/proformaInvoiceTemplate.mjs` 通过；`pnpm test -- src/erp/data/printTemplates.test.js` 通过（26/26）。
+- 下一步：在 PI 编辑页与打印预览各复核 1 次，重点确认长地址场景下仍保持左对齐且不与左侧银行地址区重叠。
+- 阻塞/风险：若后续继续压缩第二列宽度，极长英文标签在低缩放下可能更接近换行临界值，需结合实际数据再微调。
+
+## 2026-02-28
+- 完成：按页面复核意见继续微调 PI 银行区右侧信息布局：进一步收窄右侧标签列、压缩标签和值间距，并增加右侧分组左内边距，使左/右两组信息分区更明显（`web/src/erp/data/proformaInvoiceTemplate.mjs`）。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/data/proformaInvoiceTemplate.mjs` 通过；`pnpm test -- src/erp/data/printTemplates.test.js` 通过（26/26）。
+- 下一步：在真实业务数据下再看一版（特别是超长受益人名称与地址），确认无换行挤压后即可定版。
+- 阻塞/风险：右侧标签列继续缩窄后，若未来新增更长标签文案，可能触发换行，需要同步调整文案或列宽。
+
+## 2026-02-28
+- 完成：按“仍需更靠近”意见继续收紧 PI 银行区右侧字段：第 2/3 列进一步调整为 `15%/50%`，标签和值横向内边距压到 `0.2px`，强化标签-值贴合度（`web/src/erp/data/proformaInvoiceTemplate.mjs`）。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/data/proformaInvoiceTemplate.mjs` 通过；`pnpm test -- src/erp/data/printTemplates.test.js` 通过（26/26）。
+- 下一步：请在当前截图场景复核；若还需更紧，可改为 `14%/51%` 并把第 3 列 `padding-left` 置 `0`。
+- 阻塞/风险：列宽继续收窄时，`BENEFICIARY NAME:` 在极端缩放下存在换行风险。
+
+## 2026-02-28
+- 完成：定位“看起来没有更靠近”的根因并做结构性修正：右侧标签列由左对齐改为右对齐（贴近值列边界），同时给左侧列补右内边距，避免仅靠微小 `padding` 调整导致视觉不明显（`web/src/erp/data/proformaInvoiceTemplate.mjs`）。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/data/proformaInvoiceTemplate.mjs` 通过；`pnpm test -- src/erp/data/printTemplates.test.js` 通过（26/26）。
+- 下一步：请按同一截图位复核；若还需更“贴”，可把右侧标签列再降到 `14%` 并保持右对齐。
+- 阻塞/风险：若后续把右侧标签列继续压缩，`BENEFICIARY NAME:` 在低分辨率缩放下可能触发换行。
+
+## 2026-02-28
+- 完成：按“太近了，调回一档”要求回调 PI 银行区右侧布局：在保留右侧标签右对齐前提下，将列宽与间距回调到折中值（第 2/3 列 `17%/48%`，标签和值间距恢复为 `1.1px`），避免字段贴得过紧（`web/src/erp/data/proformaInvoiceTemplate.mjs`）。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/data/proformaInvoiceTemplate.mjs` 通过；`pnpm test -- src/erp/data/printTemplates.test.js` 通过（26/26）。
+- 下一步：请关闭并重新打开 PI 页面后复核；若仍偏近/偏远，可再按 `0.5px` 级别做最后微调。
+- 阻塞/风险：无。
+
+## 2026-02-28
+- 完成：按“继续回调”要求再放松一档右侧字段间距：保留右侧标签右对齐，列宽回调到 `19%/46%`，标签和值横向间距提升到 `2.2px`，降低“贴得过近”的观感（`web/src/erp/data/proformaInvoiceTemplate.mjs`）。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/data/proformaInvoiceTemplate.mjs` 通过；`pnpm test -- src/erp/data/printTemplates.test.js` 通过（26/26）。
+- 下一步：请重开 PI 页面复核；若还需继续回调，可再提升到 `2.8px` 间距并保持当前对齐策略。
+- 阻塞/风险：无。
