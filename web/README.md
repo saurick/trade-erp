@@ -44,6 +44,11 @@ PI 模板默认素材：
 - `--mask x,y,w,h`（可重复传入，用于忽略某块区域）
 - `--browser chrome|firefox|msedge`（默认 `chrome`；`webkit` 需先安装 Playwright 浏览器）
 
+## 打印一致性说明
+
+- 固定版式模板（PI / 采购合同 / 开票信息）在打印态采用整页等比缩放，避免打印时对模板内部坐标二次重排。
+- 页面编辑区与浏览器打印结果应保持同一版式结构；若打印对话框仍有偏差，建议先使用 `Margins: None`、`Scale: 100%`、勾选 `Background graphics`。
+
 ## 环境变量
 
 - `VITE_BASE_URL`：前端部署基础路径

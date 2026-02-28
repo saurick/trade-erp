@@ -261,3 +261,11 @@
 - 完成：补充根 `.gitignore` 忽略规则 `tmp/`，避免本地调试和脚本临时产物误入版本库。
 - 下一步：若后续新增临时产物目录，继续按同样方式同步到根忽略规则。
 - 阻塞/风险：无。
+
+## 2026-02-28
+- 完成：修复固定版式模板“页面预览与浏览器打印不一致”问题：打印态改为整页等比缩放（`4/3`）并保持与页面同一套坐标系，不再在打印阶段把模板内部坐标改为百分比重排（`web/src/erp/data/printTemplates.js`）。
+- 完成：新增回归单测，锁定打印窗口必须使用统一缩放且不再出现 `210mm/297mm` 的旧重排规则（`web/src/erp/data/printTemplates.test.js`）。
+- 完成：补充前端说明文档“打印一致性说明”，同步建议的浏览器打印参数（`web/README.md`）。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/data/printTemplates.js src/erp/data/printTemplates.test.js` 通过；`pnpm test -- src/erp/data/printTemplates.test.js` 通过（26/26）。
+- 下一步：请在“打印模板中心 -> PI/采购合同/开票信息”各抽一条记录点“打印”复核，重点确认字号、行距、边框与页面预览一致。
+- 阻塞/风险：不同浏览器对 `zoom` 的打印支持存在差异；已增加 `transform: scale(...)` fallback，但建议优先使用 Chrome/Edge 打印以获得最稳定结果。

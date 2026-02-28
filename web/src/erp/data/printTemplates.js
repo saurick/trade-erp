@@ -31,6 +31,9 @@ const EXCEL_XLS_MAGIC = [0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1]
 const EXCEL_XLSX_MAGIC = [0x50, 0x4b, 0x03, 0x04]
 const PDF_MAGIC = [0x25, 0x50, 0x44, 0x46]
 const FIXED_LAYOUT_TEMPLATE_KEYS = new Set(['billingInfo', 'pi', 'purchase'])
+const BILLING_INFO_CANVAS_WIDTH = 595
+const BILLING_INFO_CANVAS_HEIGHT = 842
+const A4_PRINT_SCALE_RATIO = 4 / 3
 
 const ensureTemplateEnabled = (templateKey) => {
   if (!ENABLED_TEMPLATE_KEYS.has(templateKey)) {
@@ -2959,50 +2962,68 @@ const buildWindowHTML = ({
           padding: 0 !important;
           max-height: none !important;
         }
-        .template-wrap .billing-info-template {
-          padding: 0 !important;
-          background: #fff !important;
+        .template-wrap.template-wrap-proforma-fit {
+          height: auto !important;
+          max-height: none !important;
         }
-        .template-wrap .billing-info-paper {
-          width: 210mm !important;
-          height: 297mm !important;
-          box-shadow: none !important;
-        }
-        .template-wrap .proforma-template {
-          padding: 0 !important;
-          background: #fff !important;
-        }
-        .template-wrap .proforma-paper {
-          width: 210mm !important;
-          height: 297mm !important;
-          box-shadow: none !important;
-          padding: 0 !important;
-          position: relative !important;
-          left: 0 !important;
-          top: 0 !important;
-          transform: none !important;
-        }
-        .template-wrap .proforma-sheet {
-          position: absolute !important;
-          left: ${(PROFORMA_CANVAS_OFFSET_LEFT / PROFORMA_PAGE_WIDTH) * 100}% !important;
-          top: ${(PROFORMA_CANVAS_OFFSET_TOP / PROFORMA_PAGE_HEIGHT) * 100}% !important;
-          width: ${(PROFORMA_CANVAS_WIDTH / PROFORMA_PAGE_WIDTH) * 100}% !important;
-          height: ${(PROFORMA_CANVAS_HEIGHT / PROFORMA_PAGE_HEIGHT) * 100}% !important;
-          min-height: 0 !important;
-          border-width: 0.35mm !important;
-        }
+        .template-wrap .billing-info-template,
+        .template-wrap .proforma-template,
         .template-wrap .purchase-contract-template {
           padding: 0 !important;
           background: #fff !important;
+          min-height: 0 !important;
+        }
+        .template-wrap .proforma-template {
+          height: auto !important;
+          padding-top: 0 !important;
+          padding-bottom: 0 !important;
+        }
+        /* 打印态按 4/3 等比缩放整张纸，避免模板内部重排导致“页面所见”和打印结果不一致。 */
+        .template-wrap .billing-info-paper,
+        .template-wrap .proforma-paper,
+        .template-wrap .purchase-contract-paper {
+          position: relative !important;
+          left: 0 !important;
+          top: 0 !important;
+          margin: 0 !important;
+          box-shadow: none !important;
+          transform-origin: top left !important;
+          transform: none !important;
+          zoom: ${A4_PRINT_SCALE_RATIO} !important;
+        }
+        .template-wrap .billing-info-paper {
+          width: ${BILLING_INFO_CANVAS_WIDTH}px !important;
+          height: ${BILLING_INFO_CANVAS_HEIGHT}px !important;
+        }
+        .template-wrap .proforma-paper {
+          width: ${PROFORMA_PAGE_WIDTH}px !important;
+          height: ${PROFORMA_PAGE_HEIGHT}px !important;
+          padding: 0 !important;
+        }
+        .template-wrap .proforma-sheet {
+          position: absolute !important;
+          left: ${PROFORMA_CANVAS_OFFSET_LEFT}px !important;
+          top: ${PROFORMA_CANVAS_OFFSET_TOP}px !important;
+          width: ${PROFORMA_CANVAS_WIDTH}px !important;
+          height: ${PROFORMA_CANVAS_HEIGHT}px !important;
+          min-height: 0 !important;
+          border-width: 0 !important;
         }
         .template-wrap .purchase-contract-paper {
-          width: 210mm !important;
-          height: 297mm !important;
-          box-shadow: none !important;
+          width: ${PURCHASE_CONTRACT_CANVAS_WIDTH}px !important;
+          height: ${PURCHASE_CONTRACT_CANVAS_HEIGHT}px !important;
           border: 0 !important;
         }
         .template-wrap .purchase-contract-canvas {
           transform: none !important;
+        }
+        @supports not (zoom: 1) {
+          .template-wrap .billing-info-paper,
+          .template-wrap .proforma-paper,
+          .template-wrap .purchase-contract-paper {
+            zoom: 1 !important;
+            transform: scale(${A4_PRINT_SCALE_RATIO}) !important;
+          }
         }
       }
     </style>
@@ -3894,4 +3915,6 @@ export const __TEST_ONLY__ = {
   buildBillingInfoFields,
   buildProformaInvoiceFields: buildProformaInvoiceFields_MJS,
   buildPurchaseContractFields,
+  buildWindowHTML,
+  A4_PRINT_SCALE_RATIO,
 }

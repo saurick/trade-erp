@@ -6,6 +6,8 @@ const {
   buildBillingInfoFields,
   buildProformaInvoiceFields,
   buildPurchaseContractFields,
+  buildWindowHTML,
+  A4_PRINT_SCALE_RATIO,
 } = __TEST_ONLY__
 
 const toArrayBuffer = (text) => new TextEncoder().encode(text).buffer
@@ -205,5 +207,24 @@ describe('printTemplates', () => {
     expect(fields.innerPackaging).toBe('八孔泡沫箱+真空包装')
     expect(fields.deliveryAddress).toBe('杭州临平仓')
     expect(fields.otherRequirement).toBe('请按图纸执行')
+  })
+
+  it('打印窗口使用统一等比缩放，避免打印态重排', () => {
+    const html = buildWindowHTML({
+      title: '测试打印',
+      templateKey: 'pi',
+      templateHTML:
+        '<section class="proforma-template"><article class="proforma-paper"><div class="proforma-sheet"></div></article></section>',
+      recordPanelHTML: '<section class="record-panel">record</section>',
+      source: 'default',
+      authToken: '',
+      appBaseURL: 'http://localhost:5173',
+    })
+
+    expect(html).toContain(`zoom: ${A4_PRINT_SCALE_RATIO} !important;`)
+    expect(html).toContain('width: 595px !important;')
+    expect(html).toContain('height: 842px !important;')
+    expect(html).not.toContain('width: 210mm !important;')
+    expect(html).not.toContain('height: 297mm !important;')
   })
 })
