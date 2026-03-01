@@ -106,6 +106,19 @@ const UploadFieldInput = ({
   )
 }
 
+const openNativeDatePicker = (event) => {
+  const target = event?.target
+  if (typeof target?.showPicker !== 'function') {
+    return
+  }
+
+  try {
+    target.showPicker()
+  } catch {
+    // 部分浏览器会拦截 showPicker，失败时回退原生输入行为。
+  }
+}
+
 const renderField = (field, options = {}) => {
   if (field.type === 'items') {
     return (
@@ -147,7 +160,7 @@ const renderField = (field, options = {}) => {
   }
 
   if (field.type === 'date') {
-    return <Input type="date" />
+    return <Input type="date" onClick={openNativeDatePicker} />
   }
 
   return <Input />
@@ -224,22 +237,27 @@ const ModuleTablePage = ({ moduleItem }) => {
   }
 
   const submitForm = async () => {
-    const values = await form.validateFields()
-    let payload = normalizeValues(values)
+    try {
+      const values = await form.validateFields()
+      let payload = normalizeValues(values)
 
-    if (typeof moduleItem.beforeSave === 'function') {
-      payload = moduleItem.beforeSave(payload, { getModuleRecords })
+      if (typeof moduleItem.beforeSave === 'function') {
+        payload = moduleItem.beforeSave(payload, { getModuleRecords })
+      }
+
+      if (editingRecord) {
+        await updateRecord(moduleItem, editingRecord.id, payload)
+        message.success('记录已更新')
+      } else {
+        await addRecord(moduleItem, payload)
+        message.success('记录已新增')
+      }
+
+      closeModal()
+    } catch (err) {
+      // 统一兜底提示，避免提交异常以未捕获 Promise 形式抛到控制台。
+      message.error(err?.message || '提交失败，请稍后重试')
     }
-
-    if (editingRecord) {
-      await updateRecord(moduleItem, editingRecord.id, payload)
-      message.success('记录已更新')
-    } else {
-      await addRecord(moduleItem, payload)
-      message.success('记录已新增')
-    }
-
-    closeModal()
   }
 
   const columnDefs = useMemo(() => {
