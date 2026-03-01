@@ -386,3 +386,50 @@
 - 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/data/proformaInvoiceTemplate.mjs` 通过；`pnpm test -- src/erp/data/printTemplates.test.js` 通过（26/26）。
 - 下一步：请重开 PI 页面确认顶部显示是否为 `(Buyer's Company Name)`；若需始终固定显示该文案（即使有买方字段）可继续收紧映射规则。
 - 阻塞/风险：无。
+
+## 2026-03-01
+- 完成：按页面反馈调整采购合同固定模板字段表现：`itemDescription` 增加显式左对齐类，保证产品描述值按左对齐渲染（`web/src/erp/data/printTemplates.js`）。
+- 完成：`innerPackaging`（内箱/小白盒）字段改为多行可换行（`purchase-multiline` + `multiline: true`），避免长文本被截断（`web/src/erp/data/printTemplates.js`）。
+- 完成：补充 `purchase-left` 样式类，统一采购模板左对齐语义（`web/src/erp/data/printTemplates.js`）。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/data/printTemplates.js` 通过；`pnpm test -- src/erp/data/printTemplates.test.js` 通过（26/26）。
+- 下一步：请在采购合同模板页用长“内箱(小白盒)”文本复核换行效果；若高度仍不足，可再上调对应节点高度。
+- 阻塞/风险：无。
+
+## 2026-03-01
+- 完成：修复采购合同“改了仍无变化”问题：为 `itemDescription` 与 `innerPackaging` 增加字段级样式选择器（`data-billing-field`）强制左对齐与换行，避免被组合类样式覆盖（`web/src/erp/data/printTemplates.js`）。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/data/printTemplates.js` 通过；`pnpm test -- src/erp/data/printTemplates.test.js` 通过（26/26）。
+- 下一步：请关闭并重开采购合同页面复核；若仍异常，我将进一步在生成 HTML 时输出字段调试标记定位最终生效规则。
+- 阻塞/风险：无。
+
+## 2026-03-01
+- 完成：继续修复采购合同“产品描述看起来仍居中”问题：将 `itemDescription` 文本框贴近产品描述单元格左边界（`left: 99.2`, `width: 259.8`），让左对齐在视觉上明确生效（`web/src/erp/data/printTemplates.js`）。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/data/printTemplates.js` 通过；`pnpm test -- src/erp/data/printTemplates.test.js` 通过（26/26）。
+- 下一步：请关闭并重开采购合同页面复核；若仍偏中，将继续按网格线坐标做 `1-2px` 微调。
+- 阻塞/风险：无。
+
+## 2026-03-01
+- 完成：按页面反馈修复采购合同“该区域值无法换行”问题：将唛头区静态值节点（`SIZE/GRADE/COATING/Q'TY/由我司提供`）与相关字段（`outerPackaging`、`deliveryAddress`）改为 `purchase-multiline` 并启用 `multiline: true`，允许回车与自动换行（`web/src/erp/data/printTemplates.js`）。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/data/printTemplates.js` 通过；`pnpm test -- src/erp/data/printTemplates.test.js` 通过（26/26）。
+- 下一步：请关闭并重开采购合同页面复核该区域换行；若出现行高不够导致重叠，再按节点高度做定点加高。
+- 阻塞/风险：多行文本过长时可能与下方行内容接近，需要按实际输入量控制。
+
+## 2026-03-01
+- 完成：修复外销/采购等模块日期输入交互：`type='date'` 字段在点击输入框本体时主动触发原生 `showPicker()`，不再仅依赖右侧日历图标弹出日期面板（`web/src/erp/components/ModuleTablePage.jsx`）。
+- 完成：为 `showPicker()` 增加浏览器兼容兜底（不可用或被拦截时保持原生输入行为），避免异常中断表单输入。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm test` 通过（6 个测试文件，26/26）。
+- 下一步：请在“新建外销”弹窗里点击“下单时间/签约日期/备货期限”输入框本体复核是否直接弹出日期选择器。
+- 阻塞/风险：`showPicker()` 属于浏览器能力，极旧浏览器会降级为原生行为（不影响录入）。
+
+## 2026-03-01
+- 完成：修复 ERP 编辑表单提交异常未捕获问题：`submitForm` 增加统一 `try/catch`，提交失败时给出明确提示，避免出现 `Uncaught (in promise)`（`web/src/erp/components/ModuleTablePage.jsx`）。
+- 完成：增强 ERP 存储层错误归一：`erp_repo` 将 Ent 字段校验/约束错误统一映射为 `ErrERPInvalidRecord`，并将 `payload` 反序列化失败归一为业务错误，避免前端拿到笼统“服务器内部错误”（`server/internal/data/erp_repo.go`）。
+- 完成：新增 `toBizERPRecord` 单测，覆盖非法 `payload` 与正常解析场景（`server/internal/data/erp_repo_test.go`）。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/components/ModuleTablePage.jsx` 通过；`cd /Users/simon/projects/trade-erp/server && go test ./internal/data -run 'TestToBizERPRecord|TestJsonrpcData_HandleERP_CRUD'` 通过；`cd /Users/simon/projects/trade-erp/server && go test ./internal/biz -run 'TestERPUsecase'` 通过。
+- 下一步：请在问题页面复测“编辑记录 -> 上传附件 -> 提交”；若仍失败，提供具体模块与记录 ID，我将按该数据进一步定位后端原始错误。
+- 阻塞/风险：当前仅将可识别的存储层错误归一为业务错误；若是外部依赖类故障（如 DB 连接中断）仍会返回 `50000`，需结合后端日志继续排查。
+
+## 2026-03-01
+- 完成：增强 ERP 上传字段可用性：上传后会自动把文本中的附件地址渲染为“查看附件”链接（支持多行多附件），可在编辑弹窗直接打开文件，不再只能看 URL 文本（`web/src/erp/components/ModuleTablePage.jsx`）。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/components/ModuleTablePage.jsx` 通过。
+- 下一步：请在“检测报告附件/附件（图纸等）”字段上传后点击“查看附件”复测；若你希望在列表页也直接查看，我可以再补一个“附件”列。
+- 阻塞/风险：当前查看入口在编辑弹窗内；列表页仍需点“编辑”进入查看。

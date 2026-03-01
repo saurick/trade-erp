@@ -3,6 +3,7 @@ package data
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
 	"server/internal/biz"
 	"server/internal/data/model/ent"
@@ -70,7 +71,7 @@ func (r *erpRepo) Create(ctx context.Context, moduleKey string, payload map[stri
 
 	row, err := create.Save(ctx)
 	if err != nil {
-		return nil, err
+		return nil, normalizeERPRepoError(err)
 	}
 	return toBizERPRecord(row)
 }
@@ -115,7 +116,7 @@ func (r *erpRepo) Update(ctx context.Context, moduleKey string, id int, payload 
 		if ent.IsNotFound(err) {
 			return nil, biz.ErrERPRecordNotFound
 		}
-		return nil, err
+		return nil, normalizeERPRepoError(err)
 	}
 	return toBizERPRecord(saved)
 }
@@ -145,7 +146,7 @@ func toBizERPRecord(row *ent.ERPModuleRecord) (*biz.ERPRecord, error) {
 	payload := map[string]any{}
 	if row.Payload != "" {
 		if err := json.Unmarshal([]byte(row.Payload), &payload); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("%w: payload 反序列化失败: %v", biz.ErrERPInvalidRecord, err)
 		}
 	}
 
@@ -181,4 +182,15 @@ func getPayloadString(payload map[string]any, key string) string {
 		return ""
 	}
 	return value
+}
+
+func normalizeERPRepoError(err error) error {
+	if err == nil {
+		return nil
+	}
+	// 将存储层可识别的字段/约束错误归一为业务错误，避免前端收到笼统 50000。
+	if ent.IsValidationError(err) || ent.IsConstraintError(err) {
+		return fmt.Errorf("%w: %v", biz.ErrERPInvalidRecord, err)
+	}
+	return err
 }

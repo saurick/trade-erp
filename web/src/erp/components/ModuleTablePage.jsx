@@ -69,6 +69,19 @@ const UploadFieldInput = ({
   category = 'attachments',
 }) => {
   const textValue = typeof value === 'string' ? value : ''
+  const attachmentEntries = useMemo(
+    () =>
+      textValue
+        .split('\n')
+        .map((item) => item.trim())
+        .filter(Boolean)
+        .map((item) => ({
+          raw: item,
+          href:
+            /^https?:\/\//i.test(item) || item.startsWith('/') ? item : null,
+        })),
+    [textValue]
+  )
 
   const handleUpload = async ({ file, onSuccess, onError }) => {
     try {
@@ -102,6 +115,30 @@ const UploadFieldInput = ({
       >
         <Button size="small">上传附件</Button>
       </Upload>
+      {attachmentEntries.length > 0 ? (
+        <Space wrap size={[8, 4]}>
+          {attachmentEntries.map((entry, index) =>
+            entry.href ? (
+              <Button
+                key={`${entry.raw}-${index}`}
+                size="small"
+                type="link"
+                href={entry.href}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {attachmentEntries.length > 1
+                  ? `查看附件${index + 1}`
+                  : '查看附件'}
+              </Button>
+            ) : (
+              <Text key={`${entry.raw}-${index}`} type="secondary">
+                {entry.raw}
+              </Text>
+            )
+          )}
+        </Space>
+      ) : null}
     </Space>
   )
 }
