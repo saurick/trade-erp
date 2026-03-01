@@ -306,3 +306,83 @@
 - 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/data/proformaInvoiceTemplate.mjs` 通过；`pnpm test -- src/erp/data/printTemplates.test.js` 通过（26/26）。
 - 下一步：请重开 PI 页面复核；若还需继续回调，可再提升到 `2.8px` 间距并保持当前对齐策略。
 - 阻塞/风险：无。
+
+## 2026-03-01
+- 完成：按页面反馈将 PI 银行区右侧标签列由右对齐改为左对齐，统一 `BENEFICIARY NAME/ADDRESS/A/C NO./SWIFT CODE` 起始位置（`web/src/erp/data/proformaInvoiceTemplate.mjs`）。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/data/proformaInvoiceTemplate.mjs` 通过；`pnpm test -- src/erp/data/printTemplates.test.js` 通过（26/26）。
+- 下一步：请重开 PI 页面复核最终视觉；如需更规整，可再统一右侧值列最小宽度。
+- 阻塞/风险：无。
+
+## 2026-03-01
+- 完成：修复 PI 银行区右侧 `ADDRESS` 与 `A/C NO. USD` 之间“空一行”问题：将底部银行信息改为左右独立表布局，避免左侧多行内容撑高右侧行高（`web/src/erp/data/proformaInvoiceTemplate.mjs`）。
+- 完成：在新布局下将右侧标签和值再轻微收紧（右侧标签列 `29%`，值列 `71%`，标签/值间距 `1.6px`），满足“稍微再靠近一点”的要求（`web/src/erp/data/proformaInvoiceTemplate.mjs`）。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/data/proformaInvoiceTemplate.mjs` 通过；`pnpm test -- src/erp/data/printTemplates.test.js` 通过（26/26）。
+- 下一步：请重开 PI 页面按同一数据复核；若还需微调，我可仅按 `0.4px` 级别收紧/放松右侧间距。
+- 阻塞/风险：无。
+
+## 2026-03-01
+- 完成：按“再靠近一点点”继续微调 PI 右侧字段和值间距：右侧标签列从 `29%` 调整为 `28%`，值列从 `71%` 调整为 `72%`，标签/值间距从 `1.6px` 调整为 `1.2px`（`web/src/erp/data/proformaInvoiceTemplate.mjs`）。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/data/proformaInvoiceTemplate.mjs` 通过；`pnpm test -- src/erp/data/printTemplates.test.js` 通过（26/26）。
+- 下一步：请重开页面复核；若仍需微调，我可再按 `0.2px` 级别调整间距。
+- 阻塞/风险：无。
+
+## 2026-03-01
+- 完成：按页面反馈收窄 PI 条款区标签列宽度（`Incoterms/Lead-time/Notes`）：标签列从 `18%` 调整为 `16%`，值列从 `32%` 调整为 `34%`，让左侧格子更紧凑（`web/src/erp/data/proformaInvoiceTemplate.mjs`）。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/data/proformaInvoiceTemplate.mjs` 通过；`pnpm test -- src/erp/data/printTemplates.test.js` 通过（26/26）。
+- 下一步：请重开页面复核；若还需再窄，可继续下调到 `15%`。
+- 阻塞/风险：无。
+
+## 2026-03-01
+- 完成：按页面反馈将 PI 明细表右侧金额区全部改为居中（`Net Price`、`Net Value`、`Total Net Value`），统一列内对齐方式（`web/src/erp/data/proformaInvoiceTemplate.mjs`）。
+- 完成：移除 PI 模板中未再使用的 `proforma-cell-right` 右对齐样式，避免后续误用导致对齐不一致（`web/src/erp/data/proformaInvoiceTemplate.mjs`）。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/data/proformaInvoiceTemplate.mjs` 通过；`pnpm test -- src/erp/data/printTemplates.test.js` 通过（26/26）。
+- 下一步：请重开页面复核金额列观感；若希望“标题居中、数值略偏右”也可再按 1px 级别微调。
+- 阻塞/风险：无。
+
+## 2026-03-01
+- 完成：按页面反馈调整 PI 卖方签章图片定位：签章图与右侧签字标题列使用同一宽度和起点，确保图片位于 `Authorized Signature Seller` 正上方（`web/src/erp/data/proformaInvoiceTemplate.mjs`）。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/data/proformaInvoiceTemplate.mjs` 通过；`pnpm test -- src/erp/data/printTemplates.test.js` 通过（26/26）。
+- 下一步：请重开页面确认签章位置；如需再右移/左移，可按 `1px` 级别微调。
+- 阻塞/风险：无。
+
+## 2026-03-01
+- 完成：按页面反馈将 PI 条款区字段名格子再缩窄约 1/3：标签列从 `16%` 调整为 `11%`，值列从 `34%` 调整为 `39%`（`web/src/erp/data/proformaInvoiceTemplate.mjs`）。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/data/proformaInvoiceTemplate.mjs` 通过；`pnpm test -- src/erp/data/printTemplates.test.js` 通过（26/26）。
+- 下一步：请重开页面复核；若仍需更窄，可继续下调到 `10%`。
+- 阻塞/风险：无。
+
+## 2026-03-01
+- 完成：按页面反馈处理卖方签章素材空白边：对 `proforma-signature.png` 做去空白裁剪（`680x220` -> `433x172`），减少右侧和底部空白导致的视觉偏移，使图片文字更接近 `Authorized Signature Seller` 正上方（`web/public/templates/proforma-signature.png`）。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm test -- src/erp/data/printTemplates.test.js` 通过（26/26）。
+- 下一步：请重开 PI 页面复核签章是否与下方文字完全对齐；如仍有偏差，可再做 `1-2px` 级别定位微调。
+- 阻塞/风险：无。
+
+## 2026-03-01
+- 完成：定位并修复 PI 条款区“字段格子未按预期缩窄”问题：根因是 `table-layout: fixed` 下首行为 `colspan=4`，列宽被均分，`th/td width` 基本不生效；改为 `colgroup` 明确列宽（标签列 `17%`、值列 `33%`）后生效（`web/src/erp/data/proformaInvoiceTemplate.mjs`）。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/data/proformaInvoiceTemplate.mjs` 通过；`pnpm test -- src/erp/data/printTemplates.test.js` 通过（26/26）。
+- 下一步：请重开页面复核条款区宽度；若还需更窄，可继续下调标签列到 `16%`。
+- 阻塞/风险：无。
+
+## 2026-03-01
+- 完成：修复 PI 签章区“图片过高挤压下方文字”问题：签章图改为按高度上限缩放（`max-height: 72px`）并在卖方列内居中，避免将 `Authorized Signature Seller` 顶到分割线附近（`web/src/erp/data/proformaInvoiceTemplate.mjs`）。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/data/proformaInvoiceTemplate.mjs` 通过；`pnpm test -- src/erp/data/printTemplates.test.js` 通过（26/26）。
+- 下一步：请重开页面复核签章与签字标题的上下间距；若还偏紧，可再把上限下调到 `68px`。
+- 阻塞/风险：无。
+
+## 2026-03-01
+- 完成：按页面反馈去掉 PI 卖方签章图片的 `margin`，避免额外空白影响与下方签字标题的贴合（`web/src/erp/data/proformaInvoiceTemplate.mjs`）。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/data/proformaInvoiceTemplate.mjs` 通过；`pnpm test -- src/erp/data/printTemplates.test.js` 通过（26/26）。
+- 下一步：请重开页面复核最终位置；若仍有 1-2px 偏差，可继续微调签章容器偏移。
+- 阻塞/风险：无。
+
+## 2026-03-01
+- 完成：按页面反馈将 PI 签章区整体下移一档：`proforma-signature-zone` 上内边距从 `6.7px` 调整为 `11.2px`，缩小签章内容与下方横线的视觉间距（`web/src/erp/data/proformaInvoiceTemplate.mjs`）。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/data/proformaInvoiceTemplate.mjs` 通过；`pnpm test -- src/erp/data/printTemplates.test.js` 通过（26/26）。
+- 下一步：请重开页面复核；若还需再下移，可继续增加 `1-2px`。
+- 阻塞/风险：无。
+
+## 2026-03-01
+- 完成：按页面反馈将 PI 买方公司名字段改回占位文案优先：移除 `buyerCompanyName` 的 `name` 别名与 `flattenedMap.name` 兜底，避免被通用名称覆盖（`web/src/erp/data/proformaInvoiceTemplate.mjs`）。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/data/proformaInvoiceTemplate.mjs` 通过；`pnpm test -- src/erp/data/printTemplates.test.js` 通过（26/26）。
+- 下一步：请重开 PI 页面确认顶部显示是否为 `(Buyer's Company Name)`；若需始终固定显示该文案（即使有买方字段）可继续收紧映射规则。
+- 阻塞/风险：无。

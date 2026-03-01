@@ -269,7 +269,7 @@ export const PROFORMA_INVOICE_FIELD_SCHEMA = [
     key: 'buyerCompanyName',
     label: '买方公司名',
     defaultValue: "(Buyer's Company Name)",
-    aliases: ['buyer_company_name', 'customername', 'customer_name', 'name'],
+    aliases: ['buyer_company_name', 'customername', 'customer_name'],
   },
   {
     key: 'buyerAddressTel',
@@ -563,9 +563,9 @@ export const buildProformaInvoiceFields = (record = {}) => {
     : []
 
   if (!hasExplicit.buyerCompanyName) {
+    // 避免通用 name 覆盖买方占位文案，只接收买方语义字段。
     values.buyerCompanyName =
       flattenedMap.customername ||
-      flattenedMap.name ||
       flattenedMap.partnername ||
       values.buyerCompanyName
   }
@@ -890,20 +890,20 @@ export const buildProformaInvoiceTemplateHTML = (
                 <td>${buildEditableNode('item1Ref', 'proforma-cell-center')}</td>
                 <td>${buildEditableNode('item1Desc', 'proforma-cell-left', true)}</td>
                 <td>${buildEditableNode('item1Qty', 'proforma-cell-center')}</td>
-                <td>${buildEditableNode('item1NetPrice', 'proforma-cell-right')}</td>
-                <td>${buildEditableNode('item1NetValue', 'proforma-cell-right')}</td>
+                <td>${buildEditableNode('item1NetPrice', 'proforma-cell-center')}</td>
+                <td>${buildEditableNode('item1NetValue', 'proforma-cell-center')}</td>
               </tr>
               <tr class="proforma-item-row">
                 <td>${buildEditableNode('item2No', 'proforma-cell-center')}</td>
                 <td>${buildEditableNode('item2Ref', 'proforma-cell-center')}</td>
                 <td>${buildEditableNode('item2Desc', 'proforma-cell-left', true)}</td>
                 <td>${buildEditableNode('item2Qty', 'proforma-cell-center')}</td>
-                <td>${buildEditableNode('item2NetPrice', 'proforma-cell-right')}</td>
-                <td>${buildEditableNode('item2NetValue', 'proforma-cell-right')}</td>
+                <td>${buildEditableNode('item2NetPrice', 'proforma-cell-center')}</td>
+                <td>${buildEditableNode('item2NetValue', 'proforma-cell-center')}</td>
               </tr>
               <tr class="proforma-total-title-row">
                 <td colspan="5"><strong>Total Net Value:</strong></td>
-                <td class="proforma-total-value-cell" rowspan="2">${buildEditableNode('totalNetValue', 'proforma-cell-right proforma-cell-strong')}</td>
+                <td class="proforma-total-value-cell" rowspan="2">${buildEditableNode('totalNetValue', 'proforma-cell-center proforma-cell-strong')}</td>
               </tr>
               <tr class="proforma-total-words-row">
                 <td colspan="5">${buildEditableNode('amountInWords', 'proforma-amount-words')}</td>
@@ -912,6 +912,12 @@ export const buildProformaInvoiceTemplateHTML = (
           </table>
 
           <table class="proforma-terms-table">
+            <colgroup>
+              <col class="proforma-terms-label-col" />
+              <col class="proforma-terms-value-col" />
+              <col class="proforma-terms-label-col" />
+              <col class="proforma-terms-value-col" />
+            </colgroup>
             <tbody>
               <tr class="proforma-terms-spacer-row">
                 <td colspan="4"></td>
@@ -950,35 +956,51 @@ export const buildProformaInvoiceTemplateHTML = (
             </div>
           </section>
 
-          <table class="proforma-bank-table">
-            <tbody>
-              <tr>
-                <th>BANK NAME:</th>
-                <th>BENEFICIARY NAME:</th>
-                <td>${buildEditableNode('beneficiaryName')}</td>
-              </tr>
-              <tr>
-                <td>${buildEditableNode('bankName')}</td>
-                <th>ADDRESS:</th>
-                <td>${buildEditableNode('beneficiaryAddress')}</td>
-              </tr>
-              <tr>
-                <th>BANK ADDRESS:</th>
-                <th>A/C NO. USD:</th>
-                <td>${buildEditableNode('accountUsd')}</td>
-              </tr>
-              <tr>
-                <td>${buildEditableNode('bankAddress1')}</td>
-                <th>A/C NO. EURO:</th>
-                <td>${buildEditableNode('accountEuro')}</td>
-              </tr>
-              <tr>
-                <td>${buildEditableNode('bankAddress2')}</td>
-                <th>SWIFT CODE:</th>
-                <td>${buildEditableNode('swiftCode')}</td>
-              </tr>
-            </tbody>
-          </table>
+          <section class="proforma-bank-section">
+            <table class="proforma-bank-table proforma-bank-left-table">
+              <tbody>
+                <tr>
+                  <th>BANK NAME:</th>
+                </tr>
+                <tr>
+                  <td>${buildEditableNode('bankName', '', true)}</td>
+                </tr>
+                <tr>
+                  <th>BANK ADDRESS:</th>
+                </tr>
+                <tr>
+                  <td>${buildEditableNode('bankAddress1', '', true)}</td>
+                </tr>
+                <tr>
+                  <td>${buildEditableNode('bankAddress2', '', true)}</td>
+                </tr>
+              </tbody>
+            </table>
+            <table class="proforma-bank-table proforma-bank-right-table">
+              <tbody>
+                <tr>
+                  <th>BENEFICIARY NAME:</th>
+                  <td>${buildEditableNode('beneficiaryName')}</td>
+                </tr>
+                <tr>
+                  <th>ADDRESS:</th>
+                  <td>${buildEditableNode('beneficiaryAddress', '', true)}</td>
+                </tr>
+                <tr>
+                  <th>A/C NO. USD:</th>
+                  <td>${buildEditableNode('accountUsd')}</td>
+                </tr>
+                <tr>
+                  <th>A/C NO. EURO:</th>
+                  <td>${buildEditableNode('accountEuro')}</td>
+                </tr>
+                <tr>
+                  <th>SWIFT CODE:</th>
+                  <td>${buildEditableNode('swiftCode')}</td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
         </div>
       </article>
     </section>
@@ -1175,9 +1197,6 @@ export const PROFORMA_INVOICE_STYLE = `
       .template-wrap .proforma-cell-center {
         text-align: center;
       }
-      .template-wrap .proforma-cell-right {
-        text-align: right;
-      }
       .template-wrap .proforma-cell-strong {
         font-weight: 700;
       }
@@ -1206,6 +1225,13 @@ export const PROFORMA_INVOICE_STYLE = `
         border: 1.35px solid #000;
         border-top: 0;
       }
+      /* fixed 布局下首行为 colspan 时，列宽需由 colgroup 明确指定。 */
+      .template-wrap .proforma-terms-table col.proforma-terms-label-col {
+        width: 17%;
+      }
+      .template-wrap .proforma-terms-table col.proforma-terms-value-col {
+        width: 33%;
+      }
       .template-wrap .proforma-terms-table th,
       .template-wrap .proforma-terms-table td {
         border: 0.68px solid #000;
@@ -1226,25 +1252,26 @@ export const PROFORMA_INVOICE_STYLE = `
         height: 29px;
       }
       .template-wrap .proforma-terms-table th {
-        width: 18%;
         text-align: left;
         font-weight: 700;
       }
-      .template-wrap .proforma-terms-table td {
-        width: 32%;
-      }
       .template-wrap .proforma-signature-zone {
-        padding: 6.7px 5.9px 3.4px;
+        padding: 16.2px 5.9px 3.4px;
         height: 112px;
+        --signature-label-gap: 6.7px;
       }
       .template-wrap .proforma-seller-signature {
-        width: 51%;
-        margin: 0 auto;
+        /* 签章图与右侧签字标题列保持同一水平范围，确保正上方对齐。 */
+        width: calc((100% - var(--signature-label-gap)) / 2);
+        margin-left: calc((100% + var(--signature-label-gap)) / 2);
+        margin-right: 0;
       }
       .template-wrap .proforma-seller-signature-image {
         display: block;
-        width: 100%;
+        width: auto;
+        max-width: 100%;
         height: auto;
+        max-height: 72px;
         user-select: none;
         -webkit-user-drag: none;
         pointer-events: none;
@@ -1252,7 +1279,7 @@ export const PROFORMA_INVOICE_STYLE = `
       .template-wrap .proforma-signature-labels {
         display: flex;
         justify-content: space-between;
-        gap: 6.7px;
+        gap: var(--signature-label-gap);
         margin-top: 5.9px;
       }
       .template-wrap .proforma-signature-label {
@@ -1260,11 +1287,13 @@ export const PROFORMA_INVOICE_STYLE = `
         font-size: 9.3px;
         font-weight: 700;
       }
+      .template-wrap .proforma-bank-section {
+        display: flex;
+        border-top: 1.35px solid #000;
+      }
       .template-wrap .proforma-bank-table {
-        width: 100%;
         border-collapse: collapse;
         table-layout: fixed;
-        border-top: 1.35px solid #000;
       }
       .template-wrap .proforma-bank-table th,
       .template-wrap .proforma-bank-table td {
@@ -1286,20 +1315,25 @@ export const PROFORMA_INVOICE_STYLE = `
         overflow: visible;
         text-overflow: clip;
       }
-      .template-wrap .proforma-bank-table tr > *:nth-child(1) {
+      .template-wrap .proforma-bank-left-table {
         width: 35%;
+      }
+      .template-wrap .proforma-bank-left-table th,
+      .template-wrap .proforma-bank-left-table td {
         padding-right: 6.4px;
       }
-      .template-wrap .proforma-bank-table tr > *:nth-child(2) {
-        /* 右侧标签右对齐到值列边缘，保证“标签-值”更贴近且左右分区更清晰。 */
-        width: 19%;
-        text-align: right;
-        padding-left: 6.4px;
-        padding-right: 2.2px;
+      .template-wrap .proforma-bank-right-table {
+        width: 65%;
       }
-      .template-wrap .proforma-bank-table tr > *:nth-child(3) {
-        width: 46%;
-        padding-left: 2.2px;
+      .template-wrap .proforma-bank-right-table th {
+        /* 右侧字段标签和值稍微收拢，保持同组对齐。 */
+        width: 28%;
+        padding-left: 6.4px;
+        padding-right: 1.2px;
+      }
+      .template-wrap .proforma-bank-right-table td {
+        width: 72%;
+        padding-left: 1.2px;
       }
 `
 
