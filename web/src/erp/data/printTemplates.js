@@ -1241,6 +1241,19 @@ const PURCHASE_CONTRACT_PANEL_FIELD_SCHEMA = [
   { key: 'otherRequirement', label: '其他要求' },
 ]
 
+const PANEL_MULTILINE_FIELD_KEYS = new Set([
+  'itemdescription',
+  'innerpackaging',
+  'outerpackaging',
+  'deliveryaddress',
+  'shippingdocs',
+  'otherrequirement',
+  'paymentterms',
+  'notes',
+  'buyeraddresstel',
+  'beneficiaryaddress',
+])
+
 const PURCHASE_CONTRACT_CANVAS_WIDTH = 595.32
 const PURCHASE_CONTRACT_CANVAS_HEIGHT = 841.92
 const PURCHASE_CONTRACT_TERMS_TEXT = [
@@ -1390,53 +1403,40 @@ const PURCHASE_CONTRACT_STATIC_TEXT_LAYOUT = [
     className: 'purchase-center purchase-multiline',
   },
   {
-    text: '内箱(小白盒)',
+    text: '内箱\n(小白盒)',
     left: 97.58,
-    top: 266.25,
+    top: 249.39,
     width: 44,
-    className: 'purchase-no-wrap',
+    height: 52.22,
+    className: 'purchase-multiline purchase-vcenter',
+    multiline: true,
   },
   {
-    text: 'SIZE: D9.525XD3.048X3.175',
-    left: 141.26,
-    top: 251.33,
+    text: "SIZE: D9.525XD3.048X3.175\nGRADE: N42\nCOATING: NICUNI\nQ'TY:",
+    left: 141.14,
+    top: 249.39,
     width: 145,
-    className: 'purchase-arial purchase-no-wrap',
+    height: 52.22,
+    className: 'purchase-arial purchase-multiline purchase-vcenter',
+    multiline: true,
   },
   {
-    text: 'GRADE: N42',
-    left: 141.26,
-    top: 264.56,
-    width: 80,
-    className: 'purchase-arial purchase-no-wrap',
-  },
-  {
-    text: 'COATING: NICUNI',
-    left: 141.26,
-    top: 277.76,
-    width: 100,
-    className: 'purchase-arial purchase-no-wrap',
-  },
-  {
-    text: "Q'TY:",
-    left: 141.26,
-    top: 290.96,
-    width: 40,
-    className: 'purchase-arial purchase-no-wrap',
-  },
-  {
-    text: '纸箱(外箱)',
+    text: '纸箱\n(外箱)',
     left: 290.69,
-    top: 271.41,
-    width: 37,
-    className: 'purchase-no-wrap',
+    top: 249.39,
+    width: 69.3,
+    height: 52.22,
+    className: 'purchase-multiline purchase-vcenter',
+    multiline: true,
   },
   {
     text: '由我司提供',
-    left: 363.79,
-    top: 271.65,
-    width: 40,
-    className: 'purchase-no-wrap',
+    left: 363.2,
+    top: 249.39,
+    width: 159.2,
+    height: 52.22,
+    className: 'purchase-multiline purchase-vcenter',
+    multiline: true,
   },
   {
     text: '要求交货日期',
@@ -1521,13 +1521,6 @@ const PURCHASE_CONTRACT_STATIC_TEXT_LAYOUT = [
     top: 741.56,
     width: 28,
     className: 'purchase-calibri purchase-no-wrap',
-  },
-  {
-    text: '第 1 页，共 2 页',
-    left: 261.05,
-    top: 808.51,
-    width: 72.32,
-    className: 'purchase-center purchase-no-wrap',
   },
 ]
 
@@ -1627,96 +1620,122 @@ const PURCHASE_CONTRACT_EDITABLE_TEXT_LAYOUT = [
   },
   {
     fieldKey: 'itemDescription',
-    left: 140.42,
+    // 产品描述单元格左边界约为 x=95.66，文本框贴左后左对齐才能直观看到生效。
+    // 同时给固定高度配合 purchase-vcenter，和右侧数值单元格保持垂直对齐口径。
+    left: 99.2,
     top: 185.22,
-    width: 219,
-    className: 'purchase-multiline',
+    width: 259.8,
+    height: 42.24,
+    className: 'purchase-left purchase-multiline purchase-vcenter',
     multiline: true,
   },
   {
     fieldKey: 'quantity',
-    left: 374.71,
-    top: 201.53,
-    width: 27,
-    className: 'purchase-center purchase-no-wrap purchase-arial',
+    left: 362.11,
+    top: 179.9,
+    width: 53.7,
+    height: 51.36,
+    className:
+      'purchase-center purchase-no-wrap purchase-arial purchase-vcenter',
   },
   {
     fieldKey: 'unitPrice',
-    left: 425.95,
-    top: 201.53,
-    width: 34,
-    className: 'purchase-center purchase-no-wrap purchase-arial',
+    left: 416.23,
+    top: 179.9,
+    width: 53.7,
+    height: 51.36,
+    className:
+      'purchase-center purchase-no-wrap purchase-arial purchase-vcenter',
   },
   {
     fieldKey: 'amount',
-    left: 478.5,
-    top: 201.53,
-    width: 40,
-    className: 'purchase-center purchase-no-wrap purchase-arial',
+    left: 470.38,
+    top: 179.9,
+    width: 53.52,
+    height: 51.36,
+    className:
+      'purchase-center purchase-no-wrap purchase-arial purchase-vcenter',
   },
   {
     fieldKey: 'totalAmount',
-    left: 478.5,
-    top: 235.61,
-    width: 40,
-    className: 'purchase-center purchase-no-wrap purchase-arial purchase-bold',
+    left: 470.38,
+    top: 231.26,
+    width: 53.52,
+    height: 17.52,
+    className:
+      'purchase-center purchase-no-wrap purchase-arial purchase-bold purchase-vcenter',
   },
   {
     fieldKey: 'requiredDeliveryDate',
-    left: 141.26,
-    top: 305.96,
-    width: 80,
-    className: 'purchase-arial purchase-no-wrap',
+    left: 141.14,
+    top: 301.61,
+    width: 145,
+    height: 16.68,
+    className: 'purchase-arial purchase-multiline purchase-vcenter',
+    multiline: true,
   },
   {
     fieldKey: 'sellerConfirmDeliveryDate',
-    left: 363.79,
-    top: 305.96,
-    width: 150,
-    className: 'purchase-arial purchase-no-wrap',
+    left: 363.2,
+    top: 301.61,
+    width: 159.2,
+    height: 16.68,
+    className: 'purchase-arial purchase-multiline purchase-vcenter',
+    multiline: true,
   },
   {
     fieldKey: 'innerPackaging',
     left: 141.14,
-    top: 323.85,
+    top: 318.29,
     width: 145,
-    className: 'purchase-no-wrap',
+    height: 17.16,
+    className: 'purchase-left purchase-multiline purchase-vcenter',
+    multiline: true,
   },
   {
     fieldKey: 'outerPackaging',
-    left: 363.91,
-    top: 323.01,
-    width: 145,
-    className: 'purchase-no-wrap',
+    left: 363.2,
+    top: 318.29,
+    width: 159.2,
+    height: 17.16,
+    className: 'purchase-left purchase-multiline purchase-vcenter',
+    multiline: true,
   },
   {
     fieldKey: 'shield',
     left: 141.14,
-    top: 344.25,
-    width: 80,
-    className: 'purchase-no-wrap',
+    top: 335.45,
+    width: 145,
+    height: 23.76,
+    className: 'purchase-multiline purchase-vcenter',
+    multiline: true,
   },
   {
     fieldKey: 'deliveryAddress',
-    left: 363.79,
-    top: 343.77,
-    width: 145,
-    className: 'purchase-no-wrap',
+    left: 363.2,
+    top: 335.45,
+    width: 159.2,
+    height: 23.76,
+    className: 'purchase-left purchase-multiline purchase-vcenter',
+    multiline: true,
   },
   {
     fieldKey: 'shippingDocs',
     left: 141.26,
-    top: 362.48,
+    top: 359.21,
     width: 382,
-    className: 'purchase-multiline',
+    height: 25.2,
+    className: 'purchase-multiline purchase-vcenter',
     multiline: true,
   },
   {
     fieldKey: 'otherRequirement',
     left: 141.26,
-    top: 392.25,
+    top: 384.41,
     width: 382,
-    className: 'purchase-no-wrap',
+    height: 22.32,
+    className: 'purchase-multiline purchase-vcenter',
+    multiline: true,
   },
 ]
 
@@ -2501,7 +2520,7 @@ const buildRecordPanelHTML = (record, templateKey) => {
       ([label, value, fieldKey]) => `
         <tr>
           <td class="field-key">${escapeHTML(label)}</td>
-          <td class="field-value"${isFieldSyncTemplate ? ` data-field-key="${escapeHTML(String(fieldKey))}"` : ''} contenteditable="true">${escapeHTML(value)}</td>
+          <td class="field-value"${isFieldSyncTemplate ? ` data-field-key="${escapeHTML(String(fieldKey))}"` : ''}${PANEL_MULTILINE_FIELD_KEYS.has(normalizeFieldKey(fieldKey)) ? ' data-multiline="true"' : ''} contenteditable="true">${escapeHTML(value)}</td>
         </tr>
       `
     )
@@ -2869,6 +2888,9 @@ const buildWindowHTML = ({
       .template-wrap .purchase-center {
         text-align: center;
       }
+      .template-wrap .purchase-left {
+        text-align: left;
+      }
       .template-wrap .purchase-right {
         text-align: right;
       }
@@ -2878,6 +2900,27 @@ const buildWindowHTML = ({
       .template-wrap .purchase-multiline {
         white-space: pre-wrap;
         word-break: break-word;
+      }
+      .template-wrap .purchase-vcenter {
+        display: flex;
+        align-items: center;
+      }
+      .template-wrap .purchase-center.purchase-vcenter {
+        justify-content: center;
+      }
+      .template-wrap .purchase-left.purchase-vcenter {
+        justify-content: flex-start;
+      }
+      .template-wrap .purchase-right.purchase-vcenter {
+        justify-content: flex-end;
+      }
+      /* 采购模板关键字段按字段键强制样式，避免类名组合被其它规则覆盖。 */
+      .template-wrap .purchase-editable[data-billing-field="itemDescription"],
+      .template-wrap .purchase-editable[data-billing-field="innerPackaging"] {
+        text-align: left;
+        white-space: pre-wrap;
+        word-break: break-word;
+        overflow-wrap: anywhere;
       }
       .template-wrap .purchase-terms {
         line-height: 1.32;
@@ -3082,7 +3125,14 @@ const buildWindowHTML = ({
         };
 
         var isMultilineFieldNode = function (node) {
-          return String(node?.getAttribute?.('data-multiline') || '').toLowerCase() === 'true';
+          if (!node) {
+            return false;
+          }
+          if (String(node.getAttribute('data-multiline') || '').toLowerCase() === 'true') {
+            return true;
+          }
+          var className = String(node.className || '');
+          return className.split(/\\s+/).includes('purchase-multiline');
         };
 
         var normalizeNodeText = function (raw, multiline) {

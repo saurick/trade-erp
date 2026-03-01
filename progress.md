@@ -414,6 +414,12 @@
 - 阻塞/风险：多行文本过长时可能与下方行内容接近，需要按实际输入量控制。
 
 ## 2026-03-01
+- 完成：继续修复采购合同“仍无法换行”问题：为左侧字段面板对应字段补充 `data-multiline="true"`（如 `itemDescription/innerPackaging/outerPackaging/deliveryAddress`），并在脚本侧将 `purchase-multiline` 类也纳入多行判定，确保面板编辑与模板编辑都保留换行（`web/src/erp/data/printTemplates.js`）。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/data/printTemplates.js` 通过；`pnpm test -- src/erp/data/printTemplates.test.js` 通过（26/26）。
+- 下一步：请关闭并重新打开采购合同页面后在“字段面板”和“模板区”各测试一次回车换行；若仍失效，将继续排查浏览器输入法/快捷键拦截。
+- 阻塞/风险：若某字段文本过长且节点高度不足，可能出现换行后与下方内容接近，需再微调节点高度。
+
+## 2026-03-01
 - 完成：修复外销/采购等模块日期输入交互：`type='date'` 字段在点击输入框本体时主动触发原生 `showPicker()`，不再仅依赖右侧日历图标弹出日期面板（`web/src/erp/components/ModuleTablePage.jsx`）。
 - 完成：为 `showPicker()` 增加浏览器兼容兜底（不可用或被拦截时保持原生输入行为），避免异常中断表单输入。
 - 验证：`cd /Users/simon/projects/trade-erp/web && pnpm test` 通过（6 个测试文件，26/26）。
@@ -433,3 +439,85 @@
 - 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/components/ModuleTablePage.jsx` 通过。
 - 下一步：请在“检测报告附件/附件（图纸等）”字段上传后点击“查看附件”复测；若你希望在列表页也直接查看，我可以再补一个“附件”列。
 - 阻塞/风险：当前查看入口在编辑弹窗内；列表页仍需点“编辑”进入查看。
+
+## 2026-03-01
+- 完成：修复采购合同唛头区换行与断行问题：将 `内箱(小白盒)`、`纸箱(外箱)`改为显式两行文本（`内箱\n(小白盒)`、`纸箱\n(外箱)`），并将“由我司提供”改为 `purchase-no-wrap` 避免未到单元格右边界就提前换行（`web/src/erp/data/printTemplates.js`）。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/data/printTemplates.js` 通过；`pnpm test -- src/erp/data/printTemplates.test.js` 通过（26/26）。
+- 下一步：请关闭并重开采购合同页面复核三处显示；若“由我司提供”仍显得偏窄，我可以继续把该节点宽度再放大 `8-12px`。
+- 阻塞/风险：无。
+
+## 2026-03-01
+- 完成：按页面反馈修复唛头行右侧换行与垂直对齐：将 `由我司提供` 节点恢复为可换行并扩展到接近整格宽度（`width: 159.2`），同时为 `内箱(小白盒)`、`纸箱(外箱)`、`由我司提供` 三个节点设置整格高度并加 `purchase-vcenter`，实现相对格子的上下居中（`web/src/erp/data/printTemplates.js`）。
+- 完成：新增局部样式 `.purchase-vcenter { display: flex; align-items: center; }`，仅用于采购模板相关节点的垂直居中，不影响其它模板。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/data/printTemplates.js` 通过；`pnpm test -- src/erp/data/printTemplates.test.js` 通过（26/26）。
+- 下一步：请关闭并重开采购合同页面复核右侧文本是否“接近右边框再换行”；若还想更贴边，我可再把宽度上调 `2-4px`。
+- 阻塞/风险：无。
+
+## 2026-03-01
+- 完成：按“表格值统一样式”要求，统一底部表格值节点布局：`requiredDeliveryDate/sellerConfirmDeliveryDate/innerPackaging/outerPackaging/shield/deliveryAddress/shippingDocs/otherRequirement` 全部改为按单元格高度垂直居中，并补齐右列值宽度到接近右边框，避免提前换行（`web/src/erp/data/printTemplates.js`）。
+- 完成：修正唛头区中列可编辑标签宽度，`纸箱(外箱)` 从 `37` 扩至 `69.3`，长文本换行不再过早折行。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/data/printTemplates.js` 通过；`pnpm test -- src/erp/data/printTemplates.test.js` 通过（30/30）。
+- 下一步：请重开采购合同页面并重点复核“纸箱(外箱)”与右侧值列的换行边界；若需更贴右边，可继续增加 `1-2px`。
+- 阻塞/风险：多行内容在窄行高单元格中仍可能视觉偏紧，必要时需同步增大该行高度。
+
+## 2026-03-02
+- 完成：修复唛头行中间值区（`SIZE/GRADE/COATING/Q'TY`）样式不一致问题：将原 4 个分散节点合并为 1 个整格多行节点，统一为单元格高度内渲染，并启用 `purchase-vcenter` 垂直居中（`web/src/erp/data/printTemplates.js`）。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/data/printTemplates.js` 通过；`pnpm test -- src/erp/data/printTemplates.test.js` 通过（32/32）。
+- 下一步：请重开采购合同页面复核该值区与左右两格的垂直对齐；若还偏上/偏下，可继续微调 `top` 或 `line-height`。
+- 阻塞/风险：无。
+
+## 2026-03-02
+- 完成：修复采购合同明细区 `数量(个)/单价/金额/总计` 值节点未按统一规则渲染的问题：四个字段由“手动 top 定位”改为“整格高度 + `purchase-vcenter` 垂直居中”，确保与其它值单元格一致（`web/src/erp/data/printTemplates.js`）。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/data/printTemplates.js` 通过；`pnpm test -- src/erp/data/printTemplates.test.js` 通过（32/32）。
+- 下一步：请重开采购合同页面复核四个值是否在单元格内上下居中；若你希望从“居中”改为“靠下 1-2px”，可继续微调。
+- 阻塞/风险：无。
+
+## 2026-03-02
+- 完成：按页面反馈修复 `数量(个)/单价/金额/总计` 值节点 X 轴未占满单元格问题：四个节点的 `left/width` 改为贴合对应列边界（整列宽度），在保持水平居中的同时真正使用整格渲染区域（`web/src/erp/data/printTemplates.js`）。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/data/printTemplates.js` 通过；`pnpm test -- src/erp/data/printTemplates.test.js` 通过（32/32）。
+- 下一步：请重开采购合同页面复核四列值的左右留白是否一致；若还需更满，可再各列增加 `0.5-1px`。
+- 阻塞/风险：无。
+
+## 2026-03-02
+- 完成：修复 `数量(个)/单价/金额/总计` 在 `flex` 垂直居中容器中横向未稳定居中的问题：新增组合规则 `.purchase-center.purchase-vcenter { justify-content: center; }`，并补齐 `.purchase-left/.purchase-right` 与 `purchase-vcenter` 组合的横向对齐规则（`web/src/erp/data/printTemplates.js`）。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/data/printTemplates.js` 通过；`pnpm test -- src/erp/data/printTemplates.test.js` 通过（35/35）。
+- 下一步：请重开采购合同页面复核四个数值是否在单元格中左右居中；若仍有视觉偏差，我可继续按列单独微调 `padding`。
+- 阻塞/风险：无。
+
+## 2026-03-02
+- 完成：按页面反馈移除采购合同页脚页码文案 `"第 1 页，共 2 页"`，避免单页模板出现误导信息（`web/src/erp/data/printTemplates.js`）。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/data/printTemplates.js` 通过；`pnpm test -- src/erp/data/printTemplates.test.js` 通过（35/35）。
+- 下一步：请重开采购合同页面确认页脚仅保留 `.375 in` 标记，不再显示页码文案。
+- 阻塞/风险：无。
+
+## 2026-03-01
+- 完成：在 ERP 权限管理页补充“创建管理员”能力（`web/src/erp/pages/PermissionCenterPage.jsx`），支持在同页创建管理员后继续分配菜单权限；创建规则与后端一致：超级管理员可创建一级/二级，一级管理员仅可创建直属二级。
+- 完成：抽离管理员创建 payload 组装逻辑（`web/src/erp/utils/adminManage.js`），统一处理等级与上级归属约束，并新增单测覆盖关键分支（`web/src/erp/utils/adminManage.test.js`）。
+- 完成：同步更新权限接口文档，补充 `admin.create` 入参与权限约束（`docs/erp-auth-permission-api.md`）；同步更新一期需求实现清单中的登录权限说明（`docs/erp-phase1-requirements.md`）。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/pages/PermissionCenterPage.jsx src/erp/utils/adminManage.js src/erp/utils/adminManage.test.js` 通过；`cd /Users/simon/projects/trade-erp/web && pnpm test -- src/erp/utils/adminManage.test.js` 通过（7 个测试文件，30/30）。
+- 下一步：请在 `/system/permissions` 页面直接创建一个新管理员并确认列表出现“编辑权限”按钮可用。
+- 阻塞/风险：无。
+
+## 2026-03-02
+- 完成：将权限管理页“创建管理员”从页内长表单改为弹窗交互（`web/src/erp/pages/PermissionCenterPage.jsx`），页面仅保留“创建管理员”按钮，点击后打开创建弹窗，减少页面占用并聚焦一次性创建操作。
+- 完成：补充创建弹窗默认值逻辑（`web/src/erp/utils/adminManage.js`），统一为：超级管理员默认创建一级；一级管理员默认创建直属二级并自动带上级 ID；并在弹窗打开时强制重置默认值，避免沿用上次输入。
+- 完成：新增默认值逻辑单测（`web/src/erp/utils/adminManage.test.js`），覆盖超级/一级分支与一级管理员缺失 ID 的异常分支。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/pages/PermissionCenterPage.jsx src/erp/utils/adminManage.js src/erp/utils/adminManage.test.js` 通过；`cd /Users/simon/projects/trade-erp/web && pnpm test -- src/erp/utils/adminManage.test.js` 通过（7 个测试文件，32/32）。
+- 下一步：请在 `/system/permissions` 点击“创建管理员”验证弹窗流程，并确认创建后列表即时刷新。
+- 阻塞/风险：无。
+
+## 2026-03-02
+- 完成：按页面反馈补齐采购合同主表“产品描述”单元格的垂直对齐口径（`web/src/erp/data/printTemplates.js`）：`itemDescription` 增加固定高度 `42.24` 并追加 `purchase-vcenter`，在保持左对齐的前提下与右侧数量/单价/金额的垂直位置更一致。
+- 验证：`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/data/printTemplates.js` 通过；`cd /Users/simon/projects/trade-erp/web && pnpm test -- src/erp/data/printTemplates.test.js` 通过（7 个测试文件，32/32）。
+- 下一步：请在采购合同模板页复核该行“产品描述”的垂直位置；若仍略偏上/偏下，可继续按 `1-2px` 微调高度或 `top`。
+- 阻塞/风险：产品描述超长（多行）时在固定高度内可能更紧凑，必要时可同步调大该行高度。
+
+## 2026-03-02
+- 完成：新增管理员重置密码能力（后端 `admin.reset_password`）：仅超级管理员可调用，入参 `id + new_password`，禁止重置超级管理员密码（`server/internal/data/jsonrpc.go`、`server/internal/biz/admin_manage.go`、`server/internal/data/admin_manage_repo.go`）。
+- 完成：权限管理页接入“重置密码”丝滑交互：管理员列表新增“重置密码”按钮，弹窗支持新密码/确认密码校验与“一键填充默认密码(123456)”（`web/src/erp/pages/PermissionCenterPage.jsx`）。
+- 完成：抽离重置密码 payload 校验工具（`web/src/erp/utils/adminManage.js`），统一最小长度规则与错误提示；补充前端单测。
+- 完成：补充后端单测（biz + data）：覆盖超级管理员成功重置、目标为超级管理员拒绝、非超级管理员拒绝、密码长度校验与 JSON-RPC 错误码映射（`server/internal/biz/admin_manage_test.go`、`server/internal/data/jsonrpc_admin_test.go`）。
+- 完成：同步更新接口与需求文档（`docs/erp-auth-permission-api.md`、`docs/erp-phase1-requirements.md`）。
+- 验证：`cd /Users/simon/projects/trade-erp/server && go test ./internal/biz -run TestAdminManageUsecase_ResetPassword` 通过；`cd /Users/simon/projects/trade-erp/server && go test ./internal/data -run TestJsonrpcData_AdminResetPassword` 通过；`cd /Users/simon/projects/trade-erp/web && pnpm exec eslint --no-warn-ignored src/erp/pages/PermissionCenterPage.jsx src/erp/utils/adminManage.js src/erp/utils/adminManage.test.js` 通过；`cd /Users/simon/projects/trade-erp/web && pnpm test -- src/erp/utils/adminManage.test.js` 通过（7 个测试文件，35/35）。
+- 下一步：请用超级管理员在 `/system/permissions` 实测“重置密码”弹窗（含默认密码快捷填充）并用目标管理员账号重新登录验证。
+- 阻塞/风险：当前未引入强密码策略（仅最小长度 6 位），如需生产级安全建议后续增加复杂度与密码过期策略。
